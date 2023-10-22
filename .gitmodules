@@ -1,0 +1,4 @@
+[submodule "secret"]
+	path = secret
+	url = git@github.com:Java-and-Script/pickple-back-env.git
+	branch = main

@@ -1,6 +1,8 @@
 ### Custom ###
 .idea
 .env
+src/main/resources/application-dev.yml
+src/main/resources/application-local.yml
 
 ### Intellij ###
 # User-specific stuff

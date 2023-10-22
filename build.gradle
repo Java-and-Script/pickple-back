@@ -37,3 +37,11 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+task copySubmoduleToResources(type: Copy) {
+	copy {
+		from './secret'
+		include "*.yml"
+		into 'src/main/resources'
+	}
+}
