@@ -3,13 +3,10 @@ name: cd-dev
 on:
   push:
     branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
 
 jobs:
   deploy-to-ec2:
     environment: dev
-
     runs-on: ubuntu-latest
 
     steps:
@@ -29,12 +26,6 @@ jobs:
         uses: gradle/gradle-build-action@v2
         with:
           arguments: build
-
-      - name: Docker Emulator Setting
-        uses: docker/setup-qemu-action@v2
-
-      - name: Docker BuildX Setting
-        uses: docker/setup-buildx-action@v2
 
       - name: Container Registry Login
         uses: docker/login-action@v2
