@@ -49,7 +49,6 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.CONTAINER_REGISTRY_IMAGE_TAG }}
-          platforms: linux/arm64
 
       - name: Copy Deployment Files to EC2
         uses: appleboy/scp-action@master
