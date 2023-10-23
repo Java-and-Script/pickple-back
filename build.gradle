@@ -38,10 +38,20 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-task copySubmoduleToResources(type: Copy) {
+task copySubmodule(type: Copy) {
 	copy {
 		from './secret'
-		include "*.yml"
+		include "application-*.yml"
 		into 'src/main/resources'
 	}
+
+	copy {
+		from './secret'
+		include "docker-compose.yml"
+		into 'deploy/dev'
+	}
+}
+
+jar {
+	enabled = false
 }
