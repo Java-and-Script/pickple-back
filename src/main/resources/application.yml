@@ -9,3 +9,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
         query.in_clause_parameter_padding: true
+  # 요청 URI로 리소스를 찾을 수 없는 경우 NoHandlerFoundException 예외 발생 시키기
+  mvc:
+    throw-exception-if-no-handler-found: true
+
+  # ResourceHttpRequestHandler에 대한 매핑 끄기
+  web:
+    resources:
+      add-mappings: false
