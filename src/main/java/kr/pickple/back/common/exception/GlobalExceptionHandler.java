@@ -26,14 +26,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ExceptionResponse> handleNoHandlerFoundException(final NoHandlerFoundException e) {
         log.warn("{}, requestURL: {} ", COMMON_NOT_FOUND.getMessage(), e.getRequestURL(), e);
 
-        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .code(COMMON_NOT_FOUND.getCode())
-                .message(COMMON_NOT_FOUND.getMessage())
-                .rejectedValues(new String[] {e.getRequestURL()})
-                .build();
-
         return ResponseEntity.status(COMMON_NOT_FOUND.getStatus())
-                .body(exceptionResponse);
+                .body(ExceptionResponse.from(COMMON_NOT_FOUND.getCode()));
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
@@ -48,13 +42,8 @@ public class GlobalExceptionHandler {
                 e
         );
 
-        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .code(COMMON_METHOD_NOT_ALLOWED.getCode())
-                .message(COMMON_METHOD_NOT_ALLOWED.getMessage())
-                .build();
-
         return ResponseEntity.status(COMMON_METHOD_NOT_ALLOWED.getStatus())
-                .body(exceptionResponse);
+                .body(ExceptionResponse.from(COMMON_METHOD_NOT_ALLOWED.getCode()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -76,18 +65,8 @@ public class GlobalExceptionHandler {
                 )
         );
 
-        final Object[] rejectedValues = errors.stream()
-                .map(FieldError::getRejectedValue)
-                .toArray();
-
-        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .code(COMMON_BAD_REQUEST.getCode())
-                .message(COMMON_BAD_REQUEST.getMessage())
-                .rejectedValues(rejectedValues)
-                .build();
-
         return ResponseEntity.badRequest()
-                .body(exceptionResponse);
+                .body(ExceptionResponse.from(COMMON_BAD_REQUEST.getCode()));
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
@@ -101,24 +80,14 @@ public class GlobalExceptionHandler {
             final String parsedString = dateTimeParseException.getParsedString();
             log.warn("{}, rejectedValues: {}", COMMON_BAD_REQUEST.getMessage(), parsedString, e);
 
-            final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                    .code(COMMON_BAD_REQUEST.getCode())
-                    .message(COMMON_BAD_REQUEST.getMessage())
-                    .rejectedValues(new String[] {parsedString})
-                    .build();
-
             return ResponseEntity.badRequest()
-                    .body(exceptionResponse);
+                    .body(ExceptionResponse.from(COMMON_BAD_REQUEST.getCode()));
         }
 
         log.warn("{}", COMMON_BAD_REQUEST.getMessage(), e);
-        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .code(COMMON_BAD_REQUEST.getCode())
-                .message(COMMON_BAD_REQUEST.getMessage())
-                .build();
 
         return ResponseEntity.badRequest()
-                .body(exceptionResponse);
+                .body(ExceptionResponse.from(COMMON_BAD_REQUEST.getCode()));
     }
 
     @ExceptionHandler(BusinessException.class)
@@ -128,26 +97,15 @@ public class GlobalExceptionHandler {
 
         log.warn("{}, rejectedValue: {}", exceptionCode.getMessage(), rejectedValues, e);
 
-        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .code(exceptionCode.getCode())
-                .message(exceptionCode.getMessage())
-                .rejectedValues(rejectedValues)
-                .build();
-
         return ResponseEntity.status(exceptionCode.getStatus())
-                .body(exceptionResponse);
+                .body(ExceptionResponse.from(exceptionCode.getCode()));
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(final Exception e) {
         log.error("{}", COMMON_INTERNAL_SERVER_ERROR.getMessage(), e);
-
-        final ExceptionResponse exceptionResponse = ExceptionResponse.builder()
-                .code(COMMON_INTERNAL_SERVER_ERROR.getCode())
-                .message(COMMON_INTERNAL_SERVER_ERROR.getMessage())
-                .build();
-
+        
         return ResponseEntity.internalServerError()
-                .body(exceptionResponse);
+                .body(ExceptionResponse.from(COMMON_INTERNAL_SERVER_ERROR.getCode()));
     }
 }
