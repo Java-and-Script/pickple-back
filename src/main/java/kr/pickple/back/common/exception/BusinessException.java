@@ -3,7 +3,7 @@ package kr.pickple.back.common.exception;
 import lombok.Getter;
 
 @Getter
-public class BusinessException extends RuntimeException {
+abstract class BusinessException extends RuntimeException {
 
     private final ExceptionCode exceptionCode;
     private final Object[] rejectedValues;

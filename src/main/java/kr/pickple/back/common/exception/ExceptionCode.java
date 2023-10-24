@@ -2,7 +2,7 @@ package kr.pickple.back.common.exception;
 
 import org.springframework.http.HttpStatus;
 
-public interface ExceptionCode {
+interface ExceptionCode {
 
     HttpStatus getStatus();
 
