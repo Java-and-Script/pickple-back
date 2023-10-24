@@ -38,7 +38,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ExceptionResponse> handleHttpRequestMethodNotSupportedException(
-            final HttpRequestMethodNotSupportedException e) {
+            final HttpRequestMethodNotSupportedException e
+    ) {
         log.warn(
                 "{}, supportedHttpMethods: {}, requestMethod: {}",
                 COMMON_METHOD_NOT_ALLOWED.getMessage(),
@@ -58,7 +59,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ExceptionResponse> handleMethodArgumentNotValidException(
-            final MethodArgumentNotValidException e) {
+            final MethodArgumentNotValidException e
+    ) {
         final List<FieldError> errors = e.getBindingResult()
                 .getAllErrors()
                 .stream()
@@ -90,7 +92,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ExceptionResponse> handleHttpMessageNotReadableException(
-            final HttpMessageNotReadableException e) {
+            final HttpMessageNotReadableException e
+    ) {
         final Throwable cause = e.getCause().getCause();
 
         // LocalDatetime.parse()가 불가능한 형식으로 datetime 값을 입력받는 경우
