@@ -1,6 +1,6 @@
 package kr.pickple.back.common.exception;
 
-import static kr.pickple.back.common.exception.ExceptionCode.*;
+import static kr.pickple.back.common.exception.CommonExceptionCode.*;
 
 import java.time.format.DateTimeParseException;
 import java.util.List;
