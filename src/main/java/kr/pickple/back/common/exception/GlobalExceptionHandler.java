@@ -104,7 +104,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ExceptionResponse> handleException(final Exception e) {
         log.error("{}", COMMON_INTERNAL_SERVER_ERROR.getMessage(), e);
-        
+
         return ResponseEntity.internalServerError()
                 .body(ExceptionResponse.from(COMMON_INTERNAL_SERVER_ERROR.getCode()));
     }
