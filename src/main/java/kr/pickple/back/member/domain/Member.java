@@ -2,6 +2,7 @@ package kr.pickple.back.member.domain;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -27,19 +28,24 @@ public class Member extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Column(unique = true, length = 100)
     private String email;
 
     @NotNull
+    @Column(unique = true, length = 20)
     private String nickname;
 
     @NotNull
+    @Column(length = 1000)
     private String introduction;
 
     @NotNull
+    @Column(length = 300)
     private String profileImageUrl;
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
+    @Column(length = 10)
     private MemberStatus status;
 
     @NotNull

@@ -4,6 +4,8 @@ import org.hibernate.annotations.ColumnDefault;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -27,9 +29,10 @@ public class Crew extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, length = 20)
     private String name;
 
+    @Column(length = 1000)
     private String content;
 
     @NotNull
@@ -37,10 +40,17 @@ public class Crew extends BaseEntity {
     private Integer memberCount = 1;
 
     @NotNull
+    @Column(length = 300)
     private String profileImageUrl;
 
     @NotNull
+    @Column(length = 300)
     private String backgroundImageUrl;
+
+    @NotNull
+    @Enumerated(value = EnumType.STRING)
+    @Column(length = 10)
+    private CrewStatus status;
 
     @NotNull
     @ColumnDefault(value = "0")

@@ -1,5 +1,6 @@
 package kr.pickple.back.crew.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -26,6 +27,7 @@ public class CrewMemberCandidate extends BaseEntity {
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
+    @Column(length = 10)
     private CandidateStatus status;
 
     @NotNull

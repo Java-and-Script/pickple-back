@@ -5,6 +5,7 @@ import java.time.LocalTime;
 
 import org.hibernate.annotations.ColumnDefault;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,6 +32,7 @@ public class Game extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Column(length = 1000)
     private String content;
 
     @NotNull
@@ -46,18 +48,18 @@ public class Game extends BaseEntity {
     private Integer playTimeMinutes;
 
     @NotNull
+    @Column(length = 50)
     private String mainAddress;
 
     @NotNull
+    @Column(length = 50)
     private String detailAddress;
 
-    @NotNull
     private Double latitude;
-
-    @NotNull
     private Double longitude;
 
     @NotNull
+    @Column(length = 10)
     @Enumerated(value = EnumType.STRING)
     private GameStatus status;
 

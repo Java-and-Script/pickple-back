@@ -13,5 +13,5 @@ public enum CandidateStatus {
     CANCELED("취소"),
     ;
 
-    private final String name;
+    private final String description;
 }
