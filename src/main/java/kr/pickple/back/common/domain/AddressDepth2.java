@@ -18,6 +18,6 @@ public class AddressDepth2 extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, length = 10)
     private String name;
 }

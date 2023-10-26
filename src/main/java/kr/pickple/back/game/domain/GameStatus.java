@@ -12,5 +12,5 @@ public enum GameStatus {
     ENDED("경기 종료"),
     ;
 
-    private final String name;
+    private final String description;
 }

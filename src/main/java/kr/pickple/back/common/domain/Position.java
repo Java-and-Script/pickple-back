@@ -18,13 +18,14 @@ public class Position extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, length = 10)
     private String name;
 
     @NotNull
+    @Column(length = 100)
     private String description;
 
     @NotNull
-    @Column(unique = true)
+    @Column(unique = true, length = 2)
     private String acronym;
 }

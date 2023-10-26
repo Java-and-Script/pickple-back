@@ -1,14 +1,14 @@
-package kr.pickple.back.member.domain;
+package kr.pickple.back.crew.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MemberStatus {
+public enum CrewStatus {
 
-    ACTIVE("활동"),
-    WITHDRAWN("탈퇴"),
+    OPEN("모집 중"),
+    CLOSED("모집 마감"),
     ;
 
     private final String description;
