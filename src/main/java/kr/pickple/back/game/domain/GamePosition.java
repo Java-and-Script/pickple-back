@@ -8,7 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.common.domain.Position;
+import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
