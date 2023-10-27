@@ -2,7 +2,7 @@
 .idea
 deploy
 .env
-src/main/resources/application-*.yml
+src/main/resources/application*.yml
 
 ### Intellij ###
 # User-specific stuff
