@@ -42,7 +42,7 @@ tasks.named('test') {
 task copySubmodule(type: Copy) {
 	copy {
 		from './secret'
-		include "application-*.yml"
+		include "application*.yml"
 		into 'src/main/resources'
 	}
 
