@@ -3,8 +3,6 @@ package kr.pickple.back.game.domain;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -64,19 +62,15 @@ public class Game extends BaseEntity {
     private GameStatus status;
 
     @NotNull
-    @ColumnDefault(value = "0")
     private Integer viewCount = 0;
 
     @NotNull
-    @ColumnDefault(value = "0")
     private Integer cost = 0;
 
     @NotNull
-    @ColumnDefault(value = "1")
     private Integer memberCount = 1;
 
     @NotNull
-    @ColumnDefault(value = "1")
     private Integer maxMemberCount = 1;
 
     @NotNull
