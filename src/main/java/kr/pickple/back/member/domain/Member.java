@@ -1,7 +1,5 @@
 package kr.pickple.back.member.domain;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -49,11 +47,9 @@ public class Member extends BaseEntity {
     private MemberStatus status;
 
     @NotNull
-    @ColumnDefault(value = "0")
     private Integer mannerScore = 0;
 
     @NotNull
-    @ColumnDefault(value = "0")
     private Integer mannerScoreCount = 0;
 
     @NotNull

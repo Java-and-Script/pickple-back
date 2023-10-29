@@ -1,7 +1,5 @@
 package kr.pickple.back.crew.domain;
 
-import org.hibernate.annotations.ColumnDefault;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,7 +34,6 @@ public class Crew extends BaseEntity {
     private String content;
 
     @NotNull
-    @ColumnDefault(value = "1")
     private Integer memberCount = 1;
 
     @NotNull
@@ -53,15 +50,12 @@ public class Crew extends BaseEntity {
     private CrewStatus status;
 
     @NotNull
-    @ColumnDefault(value = "0")
     private Integer likeCount = 0;
 
     @NotNull
-    @ColumnDefault(value = "1")
     private Integer maxMemberCount = 1;
 
     @NotNull
-    @ColumnDefault(value = "0")
     private Integer competitionPoint = 0;
 
     @NotNull

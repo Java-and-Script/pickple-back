@@ -1,32 +1,21 @@
 package kr.pickple.back.position.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.common.domain.BaseEntity;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Position extends BaseEntity {
+@Getter
+@RequiredArgsConstructor
+public enum Position {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    CENTER("센터", "C", "팀의 공격과 수비에서 중추적인 역할"),
+    POWER_FORWARD("파워 포워드", "PF", "득점, 리바운드, 수비에서의 강인한 플레이를 담당하는 역할"),
+    SMALL_FORWARD("스몰 포워드", "SF", "공격과 수비 양면에서 다재다능한 역할"),
+    POINT_GUARD("포인트 가드", "PG", "공격 조직과 전술적인 플레이를 주도하는 주장 역할"),
+    SHOOTING_GUARD("슈팅 가드", "SG", "주로 3점슛을 통해 팀의 주요 득점 옵션을 담당하는 역할"),
+    EMPTY("포지션 없음", "없음", "포지션을 별도로 선택하지 않음"),
+    ;
 
-    @NotNull
-    @Column(unique = true, length = 10)
-    private String name;
-
-    @NotNull
-    @Column(length = 100)
-    private String description;
-
-    @NotNull
-    @Column(unique = true, length = 2)
-    private String acronym;
+    private final String name;
+    private final String acronym;
+    private final String description;
 }
