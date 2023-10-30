@@ -80,11 +80,11 @@ public class Game extends BaseEntity {
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth_1_id")
+    @JoinColumn(name = "address_depth1_id")
     private AddressDepth1 addressDepth1;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth_2_id")
+    @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 }
