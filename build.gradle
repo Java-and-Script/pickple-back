@@ -25,10 +25,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
 	runtimeOnly 'com.h2database:h2'
 	runtimeOnly 'com.mysql:mysql-connector-j'
@@ -38,6 +42,10 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.named('compileJava') {
+    inputs.files(tasks.named('processResources'))
 }
 
 task copySubmodule(type: Copy) {
