@@ -33,7 +33,7 @@ public class OAuthController {
     @GetMapping("/login/{oAuthProvider}")
     public void login(
             @PathVariable final OAuthProvider oAuthProvider,
-            @RequestParam("authCode") final String authCode
+            @RequestParam final String authCode
     ) {
         oAuthService.processLoginOrRegistration(oAuthProvider, authCode);
     }
