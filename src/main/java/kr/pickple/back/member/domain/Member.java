@@ -13,11 +13,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
 
@@ -33,7 +35,6 @@ public class Member extends BaseEntity {
     @Column(unique = true, length = 20)
     private String nickname;
 
-    @NotNull
     @Column(length = 1000)
     private String introduction;
 
@@ -53,6 +54,14 @@ public class Member extends BaseEntity {
     private Integer mannerScoreCount = 0;
 
     @NotNull
+    @Column(unique = true)
+    private Long oauthId;
+
+    @NotNull
+    @Enumerated(value = EnumType.STRING)
+    private OAuthProvider oauthProvider;
+
+    @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_depth1_id")
     private AddressDepth1 addressDepth1;
@@ -61,4 +70,25 @@ public class Member extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
+
+    @Builder
+    private Member(
+            final String email,
+            final String nickname,
+            final String profileImageUrl,
+            final MemberStatus status,
+            final Long oauthId,
+            final OAuthProvider oauthProvider,
+            final AddressDepth1 addressDepth1,
+            final AddressDepth2 addressDepth2
+    ) {
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.status = status;
+        this.oauthId = oauthId;
+        this.oauthProvider = oauthProvider;
+        this.addressDepth1 = addressDepth1;
+        this.addressDepth2 = addressDepth2;
+    }
 }
