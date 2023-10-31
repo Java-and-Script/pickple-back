@@ -45,12 +45,12 @@ public enum Position {
     public static final class PositionConverter implements AttributeConverter<Position, String> {
 
         @Override
-        public String convertToDatabaseColumn(Position position) {
+        public String convertToDatabaseColumn(final Position position) {
             return position.getAcronym();
         }
 
         @Override
-        public Position convertToEntityAttribute(String acronym) {
+        public Position convertToEntityAttribute(final String acronym) {
             return Position.from(acronym);
         }
     }
