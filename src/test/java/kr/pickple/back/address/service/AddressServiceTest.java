@@ -39,7 +39,7 @@ class AddressServiceTest {
                 addressDepth2Name);
 
         //then
-        assertThat(mainAddressResponse.getAddressDepth1Name()).isEqualTo(addressDepth1Name);
-        assertThat(mainAddressResponse.getAddressDepth2Name()).isEqualTo(addressDepth2Name);
+        assertThat(mainAddressResponse.getAddressDepth1().getName()).isEqualTo(addressDepth1Name);
+        assertThat(mainAddressResponse.getAddressDepth2().getName()).isEqualTo(addressDepth2Name);
     }
 }

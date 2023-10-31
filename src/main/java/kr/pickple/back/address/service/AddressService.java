@@ -45,11 +45,11 @@ public class AddressService {
 
         final AddressDepth2 addressDepth2 = addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2Name,
                         addressDepth1)
-                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1.getName(), addressDepth2Name));
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name, addressDepth2Name));
 
         return MainAddressResponse.builder()
-                .addressDepth1Name(addressDepth1.getName())
-                .addressDepth2Name(addressDepth2.getName())
+                .addressDepth1(addressDepth1)
+                .addressDepth2(addressDepth2)
                 .build();
     }
 }
