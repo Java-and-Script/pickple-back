@@ -1,12 +1,9 @@
 package kr.pickple.back.position.dto;
 
 import kr.pickple.back.position.domain.Position;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PositionResponse {
 
     private String name;
