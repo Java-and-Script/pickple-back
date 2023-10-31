@@ -15,24 +15,24 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import kr.pickple.back.auth.config.property.JwtConfig;
+import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.exception.AuthException;
 
 @Component
 public class JwtProvider {
 
-    private final JwtConfig jwtConfig;
+    private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
 
-    public JwtProvider(JwtConfig jwtConfig) {
-        this.jwtConfig = jwtConfig;
-        byte[] keyBytes = Decoders.BASE64.decode(jwtConfig.getSecretKey());
+    public JwtProvider(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
+        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
     public AuthTokens createLoginToken(final String subject) {
-        final String accessToken = generateToken(subject, jwtConfig.getAccessTokenExpirationTime());
-        final String refreshToken = generateToken("", jwtConfig.getRefreshTokenExpirationTime());
+        final String accessToken = generateToken(subject, jwtProperties.getAccessTokenExpirationTime());
+        final String refreshToken = generateToken("", jwtProperties.getRefreshTokenExpirationTime());
 
         return AuthTokens.builder()
                 .accessToken(accessToken)
@@ -41,7 +41,7 @@ public class JwtProvider {
     }
 
     public String createRegisterToken(final String subject) {
-        return generateToken(subject, jwtConfig.getRegisterTokenExpirationTime());
+        return generateToken(subject, jwtProperties.getRegisterTokenExpirationTime());
     }
 
     private String generateToken(final String subject, final Long expirationTime) {
@@ -57,7 +57,7 @@ public class JwtProvider {
     }
 
     public String regenerateAccessToken(final String subject) {
-        return generateToken(subject, jwtConfig.getAccessTokenExpirationTime());
+        return generateToken(subject, jwtProperties.getAccessTokenExpirationTime());
     }
 
     public String getSubject(final String token) {
