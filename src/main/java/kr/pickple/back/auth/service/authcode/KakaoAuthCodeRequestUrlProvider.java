@@ -3,7 +3,7 @@ package kr.pickple.back.auth.service.authcode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import kr.pickple.back.auth.config.property.KakaoOAuthConfig;
+import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import lombok.RequiredArgsConstructor;
 
@@ -11,7 +11,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KakaoAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvider {
 
-    private final KakaoOAuthConfig kakaoOAuthConfig;
+    private final KakaoOAuthProperties kakaoOAuthProperties;
 
     @Override
     public OAuthProvider oAuthProvider() {
@@ -21,11 +21,11 @@ public class KakaoAuthCodeRequestUrlProvider implements AuthCodeRequestUrlProvid
     @Override
     public String provideUrl() {
         return UriComponentsBuilder
-                .fromUriString(kakaoOAuthConfig.getProviderUrl())
+                .fromUriString(kakaoOAuthProperties.getProviderUrl())
                 .queryParam("response_type", "code")
-                .queryParam("client_id", kakaoOAuthConfig.getClientId())
-                .queryParam("redirect_uri", kakaoOAuthConfig.getRedirectUrl())
-                .queryParam("scope", String.join(",", kakaoOAuthConfig.getScope()))
+                .queryParam("client_id", kakaoOAuthProperties.getClientId())
+                .queryParam("redirect_uri", kakaoOAuthProperties.getRedirectUrl())
+                .queryParam("scope", String.join(",", kakaoOAuthProperties.getScope()))
                 .toUriString();
     }
 }
