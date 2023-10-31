@@ -4,7 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import kr.pickple.back.auth.config.property.KakaoOAuthConfig;
+import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
 import kr.pickple.back.auth.domain.oauth.OAuthMember;
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import kr.pickple.back.auth.dto.kakao.KakaoTokenResponse;
@@ -16,7 +16,7 @@ public class KakaoMemberClient implements OAuthMemberClient {
 
     private final KakaoAuthApiClient kakaoAuthApiClient;
     private final KakaoMemberApiClient kakaoMemberApiClient;
-    private final KakaoOAuthConfig kakaoOauthConfig;
+    private final KakaoOAuthProperties kakaoOauthProperties;
 
     @Override
     public OAuthProvider oAuthProvider() {
@@ -33,10 +33,10 @@ public class KakaoMemberClient implements OAuthMemberClient {
     private MultiValueMap<String, String> tokenRequestParams(final String authCode) {
         final MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
-        params.add("client_id", kakaoOauthConfig.getClientId());
-        params.add("redirect_uri", kakaoOauthConfig.getRedirectUrl());
+        params.add("client_id", kakaoOauthProperties.getClientId());
+        params.add("redirect_uri", kakaoOauthProperties.getRedirectUrl());
         params.add("code", authCode);
-        params.add("client_secret", kakaoOauthConfig.getClientSecret());
+        params.add("client_secret", kakaoOauthProperties.getClientSecret());
 
         return params;
     }

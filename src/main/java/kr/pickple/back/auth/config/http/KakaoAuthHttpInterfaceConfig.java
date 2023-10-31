@@ -1,4 +1,4 @@
-package kr.pickple.back.auth.config;
+package kr.pickple.back.auth.config.http;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.MediaType.*;
@@ -9,7 +9,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.support.WebClientAdapter;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-import kr.pickple.back.auth.config.property.KakaoOAuthConfig;
+import kr.pickple.back.auth.config.WebClientConfig;
+import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
 import kr.pickple.back.auth.service.memberclient.KakaoAuthApiClient;
 import lombok.RequiredArgsConstructor;
 
@@ -17,8 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KakaoAuthHttpInterfaceConfig {
 
-    private final KakaoOAuthConfig kakaoOauthConfig;
-    private final WebClientConfig webClientConfig;
+    private final KakaoOAuthProperties kakaoOauthProperties;
 
     @Bean
     public KakaoAuthApiClient kakaoAuthApiClient() {
@@ -28,8 +28,8 @@ public class KakaoAuthHttpInterfaceConfig {
     private <T> T createHttpInterface(final Class<T> clazz) {
         final WebClient webClient = WebClient.builder()
                 .defaultHeader(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-                .baseUrl(kakaoOauthConfig.getAuthUrl())
-                .exchangeStrategies(webClientConfig.getExchangeStrategies())
+                .baseUrl(kakaoOauthProperties.getAuthUrl())
+                .exchangeStrategies(WebClientConfig.getExchangeStrategies())
                 .build();
         final HttpServiceProxyFactory build = HttpServiceProxyFactory
                 .builder(WebClientAdapter.forClient(webClient))

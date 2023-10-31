@@ -3,11 +3,11 @@ package kr.pickple.back.auth.config;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
-import kr.pickple.back.auth.config.property.CorsConfig;
-import kr.pickple.back.auth.config.property.KakaoOAuthConfig;
+import kr.pickple.back.auth.config.property.CorsProperties;
+import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
 
 @Configuration
-@EnableConfigurationProperties(value = {KakaoOAuthConfig.class, CorsConfig.class})
+@EnableConfigurationProperties(value = {KakaoOAuthProperties.class, CorsProperties.class})
 public class AuthConfig {
 
 }

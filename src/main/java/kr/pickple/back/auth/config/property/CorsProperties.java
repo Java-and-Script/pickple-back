@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "cors")
-public class CorsConfig {
+public class CorsProperties {
 
     private final String url;
 }
