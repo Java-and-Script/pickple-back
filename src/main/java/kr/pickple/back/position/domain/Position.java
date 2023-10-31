@@ -32,6 +32,13 @@ public enum Position {
     private static final Map<String, Position> positionMap = Collections.unmodifiableMap(Stream.of(values())
             .collect(Collectors.toMap(Position::getAcronym, Function.identity())));
 
+    private final String name;
+
+    @JsonValue
+    private final String acronym;
+
+    private final String description;
+
     @JsonCreator
     public static Position from(final String positionAcronym) {
         if (positionMap.containsKey(positionAcronym)) {
@@ -54,11 +61,4 @@ public enum Position {
             return Position.from(acronym);
         }
     }
-
-    private final String name;
-
-    @JsonValue
-    private final String acronym;
-
-    private final String description;
 }
