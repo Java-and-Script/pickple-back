@@ -1,5 +1,19 @@
 package kr.pickple.back.position.domain;
 
+import static kr.pickple.back.position.exception.PositionExceptionCode.*;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
+import kr.pickple.back.position.exception.PositionException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -14,6 +28,32 @@ public enum Position {
     SHOOTING_GUARD("슈팅 가드", "SG", "주로 3점슛을 통해 팀의 주요 득점 옵션을 담당하는 역할"),
     EMPTY("포지션 없음", "없음", "포지션을 별도로 선택하지 않음"),
     ;
+
+    private static final Map<String, Position> positionMap = Collections.unmodifiableMap(Stream.of(values())
+            .collect(Collectors.toMap(Position::getAcronym, Function.identity())));
+
+    @JsonCreator
+    public static Position from(final String positionAcronym) {
+        if (positionMap.containsKey(positionAcronym)) {
+            return positionMap.get(positionAcronym);
+        }
+
+        throw new PositionException(POSITION_NOT_FOUND, positionAcronym);
+    }
+
+    @Converter
+    public static final class PositionConverter implements AttributeConverter<Position, String> {
+
+        @Override
+        public String convertToDatabaseColumn(Position position) {
+            return position.getAcronym();
+        }
+
+        @Override
+        public Position convertToEntityAttribute(String acronym) {
+            return Position.from(acronym);
+        }
+    }
 
     private final String name;
 
