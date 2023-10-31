@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class KakaoAuthHttpInterfaceConfig {
 
     private final KakaoOAuthConfig kakaoOauthConfig;
+    private final WebClientConfig webClientConfig;
 
     @Bean
     public KakaoAuthApiClient kakaoAuthApiClient() {
@@ -28,6 +29,7 @@ public class KakaoAuthHttpInterfaceConfig {
         final WebClient webClient = WebClient.builder()
                 .defaultHeader(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
                 .baseUrl(kakaoOauthConfig.getAuthUrl())
+                .exchangeStrategies(webClientConfig.getExchangeStrategies())
                 .build();
         final HttpServiceProxyFactory build = HttpServiceProxyFactory
                 .builder(WebClientAdapter.forClient(webClient))
