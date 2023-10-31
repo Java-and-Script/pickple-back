@@ -44,21 +44,6 @@ public class JwtProvider {
         return generateToken(subject, jwtConfig.getRegisterTokenExpirationTime());
     }
 
-    public void validateTokens(final AuthTokens authTokens) {
-        validateAccessToken(authTokens.getAccessToken());
-        validateRefreshToken(authTokens.getRefreshToken());
-    }
-
-    public void validateRegisterToken(final String registerToken) {
-        try {
-            parseToken(registerToken);
-        } catch (final ExpiredJwtException e) {
-            throw new AuthException(AUTH_EXPIRED_REGISTER_TOKEN, registerToken);
-        } catch (final JwtException | IllegalArgumentException e) {
-            throw new AuthException(AUTH_INVALID_REGISTER_TOKEN, registerToken);
-        }
-    }
-
     private String generateToken(final String subject, final Long expirationTime) {
         final Date now = new Date();
 
@@ -69,6 +54,10 @@ public class JwtProvider {
                 .expiration(new Date(now.getTime() + expirationTime))
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public String regenerateAccessToken(final String subject) {
+        return generateToken(subject, jwtConfig.getAccessTokenExpirationTime());
     }
 
     public String getSubject(final String token) {
@@ -83,6 +72,11 @@ public class JwtProvider {
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token);
+    }
+
+    public void validateTokens(final AuthTokens authTokens) {
+        validateAccessToken(authTokens.getAccessToken());
+        validateRefreshToken(authTokens.getRefreshToken());
     }
 
     private void validateAccessToken(final String accessToken) {
@@ -105,6 +99,16 @@ public class JwtProvider {
         }
     }
 
+    public void validateRegisterToken(final String registerToken) {
+        try {
+            parseToken(registerToken);
+        } catch (final ExpiredJwtException e) {
+            throw new AuthException(AUTH_EXPIRED_REGISTER_TOKEN, registerToken);
+        } catch (final JwtException | IllegalArgumentException e) {
+            throw new AuthException(AUTH_INVALID_REGISTER_TOKEN, registerToken);
+        }
+    }
+
     public boolean isValidRefreshAndInvalidAccess(final String refreshToken, final String accessToken) {
         validateRefreshToken(refreshToken);
         try {
@@ -113,10 +117,6 @@ public class JwtProvider {
             return true;
         }
         return false;
-    }
-
-    public String regenerateAccessToken(final String subject) {
-        return generateToken(subject, jwtConfig.getAccessTokenExpirationTime());
     }
 
     public boolean isValidRefreshAndValidAccess(final String refreshToken, final String accessToken) {
