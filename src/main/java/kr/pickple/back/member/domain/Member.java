@@ -1,6 +1,7 @@
 package kr.pickple.back.member.domain;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -15,6 +16,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.member.domain.MemberStatus.MemberStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -45,7 +47,7 @@ public class Member extends BaseEntity {
     private String profileImageUrl;
 
     @NotNull
-    @Enumerated(value = EnumType.STRING)
+    @Convert(converter = MemberStatusConverter.class)
     @Column(length = 10)
     private MemberStatus status;
 
