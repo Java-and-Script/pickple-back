@@ -14,7 +14,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KakaoMemberClient implements OAuthMemberClient {
 
-    private final KakaoApiClient kakaoApiClient;
+    private final KakaoAuthApiClient kakaoAuthApiClient;
+    private final KakaoMemberApiClient kakaoMemberApiClient;
     private final KakaoOAuthConfig kakaoOauthConfig;
 
     @Override
@@ -24,9 +25,9 @@ public class KakaoMemberClient implements OAuthMemberClient {
 
     @Override
     public OAuthMember fetch(final String authCode) {
-        final KakaoTokenResponse tokenInfo = kakaoApiClient.fetchToken(tokenRequestParams(authCode));
+        final KakaoTokenResponse tokenInfo = kakaoAuthApiClient.fetchToken(tokenRequestParams(authCode));
 
-        return kakaoApiClient.fetchMember("Bearer " + tokenInfo.getAccessToken()).toOAuthMember();
+        return kakaoMemberApiClient.fetchMember("Bearer " + tokenInfo.getAccessToken()).toOAuthMember();
     }
 
     private MultiValueMap<String, String> tokenRequestParams(final String authCode) {
