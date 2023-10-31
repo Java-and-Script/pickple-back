@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "jwt")
-public class JwtConfig {
+public class JwtProperties {
 
     private final String secretKey;
     private final Long accessTokenExpirationTime;
