@@ -2,11 +2,6 @@ package kr.pickple.back.auth.dto.kakao;
 
 import static lombok.AccessLevel.*;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.databind.PropertyNamingStrategies.SnakeCaseStrategy;
-import com.fasterxml.jackson.databind.annotation.JsonNaming;
-
 import kr.pickple.back.auth.domain.oauth.OAuthMember;
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import lombok.Getter;
@@ -14,16 +9,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = PRIVATE)
-@JsonNaming(SnakeCaseStrategy.class)
 public class KakaoMemberResponse {
 
     private Long id;
-    private LocalDateTime connectedAt;
     private KakaoAccount kakaoAccount;
 
     @Getter
     @NoArgsConstructor(access = PRIVATE)
-    @JsonNaming(SnakeCaseStrategy.class)
     static class KakaoAccount {
 
         private String email;
@@ -32,7 +24,6 @@ public class KakaoMemberResponse {
 
     @Getter
     @NoArgsConstructor(access = PRIVATE)
-    @JsonNaming(SnakeCaseStrategy.class)
     static class Profile {
 
         private String nickname;

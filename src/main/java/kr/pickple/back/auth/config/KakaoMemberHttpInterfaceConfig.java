@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 public class KakaoMemberHttpInterfaceConfig {
 
     private final KakaoOAuthConfig kakaoOauthConfig;
+    private final WebClientConfig webClientConfig;
 
     @Bean
     public KakaoMemberApiClient kakaoMemberApiClient() {
@@ -24,6 +25,7 @@ public class KakaoMemberHttpInterfaceConfig {
     private <T> T createHttpInterface(final Class<T> clazz) {
         final WebClient webClient = WebClient.builder()
                 .baseUrl(kakaoOauthConfig.getMemberUrl())
+                .exchangeStrategies(webClientConfig.getExchangeStrategies())
                 .build();
         final HttpServiceProxyFactory build = HttpServiceProxyFactory
                 .builder(WebClientAdapter.forClient(webClient))
