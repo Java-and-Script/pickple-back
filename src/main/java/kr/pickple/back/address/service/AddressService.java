@@ -25,10 +25,10 @@ public class AddressService {
     private final AddressDepth2Repository addressDepth2Repository;
 
     public AllAddressResponse findAllAddress() {
-        AddressDepth1 addressDepth1 = addressDepth1Repository.findAll()
+        final AddressDepth1 addressDepth1 = addressDepth1Repository.findAll()
                 .get(0);
 
-        List<String> addressDepth2List = addressDepth2Repository.findByAddressDepth1(addressDepth1)
+        final List<String> addressDepth2List = addressDepth2Repository.findByAddressDepth1(addressDepth1)
                 .stream()
                 .map(AddressDepth2::getName)
                 .toList();
@@ -40,10 +40,10 @@ public class AddressService {
     }
 
     public MainAddressResponse findMainAddressByNames(final String addressDepth1Name, final String addressDepth2Name) {
-        AddressDepth1 addressDepth1 = addressDepth1Repository.findByName(addressDepth1Name)
+        final AddressDepth1 addressDepth1 = addressDepth1Repository.findByName(addressDepth1Name)
                 .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name));
 
-        AddressDepth2 addressDepth2 = addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2Name,
+        final AddressDepth2 addressDepth2 = addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2Name,
                         addressDepth1)
                 .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1.getName(), addressDepth2Name));
 
