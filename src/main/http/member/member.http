@@ -1,0 +1,14 @@
+### 회원 생성
+POST http://localhost:8080/members
+Content-Type: application/json
+
+{
+	"email":"changhyeon.h@kakao.com",
+	"nickname":"창현",
+	"profileImageUrl":"http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg",
+	"positions":["SG"],
+	"addressDepth1":"서울시",
+	"addressDepth2":"영등포구",
+	"oauthId": 32014123,
+	"oauthProvider": "KAKAO"
+}
