@@ -16,6 +16,9 @@ public enum Position {
     ;
 
     private final String name;
+
+    @JsonValue
     private final String acronym;
+
     private final String description;
 }
