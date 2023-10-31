@@ -2,6 +2,9 @@ package kr.pickple.back.member.dto;
 
 import java.util.List;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import kr.pickple.back.member.domain.Member;
@@ -14,13 +17,29 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberCreateRequest {
 
+    @NotBlank(message = "닉네임은 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private String nickname;
+
+    @NotBlank(message = "프로필 이미지 URL은 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private String profileImageUrl;
+
+    @NotBlank(message = "이메일은 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private String email;
+
+    @NotNull(message = "포지션은 값이 없을 수 없음")
     private List<String> positions;
+
+    @NotNull(message = "oauth id는 값이 없을 수 없음")
+    @Positive(message = "oauth id는 값이 없거나 양수일 수 없음")
     private Long oauthId;
+
+    @NotNull(message = "oauth 제공자는 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private OAuthProvider oauthProvider;
+
+    @NotBlank(message = "주소1은 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private String addressDepth1;
+
+    @NotBlank(message = "주소2는 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private String addressDepth2;
 
     public Member toEntity(MainAddressResponse mainAddressResponse) {
