@@ -15,6 +15,7 @@ import kr.pickple.back.position.domain.Position;
 import kr.pickple.back.position.util.PositionStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -25,6 +26,7 @@ public class MemberPosition extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @NotNull
     @Convert(converter = PositionStatusConverter.class)
     @Column(length = 2)

@@ -12,3 +12,6 @@ Content-Type: application/json
 	"oauthId": 32014123,
 	"oauthProvider": "KAKAO"
 }
+
+### 사용자 프로필 조회
+GET http://localhost:8080/members/1

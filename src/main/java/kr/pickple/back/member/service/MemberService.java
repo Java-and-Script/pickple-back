@@ -13,6 +13,7 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
+import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
@@ -62,5 +63,17 @@ public class MemberService {
         if (memberRepository.existsByEmailOrNicknameOrOauthId(email, nickname, oauthId)) {
             throw new MemberException(MEMBER_IS_EXISTED, email, nickname, oauthId);
         }
+    }
+
+    public MemberProfileResponse findMemberProfileById(final Long memberId) {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+
+        final List<Position> positions = memberPositionRepository.findAllByMember(member)
+                .stream()
+                .map(MemberPosition::getPosition)
+                .toList();
+
+        return MemberProfileResponse.of(member, positions);
     }
 }
