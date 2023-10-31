@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.service.MemberService;
@@ -22,7 +23,7 @@ public class MemberController {
 
     @PostMapping
     public ResponseEntity<AuthenticatedMemberResponse> createMember(
-            @RequestBody MemberCreateRequest memberCreateRequest
+            @Valid @RequestBody MemberCreateRequest memberCreateRequest
     ) {
         return ResponseEntity.status(CREATED)
                 .body(memberService.createMember(memberCreateRequest));
