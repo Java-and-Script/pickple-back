@@ -6,15 +6,21 @@ import org.springframework.http.HttpMethod;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import kr.pickple.back.auth.config.property.CorsConfig;
 import kr.pickple.back.auth.util.OAuthProviderConverter;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
+    private final CorsConfig corsConfig;
 
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
+
         registry.addMapping("/**")
-                .allowedOrigins("http://pickple.kr")
+                .allowedOrigins(corsConfig.getUrl())
                 .allowedMethods(
                         HttpMethod.GET.name(),
                         HttpMethod.POST.name(),
