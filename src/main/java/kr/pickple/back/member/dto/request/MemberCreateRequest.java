@@ -1,4 +1,4 @@
-package kr.pickple.back.member.dto;
+package kr.pickple.back.member.dto.request;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ public class MemberCreateRequest {
     @NotBlank(message = "주소2는 값이 없거나, 공백이거나, 빈칸일 수 없음")
     private String addressDepth2;
 
-    public Member toEntity(MainAddressResponse mainAddressResponse) {
+    public Member toEntity(final MainAddressResponse mainAddressResponse) {
         return Member.builder()
                 .email(email)
                 .nickname(nickname)

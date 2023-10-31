@@ -1,4 +1,4 @@
-package kr.pickple.back.member.dto;
+package kr.pickple.back.member.dto.response;
 
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import kr.pickple.back.member.domain.Member;

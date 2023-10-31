@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import kr.pickple.back.member.dto.AuthenticatedMemberResponse;
-import kr.pickple.back.member.dto.MemberCreateRequest;
+import kr.pickple.back.member.dto.request.MemberCreateRequest;
+import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 

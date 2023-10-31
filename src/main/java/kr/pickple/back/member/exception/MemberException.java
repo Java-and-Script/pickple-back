@@ -5,7 +5,7 @@ import kr.pickple.back.common.exception.ExceptionCode;
 
 public class MemberException extends BusinessException {
 
-    public MemberException(ExceptionCode exceptionCode, Object... rejectedValues) {
+    public MemberException(final ExceptionCode exceptionCode, final Object... rejectedValues) {
         super(exceptionCode, rejectedValues);
     }
 }
