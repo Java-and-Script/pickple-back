@@ -46,6 +46,7 @@ public class MemberService {
 
         final List<MemberPosition> positions = memberCreateRequest.getPositions()
                 .stream()
+                .distinct()
                 .map(position -> MemberPosition.builder()
                         .position(Position.from(position))
                         .member(savedMember)
