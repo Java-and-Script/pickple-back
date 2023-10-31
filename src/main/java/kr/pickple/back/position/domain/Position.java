@@ -11,8 +11,6 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
 import kr.pickple.back.position.exception.PositionException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -48,17 +46,4 @@ public enum Position {
         throw new PositionException(POSITION_NOT_FOUND, positionAcronym);
     }
 
-    @Converter
-    public static final class PositionConverter implements AttributeConverter<Position, String> {
-
-        @Override
-        public String convertToDatabaseColumn(final Position position) {
-            return position.getAcronym();
-        }
-
-        @Override
-        public Position convertToEntityAttribute(final String acronym) {
-            return Position.from(acronym);
-        }
-    }
 }

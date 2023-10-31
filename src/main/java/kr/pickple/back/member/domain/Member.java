@@ -16,7 +16,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OAuthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.member.domain.MemberStatus.MemberStatusConverter;
+import kr.pickple.back.member.util.MemberStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
