@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -18,5 +19,6 @@ public class RefreshToken {
     private String token;
 
     @NotNull
+    @Getter
     private Long memberId;
 }
