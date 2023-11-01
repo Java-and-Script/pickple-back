@@ -12,7 +12,8 @@ import kr.pickple.back.position.dto.PositionResponse;
 public class PositionService {
 
     public List<PositionResponse> findAllPositions() {
-        final List<Position> positions = Arrays.stream(Position.values()).toList();
+        final List<Position> positions = Arrays.stream(Position.values())
+                .toList();
 
         return positions.stream()
                 .map(PositionResponse::from)
