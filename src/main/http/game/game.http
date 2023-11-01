@@ -1,0 +1,19 @@
+### 게임 생성
+POST http://localhost:8080/games
+Content-Type: application/json
+
+{
+  "content": "재밌는 농구 경기 해요~! 다 초보입니다",
+  "playDate": "2023-02-01",
+  "playStartTime": "11:30",
+  "playTimeMinutes": 90,
+  "mainAddress": "서울 영등포구 도림동 254",
+  "detailAddress": "영등포 다목적 체육관 2층 201호",
+  "cost": 100,
+  "maxMemberCount": "5",
+  "positions": [
+    "C",
+    "PG"
+  ],
+  "hostId": 1
+}
