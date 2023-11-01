@@ -1,5 +1,7 @@
 package kr.pickple.back.crew.domain;
 
+import static kr.pickple.back.crew.domain.CrewStatus.*;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,8 +18,11 @@ import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Crew extends BaseEntity {
@@ -47,7 +52,7 @@ public class Crew extends BaseEntity {
     @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(length = 10)
-    private CrewStatus status;
+    private CrewStatus status = OPEN;
 
     @NotNull
     private Integer likeCount = 0;
@@ -72,4 +77,45 @@ public class Crew extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
+
+    @Builder
+    private Crew(
+            final String name,
+            final String content,
+            final Integer memberCount,
+            final String profileImageUrl,
+            final String backgroundImageUrl,
+            final CrewStatus status,
+            final Integer likeCount,
+            final Integer maxMemberCount,
+            final Integer competitionPoint,
+            final Member leader,
+            final AddressDepth1 addressDepth1,
+            final AddressDepth2 addressDepth2
+    ) {
+        this.name = name;
+        this.content = content;
+        this.profileImageUrl = profileImageUrl;
+        this.backgroundImageUrl = backgroundImageUrl;
+        this.status = validateCrewStatus(maxMemberCount);
+        this.maxMemberCount = maxMemberCount;
+        this.leader = leader;
+        this.addressDepth1 = addressDepth1;
+        this.addressDepth2 = addressDepth2;
+    }
+
+    public CrewStatus validateCrewStatus(Integer maxMemberCount) {
+        if (maxMemberCount == 1) {
+            status = CLOSED;
+        }
+        return this.status;
+    }
+
+    public void addCrewDefaultProfileImage(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
+    public void addCrewDefaultBackgroundImage(String backgroundImageUrl) {
+        this.backgroundImageUrl = backgroundImageUrl;
+    }
 }
