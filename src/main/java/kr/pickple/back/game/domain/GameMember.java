@@ -15,6 +15,7 @@ import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -39,4 +40,11 @@ public class GameMember extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
     private Game game;
+
+    @Builder
+    private GameMember(final RegistrationStatus status, final Member member, final Game game) {
+        this.status = status;
+        this.member = member;
+        this.game = game;
+    }
 }
