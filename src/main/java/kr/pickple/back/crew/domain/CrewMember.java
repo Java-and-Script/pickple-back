@@ -1,5 +1,7 @@
 package kr.pickple.back.crew.domain;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -15,8 +17,11 @@ import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewMember extends BaseEntity {
@@ -28,7 +33,7 @@ public class CrewMember extends BaseEntity {
     @NotNull
     @Enumerated(value = EnumType.STRING)
     @Column(length = 10)
-    private RegistrationStatus status;
+    private RegistrationStatus status = WAITING;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,4 +44,15 @@ public class CrewMember extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crew_id")
     private Crew crew;
+
+    @Builder
+    private CrewMember(
+            final Long id,
+            final RegistrationStatus status,
+            final Member member,
+            final Crew crew
+    ) {
+        this.member = member;
+        this.crew = crew;
+    }
 }
