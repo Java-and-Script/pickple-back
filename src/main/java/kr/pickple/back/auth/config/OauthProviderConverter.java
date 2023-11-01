@@ -1,4 +1,4 @@
-package kr.pickple.back.auth.util;
+package kr.pickple.back.auth.config;
 
 import org.springframework.core.convert.converter.Converter;
 
