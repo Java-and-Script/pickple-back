@@ -18,7 +18,7 @@ public enum AuthExceptionCode implements ExceptionCode {
     AUTH_INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "AUT-006", "유효하지 않은 RefreshToken"),
     AUTH_INVALID_REGISTER_TOKEN(HttpStatus.BAD_REQUEST, "AUT-007", "유효하지 않은 RegisterToken"),
     AUTH_NOT_FOUND_REFRESH_TOKEN(HttpStatus.NOT_FOUND, "AUT-008", "RefreshToken이 존재하지 않음"),
-    ;
+    AUTH_FAIL_TO_VALIDATE_TOKEN(HttpStatus.BAD_REQUEST, "AUT-009", "토큰을 검증할 수 없음");
 
     private final HttpStatus status;
     private final String code;
