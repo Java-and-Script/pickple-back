@@ -23,3 +23,8 @@ jwt:
   access-token-expiration-time: 1230000
   refresh-token-expiration-time: 1429600
   register-token-expiration-time: 300000
+
+s3:
+  default:
+    profile: https://test.com/crew_profile_default.jpeg
+    background: https://test.com/crew_background_default.jpeg
