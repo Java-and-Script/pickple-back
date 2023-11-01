@@ -3,6 +3,7 @@ package kr.pickple.back.auth.service;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.auth.domain.oauth.OauthMember;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class OauthService {
 
     private final MemberRepository memberRepository;
@@ -31,6 +33,7 @@ public class OauthService {
         return authCodeRequestUrlProviderComposite.provide(oauthProvider);
     }
 
+    @Transactional
     public AuthenticatedMemberResponse processLoginOrRegistration(
             final OauthProvider oauthProvider,
             final String authCode

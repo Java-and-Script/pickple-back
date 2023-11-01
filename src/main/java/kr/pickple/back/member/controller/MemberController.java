@@ -1,5 +1,6 @@
 package kr.pickple.back.member.controller;
 
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.http.HttpStatus.*;
 
@@ -15,9 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.property.JwtProperties;
+import kr.pickple.back.auth.config.resolver.SignUp;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
+import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
@@ -31,9 +34,17 @@ public class MemberController {
 
     @PostMapping
     public ResponseEntity<AuthenticatedMemberResponse> createMember(
-            @Valid @RequestBody MemberCreateRequest memberCreateRequest,
+            @SignUp final String oauthSubject,
+            @Valid @RequestBody final MemberCreateRequest memberCreateRequest,
             final HttpServletResponse httpServletResponse
     ) {
+        final String oauthProviderName = memberCreateRequest.getOauthProvider().name();
+        final String requestOauthSubject = oauthProviderName + memberCreateRequest.getOauthId();
+
+        if (!oauthSubject.equals(requestOauthSubject)) {
+            throw new MemberException(MEMBER_SIGNUP_OAUTH_SUBJECT_INVALID, requestOauthSubject);
+        }
+
         final AuthenticatedMemberResponse authenticatedMemberResponse = memberService.createMember(memberCreateRequest);
         final String refreshToken = authenticatedMemberResponse.getRefreshToken();
 
@@ -54,7 +65,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}")
-    public ResponseEntity<MemberProfileResponse> findMemberProfileById(@PathVariable Long memberId) {
+    public ResponseEntity<MemberProfileResponse> findMemberProfileById(@PathVariable final Long memberId) {
         return ResponseEntity.status(OK)
                 .body(memberService.findMemberProfileById(memberId));
     }
