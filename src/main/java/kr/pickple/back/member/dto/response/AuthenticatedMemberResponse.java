@@ -1,6 +1,8 @@
 package kr.pickple.back.member.dto.response;
 
+import kr.pickple.back.auth.domain.oauth.OauthMember;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
+import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -8,17 +10,21 @@ import lombok.Getter;
 @Getter
 public class AuthenticatedMemberResponse {
 
-    private Long id;
-    private String nickname;
-    private String profileImageUrl;
-    private String email;
-    private Long oauthId;
-    private OauthProvider oauthProvider;
-    private String addressDepth1;
-    private String addressDepth2;
+    private final String accessToken;
+    private final String refreshToken;
+    private final Long id;
+    private final String nickname;
+    private final String profileImageUrl;
+    private final String email;
+    private final Long oauthId;
+    private final OauthProvider oauthProvider;
+    private final String addressDepth1;
+    private final String addressDepth2;
 
     @Builder
     private AuthenticatedMemberResponse(
+            final String accessToken,
+            final String refreshToken,
             final Long id,
             final String nickname,
             final String profileImageUrl,
@@ -28,6 +34,8 @@ public class AuthenticatedMemberResponse {
             final String addressDepth1,
             final String addressDepth2
     ) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.id = id;
         this.nickname = nickname;
         this.profileImageUrl = profileImageUrl;
@@ -38,8 +46,10 @@ public class AuthenticatedMemberResponse {
         this.addressDepth2 = addressDepth2;
     }
 
-    public static AuthenticatedMemberResponse from(final Member member) {
+    public static AuthenticatedMemberResponse of(final Member member, final AuthTokens authTokens) {
         return AuthenticatedMemberResponse.builder()
+                .accessToken(authTokens.getAccessToken())
+                .refreshToken(authTokens.getRefreshToken())
                 .id(member.getId())
                 .nickname(member.getNickname())
                 .profileImageUrl(member.getProfileImageUrl())
@@ -48,6 +58,17 @@ public class AuthenticatedMemberResponse {
                 .oauthProvider(member.getOauthProvider())
                 .addressDepth1(member.getAddressDepth1().getName())
                 .addressDepth2(member.getAddressDepth2().getName())
+                .build();
+    }
+
+    public static AuthenticatedMemberResponse of(final OauthMember oauthMember, final AuthTokens registerToken) {
+        return AuthenticatedMemberResponse.builder()
+                .accessToken(registerToken.getAccessToken())
+                .nickname(oauthMember.getNickname())
+                .profileImageUrl(oauthMember.getProfileImageUrl())
+                .email(oauthMember.getEmail())
+                .oauthId(oauthMember.getOauthId())
+                .oauthProvider(oauthMember.getOauthProvider())
                 .build();
     }
 }
