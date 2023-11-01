@@ -9,6 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.auth.domain.token.AuthTokens;
+import kr.pickple.back.auth.domain.token.JwtProvider;
+import kr.pickple.back.auth.domain.token.RefreshToken;
+import kr.pickple.back.auth.repository.RefreshTokenRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
@@ -28,6 +32,8 @@ public class MemberService {
     private final AddressService addressService;
     private final MemberRepository memberRepository;
     private final MemberPositionRepository memberPositionRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
@@ -56,7 +62,16 @@ public class MemberService {
 
         memberPositionRepository.saveAll(positions);
 
-        return AuthenticatedMemberResponse.from(savedMember);
+        final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(savedMember.getId()));
+
+        final RefreshToken refreshToken = RefreshToken.builder()
+                .token(loginTokens.getRefreshToken())
+                .memberId(savedMember.getId())
+                .build();
+
+        refreshTokenRepository.save(refreshToken);
+
+        return AuthenticatedMemberResponse.of(savedMember, loginTokens);
     }
 
     private void validateIsDuplicatedMemberInfo(final String email, final String nickname, final Long oauthId) {
