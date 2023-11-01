@@ -37,7 +37,7 @@ public class GameService {
 
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest) {
-        Member host = memberRepository.findById(gameCreateRequest.getHostId())
+        final Member host = memberRepository.findById(gameCreateRequest.getHostId())
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, gameCreateRequest.getHostId()));
 
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
