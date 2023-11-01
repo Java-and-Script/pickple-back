@@ -14,6 +14,7 @@ import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.exception.AddressException;
 import kr.pickple.back.address.repository.AddressDepth1Repository;
 import kr.pickple.back.address.repository.AddressDepth2Repository;
+import kr.pickple.back.address.util.AddressParser;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -51,5 +52,13 @@ public class AddressService {
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
                 .build();
+    }
+
+    //기존 메서드 네이밍 및 시그니처 유지를 위해 임시적으로 아래와 구현했습니다.
+    //todo 현호:서로 다른 입력을 받아 MainAddressResponse를 반환하는 두 메서드를 어떻게 통합하면 좋을 지 논의해보면 좋겠습니다.
+    public MainAddressResponse findMainAddressByAddressStrings(final String mainAddress) {
+        List<String> depthedAddress = AddressParser.convertToDepthedAddress(mainAddress);
+
+        return findMainAddressByNames(depthedAddress.get(0), depthedAddress.get(1));
     }
 }
