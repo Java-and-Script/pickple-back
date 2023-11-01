@@ -10,28 +10,25 @@ import java.util.Set;
 
 import org.springframework.stereotype.Component;
 
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.exception.AuthException;
 
 @Component
 public class AuthCodeRequestUrlProviderComposite {
 
-    private final Map<OAuthProvider, AuthCodeRequestUrlProvider> mapping;
+    private final Map<OauthProvider, AuthCodeRequestUrlProvider> mapping;
 
     public AuthCodeRequestUrlProviderComposite(final Set<AuthCodeRequestUrlProvider> providers) {
         mapping = providers.stream()
-                .collect(toMap(
-                        AuthCodeRequestUrlProvider::oAuthProvider,
-                        identity()
-                ));
+                .collect(toMap(AuthCodeRequestUrlProvider::oauthprovider, identity()));
     }
 
-    public String provide(final OAuthProvider oAuthProvider) {
-        return getProvider(oAuthProvider).provideUrl();
+    public String provide(final OauthProvider oauthProvider) {
+        return getProvider(oauthProvider).provideUrl();
     }
 
-    private AuthCodeRequestUrlProvider getProvider(final OAuthProvider oAuthProvider) {
-        return Optional.ofNullable(mapping.get(oAuthProvider))
-                .orElseThrow(() -> new AuthException(AUTH_NOT_FOUND_OAUTH_PROVIDER, oAuthProvider.toString()));
+    private AuthCodeRequestUrlProvider getProvider(final OauthProvider oauthProvider) {
+        return Optional.ofNullable(mapping.get(oauthProvider))
+                .orElseThrow(() -> new AuthException(AUTH_NOT_FOUND_OAUTH_PROVIDER, oauthProvider.toString()));
     }
 }

@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import lombok.AccessLevel;
@@ -63,7 +63,7 @@ public class Member extends BaseEntity {
 
     @NotNull
     @Enumerated(value = EnumType.STRING)
-    private OAuthProvider oauthProvider;
+    private OauthProvider oauthProvider;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -82,7 +82,7 @@ public class Member extends BaseEntity {
             final String profileImageUrl,
             final MemberStatus status,
             final Long oauthId,
-            final OAuthProvider oauthProvider,
+            final OauthProvider oauthProvider,
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2
     ) {

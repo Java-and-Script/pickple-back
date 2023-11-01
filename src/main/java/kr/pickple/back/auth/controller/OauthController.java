@@ -9,32 +9,32 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
-import kr.pickple.back.auth.service.OAuthService;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
+import kr.pickple.back.auth.service.OauthService;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
-public class OAuthController {
+public class OauthController {
 
-    private final OAuthService oAuthService;
+    private final OauthService oauthService;
 
-    @GetMapping("/{oAuthProvider}")
+    @GetMapping("/{oauthProvider}")
     public void redirectAuthCodeRequestUrl(
-            @PathVariable final OAuthProvider oAuthProvider,
+            @PathVariable final OauthProvider oauthProvider,
             final HttpServletResponse response
     ) throws IOException {
-        final String redirectUrl = oAuthService.getAuthCodeRequestUrl(oAuthProvider);
+        final String redirectUrl = oauthService.getAuthCodeRequestUrl(oauthProvider);
 
         response.sendRedirect(redirectUrl);
     }
 
-    @GetMapping("/login/{oAuthProvider}")
+    @GetMapping("/login/{oauthProvider}")
     public void login(
-            @PathVariable final OAuthProvider oAuthProvider,
+            @PathVariable final OauthProvider oauthProvider,
             @RequestParam final String authCode
     ) {
-        oAuthService.processLoginOrRegistration(oAuthProvider, authCode);
+        oauthService.processLoginOrRegistration(oauthProvider, authCode);
     }
 }

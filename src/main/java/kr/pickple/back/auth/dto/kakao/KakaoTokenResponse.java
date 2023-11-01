@@ -1,12 +1,11 @@
 package kr.pickple.back.auth.dto.kakao;
 
-import static lombok.AccessLevel.*;
-
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KakaoTokenResponse {
 
     private String refreshToken;

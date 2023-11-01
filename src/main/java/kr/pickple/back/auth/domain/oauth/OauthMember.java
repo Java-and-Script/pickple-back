@@ -8,11 +8,11 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class OAuthMember {
+public class OauthMember {
 
     private Long id;
     private String email;
     private String profileImageUrl;
     private String nickname;
-    private OAuthProvider oAuthProvider;
+    private OauthProvider oauthProvider;
 }
