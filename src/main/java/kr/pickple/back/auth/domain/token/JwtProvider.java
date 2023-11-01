@@ -24,9 +24,9 @@ public class JwtProvider {
     private final JwtProperties jwtProperties;
     private final SecretKey secretKey;
 
-    public JwtProvider(JwtProperties jwtProperties) {
+    public JwtProvider(final JwtProperties jwtProperties) {
         this.jwtProperties = jwtProperties;
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
+        final byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getSecretKey());
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -47,8 +47,7 @@ public class JwtProvider {
     private String generateToken(final String subject, final Long expirationTime) {
         final Date now = new Date();
 
-        return Jwts
-                .builder()
+        return Jwts.builder()
                 .subject(subject)
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationTime))
@@ -67,8 +66,7 @@ public class JwtProvider {
     }
 
     private Jws<Claims> parseToken(final String token) {
-        return Jwts
-                .parser()
+        return Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token);
@@ -111,11 +109,13 @@ public class JwtProvider {
 
     public boolean isValidRefreshAndInvalidAccess(final String refreshToken, final String accessToken) {
         validateRefreshToken(refreshToken);
+
         try {
             validateAccessToken(accessToken);
         } catch (final AuthException e) {
             return true;
         }
+
         return false;
     }
 
@@ -123,6 +123,7 @@ public class JwtProvider {
         try {
             validateRefreshToken(refreshToken);
             validateAccessToken(accessToken);
+
             return true;
         } catch (final JwtException e) {
             return false;

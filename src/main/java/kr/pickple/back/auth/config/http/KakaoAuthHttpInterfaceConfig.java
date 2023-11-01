@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.client.support.WebClientAdapter
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
 import kr.pickple.back.auth.config.WebClientConfig;
-import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
+import kr.pickple.back.auth.config.property.KakaoOauthProperties;
 import kr.pickple.back.auth.service.memberclient.KakaoAuthApiClient;
 import lombok.RequiredArgsConstructor;
 
@@ -18,7 +18,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class KakaoAuthHttpInterfaceConfig {
 
-    private final KakaoOAuthProperties kakaoOauthProperties;
+    private final KakaoOauthProperties kakaoOauthProperties;
 
     @Bean
     public KakaoAuthApiClient kakaoAuthApiClient() {

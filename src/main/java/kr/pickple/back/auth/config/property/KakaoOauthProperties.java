@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 @ConfigurationProperties(prefix = "oauth.kakao")
-public class KakaoOAuthProperties {
+public class KakaoOauthProperties {
 
     private final String clientId;
     private final String clientSecret;

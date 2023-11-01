@@ -1,6 +1,6 @@
 package kr.pickple.back.member.dto.response;
 
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.domain.Member;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,7 @@ public class AuthenticatedMemberResponse {
     private String profileImageUrl;
     private String email;
     private Long oauthId;
-    private OAuthProvider oauthProvider;
+    private OauthProvider oauthProvider;
     private String addressDepth1;
     private String addressDepth2;
 
@@ -24,7 +24,7 @@ public class AuthenticatedMemberResponse {
             final String profileImageUrl,
             final String email,
             final Long oauthId,
-            final OAuthProvider oauthProvider,
+            final OauthProvider oauthProvider,
             final String addressDepth1,
             final String addressDepth2
     ) {

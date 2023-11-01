@@ -7,7 +7,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import kr.pickple.back.auth.config.property.CorsProperties;
-import kr.pickple.back.auth.util.OAuthProviderConverter;
+import kr.pickple.back.auth.util.OauthProviderConverter;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -18,7 +18,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
-
         registry.addMapping("/**")
                 .allowedOrigins(corsProperties.getUrl())
                 .allowedMethods(
@@ -34,6 +33,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Override
     public void addFormatters(final FormatterRegistry registry) {
-        registry.addConverter(new OAuthProviderConverter());
+        registry.addConverter(new OauthProviderConverter());
     }
 }

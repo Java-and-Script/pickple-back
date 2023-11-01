@@ -5,10 +5,10 @@ import org.springframework.context.annotation.Configuration;
 
 import kr.pickple.back.auth.config.property.CorsProperties;
 import kr.pickple.back.auth.config.property.JwtProperties;
-import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
+import kr.pickple.back.auth.config.property.KakaoOauthProperties;
 
 @Configuration
-@EnableConfigurationProperties(value = {KakaoOAuthProperties.class, CorsProperties.class, JwtProperties.class})
+@EnableConfigurationProperties(value = {KakaoOauthProperties.class, CorsProperties.class, JwtProperties.class})
 public class AuthConfig {
 
 }

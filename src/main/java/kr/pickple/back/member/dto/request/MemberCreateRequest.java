@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberStatus;
 import lombok.AccessLevel;
@@ -34,7 +34,7 @@ public class MemberCreateRequest {
     private Long oauthId;
 
     @NotNull(message = "oauth 제공자는 null이거나 빈 문자열이거나 공백일 수 없음")
-    private OAuthProvider oauthProvider;
+    private OauthProvider oauthProvider;
 
     @NotBlank(message = "주소1은 null이거나 빈 문자열이거나 공백일 수 없음")
     private String addressDepth1;

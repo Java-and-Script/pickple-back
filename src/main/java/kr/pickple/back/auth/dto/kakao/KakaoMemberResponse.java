@@ -1,21 +1,30 @@
 package kr.pickple.back.auth.dto.kakao;
 
-import static lombok.AccessLevel.*;
-
-import kr.pickple.back.auth.domain.oauth.OAuthMember;
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
+import kr.pickple.back.auth.domain.oauth.OauthMember;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor(access = PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class KakaoMemberResponse {
 
     private Long id;
     private KakaoAccount kakaoAccount;
 
+    public OauthMember toOauthMember() {
+        return OauthMember.builder()
+                .id(id)
+                .email(kakaoAccount.email)
+                .nickname(kakaoAccount.profile.nickname)
+                .profileImageUrl(kakaoAccount.profile.profileImageUrl)
+                .oauthProvider(OauthProvider.KAKAO)
+                .build();
+    }
+
     @Getter
-    @NoArgsConstructor(access = PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class KakaoAccount {
 
         private String email;
@@ -23,20 +32,10 @@ public class KakaoMemberResponse {
     }
 
     @Getter
-    @NoArgsConstructor(access = PRIVATE)
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Profile {
 
         private String nickname;
         private String profileImageUrl;
-    }
-
-    public OAuthMember toOAuthMember() {
-        return OAuthMember.builder()
-                .id(id)
-                .email(kakaoAccount.email)
-                .nickname(kakaoAccount.profile.nickname)
-                .profileImageUrl(kakaoAccount.profile.profileImageUrl)
-                .oAuthProvider(OAuthProvider.KAKAO)
-                .build();
     }
 }

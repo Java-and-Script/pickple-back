@@ -4,30 +4,30 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import kr.pickple.back.auth.config.property.KakaoOAuthProperties;
-import kr.pickple.back.auth.domain.oauth.OAuthMember;
-import kr.pickple.back.auth.domain.oauth.OAuthProvider;
+import kr.pickple.back.auth.config.property.KakaoOauthProperties;
+import kr.pickple.back.auth.domain.oauth.OauthMember;
+import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.dto.kakao.KakaoTokenResponse;
 import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public class KakaoMemberClient implements OAuthMemberClient {
+public class KakaoMemberClient implements OauthMemberClient {
 
     private final KakaoAuthApiClient kakaoAuthApiClient;
     private final KakaoMemberApiClient kakaoMemberApiClient;
-    private final KakaoOAuthProperties kakaoOauthProperties;
+    private final KakaoOauthProperties kakaoOauthProperties;
 
     @Override
-    public OAuthProvider oAuthProvider() {
-        return OAuthProvider.KAKAO;
+    public OauthProvider oauthProvider() {
+        return OauthProvider.KAKAO;
     }
 
     @Override
-    public OAuthMember fetch(final String authCode) {
+    public OauthMember fetch(final String authCode) {
         final KakaoTokenResponse tokenInfo = kakaoAuthApiClient.fetchToken(tokenRequestParams(authCode));
 
-        return kakaoMemberApiClient.fetchMember("Bearer " + tokenInfo.getAccessToken()).toOAuthMember();
+        return kakaoMemberApiClient.fetchMember("Bearer " + tokenInfo.getAccessToken()).toOauthMember();
     }
 
     private MultiValueMap<String, String> tokenRequestParams(final String authCode) {
