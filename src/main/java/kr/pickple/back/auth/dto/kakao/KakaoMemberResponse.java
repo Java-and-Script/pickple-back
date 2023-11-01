@@ -15,7 +15,7 @@ public class KakaoMemberResponse {
 
     public OauthMember toOauthMember() {
         return OauthMember.builder()
-                .id(id)
+                .oauthId(id)
                 .email(kakaoAccount.email)
                 .nickname(kakaoAccount.profile.nickname)
                 .profileImageUrl(kakaoAccount.profile.profileImageUrl)

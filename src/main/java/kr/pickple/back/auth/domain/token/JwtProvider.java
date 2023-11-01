@@ -40,8 +40,12 @@ public class JwtProvider {
                 .build();
     }
 
-    public String createRegisterToken(final String subject) {
-        return generateToken(subject, jwtProperties.getRegisterTokenExpirationTime());
+    public AuthTokens createRegisterToken(final String subject) {
+        String registerToken = generateToken(subject, jwtProperties.getRegisterTokenExpirationTime());
+
+        return AuthTokens.builder()
+                .accessToken(registerToken)
+                .build();
     }
 
     private String generateToken(final String subject, final Long expirationTime) {

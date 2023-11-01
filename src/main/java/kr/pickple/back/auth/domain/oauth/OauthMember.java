@@ -10,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class OauthMember {
 
-    private Long id;
+    private Long oauthId;
     private String email;
     private String profileImageUrl;
     private String nickname;
