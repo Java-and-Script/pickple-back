@@ -57,7 +57,7 @@ public class AddressService {
     //기존 메서드 네이밍 및 시그니처 유지를 위해 임시적으로 아래와 구현했습니다.
     //todo 현호:서로 다른 입력을 받아 MainAddressResponse를 반환하는 두 메서드를 어떻게 통합하면 좋을 지 논의해보면 좋겠습니다.
     public MainAddressResponse findMainAddressByAddressStrings(final String mainAddress) {
-        List<String> depthedAddress = AddressParser.convertToDepthedAddress(mainAddress);
+        final List<String> depthedAddress = AddressParser.splitToAddressDepth1And2(mainAddress);
 
         return findMainAddressByNames(depthedAddress.get(0), depthedAddress.get(1));
     }
