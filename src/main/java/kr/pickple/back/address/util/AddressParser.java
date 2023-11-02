@@ -5,14 +5,16 @@ import java.util.List;
 
 public final class AddressParser {
 
-    public static List<String> convertToDepthedAddress(final String mainAddress) {
+    public static final int ADDRESS_DEPTH_SIZE = 2;
+
+    public static List<String> splitToAddressDepth1And2(final String mainAddress) {
         return Arrays.stream(mainAddress.split(" "))
-                .limit(2)
-                .map(AddressParser::addCityToFirstAddress)
+                .limit(ADDRESS_DEPTH_SIZE)
+                .map(AddressParser::addCitySuffixToFirstAddress)
                 .toList();
     }
 
-    private static String addCityToFirstAddress(String firstAddress) {
-        return firstAddress.equals("서울") ? "서울시" : firstAddress;
+    private static String addCitySuffixToFirstAddress(String addressDepth1) {
+        return addressDepth1.equals("서울") ? "서울시" : addressDepth1;
     }
 }
