@@ -7,6 +7,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import kr.pickple.back.auth.config.OauthProviderConverter;
@@ -47,5 +48,12 @@ public class WebConfig implements WebMvcConfigurer {
     public void addArgumentResolvers(final List<HandlerMethodArgumentResolver> resolvers) {
         resolvers.add(registerTokenArgumentResolver);
         resolvers.add(loginTokenArgumentResolver);
+
+    }
+
+    @Override
+    public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        registry.addResourceHandler("/docs/**")
+                .addResourceLocations("classpath:/static/docs/");
     }
 }
