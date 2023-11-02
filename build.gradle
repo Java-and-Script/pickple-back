@@ -1,7 +1,10 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '3.1.5'
-    id 'io.spring.dependency-management' version '1.1.3'
+	id 'java'
+	id 'org.springframework.boot' version '3.1.5'
+	id 'io.spring.dependency-management' version '1.1.3'
+	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+	id 'com.epages.restdocs-api-spec' version "0.18.2"
+	id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'kr.pickple'
@@ -12,9 +15,10 @@ java {
 }
 
 configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	asciidoctorExt
 }
 
 repositories {
@@ -26,26 +30,36 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-    implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
     implementation 'io.jsonwebtoken:jjwt-api:0.12.1'
     runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.1'
     runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.1'
 
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
 
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+
+	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+	testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+ext {
+	set('snippetsDir', file('build/generated-snippets'))
 }
 
 tasks.named('test') {
-    useJUnitPlatform()
+	outputs.dir snippetsDir
+	useJUnitPlatform()
 }
 
 tasks.named('compileJava') {
@@ -68,4 +82,30 @@ task copySubmodule(type: Copy) {
 
 jar {
     enabled = false
+}
+
+asciidoctor {
+	dependsOn test
+	inputs.dir snippetsDir
+	configurations 'asciidoctorExt'
+	baseDirFollowsSourceFile()
+}
+
+bootJar {
+	dependsOn asciidoctor
+	dependsOn(':openapi3')
+
+	from("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
+}
+
+openapi3 {
+	server = "https://pickple.kr"
+	title = "pickple API 문서"
+	description = "pickple 서비스의 API 문서입니다."
+	version = "0.0.1"
+	outputFileNamePrefix = 'pickple'
+	format = 'yaml'
+	outputDirectory = 'build/resources/main/static/docs'
 }
