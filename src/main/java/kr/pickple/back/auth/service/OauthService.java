@@ -69,17 +69,17 @@ public class OauthService {
         return AuthenticatedMemberResponse.of(oauthMember, registerToken);
     }
 
-    public AccessTokenResponse modificationAccessToken(final String refreshToken, final String authorizationHeader) {
+    public AccessTokenResponse regenerateAccessToken(final String refreshToken, final String authorizationHeader) {
         final String accessToken = tokenExtractor.extractAccessToken(authorizationHeader);
 
         if (jwtProvider.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
             final RefreshToken validRefreshToken = refreshTokenRepository.findById(refreshToken)
                     .orElseThrow(() -> new AuthException(AUTH_INVALID_REFRESH_TOKEN));
 
-            final String modifiedAccessToken = jwtProvider.regenerateAccessToken(
+            final String regeneratedAccessToken = jwtProvider.regenerateAccessToken(
                     validRefreshToken.getMemberId().toString());
 
-            return AccessTokenResponse.of(modifiedAccessToken);
+            return AccessTokenResponse.of(regeneratedAccessToken);
         }
 
         if (jwtProvider.isValidRefreshAndValidAccess(refreshToken, accessToken)) {

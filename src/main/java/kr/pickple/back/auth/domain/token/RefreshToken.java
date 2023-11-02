@@ -11,14 +11,14 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class RefreshToken {
 
     @Id
     private String token;
 
-    @NotNull
     @Getter
+    @NotNull
     private Long memberId;
 }

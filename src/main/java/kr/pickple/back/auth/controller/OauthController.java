@@ -69,11 +69,11 @@ public class OauthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<AccessTokenResponse> modificationAccessToken(
+    public ResponseEntity<AccessTokenResponse> regenerateAccessToken(
             @CookieValue("refresh-token") final String refreshToken,
             @RequestHeader("Authorization") final String authorizationHeader
     ) {
-        final AccessTokenResponse modifiedAccessToken = oauthService.modificationAccessToken(refreshToken,
+        final AccessTokenResponse modifiedAccessToken = oauthService.regenerateAccessToken(refreshToken,
                 authorizationHeader);
 
         return ResponseEntity.status(CREATED)
