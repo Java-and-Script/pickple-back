@@ -33,3 +33,6 @@ Content-Type: application/json
 {
   "status": "확정"
 }
+
+### 게스트 모집 참여 신청 거절/취소
+DELETE http://localhost:8080/games/2/members/3
