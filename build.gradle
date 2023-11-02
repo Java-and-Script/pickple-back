@@ -101,7 +101,7 @@ bootJar {
 	dependsOn(':openapi3')
 
 	from("${asciidoctor.outputDir}") {
-		into 'static/docs' // jar 파일 내에 static/docs 폴더를 만들어 html 파일 복사 (배포 파일 실행 시 docs 문서 볼 수 있음)
+		into 'static/docs'
 	}
 }
 
