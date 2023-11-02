@@ -80,6 +80,11 @@ task copySubmodule(type: Copy) {
     }
 }
 
+task copyHtml(type: Copy) {
+	from 'build/docs/asciidoc'
+	into 'build/resources/main/static/docs'
+}
+
 jar {
     enabled = false
 }
@@ -96,14 +101,14 @@ bootJar {
 	dependsOn(':openapi3')
 
 	from("${asciidoctor.outputDir}") {
-		into 'static/docs'
+		into 'static/docs' // jar 파일 내에 static/docs 폴더를 만들어 html 파일 복사 (배포 파일 실행 시 docs 문서 볼 수 있음)
 	}
 }
 
 openapi3 {
 	server = "https://pickple.kr"
-	title = "pickple API 문서"
-	description = "pickple 서비스의 API 문서입니다."
+	title = "PICKPLE API 문서"
+	description = "PICKPLE 서비스의 API 문서입니다."
 	version = "0.0.1"
 	outputFileNamePrefix = 'pickple'
 	format = 'yaml'
