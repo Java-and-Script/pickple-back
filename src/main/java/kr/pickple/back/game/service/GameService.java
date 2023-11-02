@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
-import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
@@ -42,7 +41,6 @@ public class GameService {
         final Game savedGame = gameRepository.save(game);
 
         final GameMember gameMember = GameMember.builder()
-                .status(RegistrationStatus.CONFIRMED)
                 .member(host)
                 .game(savedGame)
                 .build();
