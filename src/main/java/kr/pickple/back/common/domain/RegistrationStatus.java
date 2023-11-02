@@ -1,10 +1,6 @@
 package kr.pickple.back.common.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import kr.pickple.back.crew.exception.CrewException;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import static kr.pickple.back.common.exception.CommonExceptionCode.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -12,7 +8,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_STATUS_NOT_FOUND;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import kr.pickple.back.common.exception.CommonException;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
@@ -22,8 +23,8 @@ public enum RegistrationStatus {
     CONFIRMED("확정"),
     ;
 
-    private static final Map<String, RegistrationStatus> registrationStatusMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(RegistrationStatus::getDescription, Function.identity())));
+    private static final Map<String, RegistrationStatus> registrationStatusMap = Collections.unmodifiableMap(
+            Stream.of(values()).collect(Collectors.toMap(RegistrationStatus::getDescription, Function.identity())));
 
     @JsonValue
     private final String description;
@@ -34,6 +35,6 @@ public enum RegistrationStatus {
             return registrationStatusMap.get(description);
         }
 
-        throw new CrewException(CREW_MEMBER_STATUS_NOT_FOUND, description);
+        throw new CommonException(COMMON_BAD_REQUEST, description);
     }
 }
