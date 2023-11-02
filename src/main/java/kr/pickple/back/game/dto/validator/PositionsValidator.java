@@ -14,27 +14,19 @@ public class PositionsValidator implements ConstraintValidator<PositionsValid, L
             .toList();
 
     @Override
-    public void initialize(PositionsValid constraintAnnotation) {
+    public void initialize(final PositionsValid constraintAnnotation) {
     }
 
     @Override
-    public boolean isValid(List<String> positions, ConstraintValidatorContext context) {
-        if (positions == null) {
-            return false;
-        }
-
-        if (hasDuplicate(positions)) {
-            return false;
-        }
-
-        if (hasNotValidAcronyms(positions)) {
+    public boolean isValid(final List<String> positions, final ConstraintValidatorContext context) {
+        if (positions == null || isDuplicate(positions) || isInValidAcronyms(positions)) {
             return false;
         }
 
         return true;
     }
 
-    private boolean hasDuplicate(List<String> positions) {
+    private boolean isDuplicate(final List<String> positions) {
         List<String> distinctPositions = positions.stream()
                 .distinct()
                 .toList();
@@ -42,7 +34,7 @@ public class PositionsValidator implements ConstraintValidator<PositionsValid, L
         return positions.size() != distinctPositions.size();
     }
 
-    private boolean hasNotValidAcronyms(List<String> positions) {
+    private boolean isInValidAcronyms(final List<String> positions) {
         return positions.stream()
                 .anyMatch(position -> !positionAcronyms.contains(position));
     }
