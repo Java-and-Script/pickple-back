@@ -2,8 +2,6 @@ package kr.pickple.back.crew.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Convert;
 import kr.pickple.back.crew.exception.CrewException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -36,18 +34,5 @@ public enum CrewStatus {
             return crewStatusMap.get(description);
         }
         throw new CrewException(CREW_STATUS_NOT_FOUND, description);
-    }
-
-    @Convert
-    public static final class CrewStatusConverter implements AttributeConverter<CrewStatus, String> {
-        @Override
-        public String convertToDatabaseColumn(CrewStatus attribute) {
-            return attribute.getDescription();
-        }
-
-        @Override
-        public CrewStatus convertToEntityAttribute(String dbData) {
-            return CrewStatus.from(dbData);
-        }
     }
 }

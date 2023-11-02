@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.crew.util.CrewStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -43,7 +44,7 @@ public class Crew extends BaseEntity {
 
     @NotNull
     @Column(length = 10)
-    @Convert(converter = CrewStatus.CrewStatusConverter.class)
+    @Convert(converter = CrewStatusConverter.class)
     private CrewStatus status = OPEN;
 
     @NotNull
