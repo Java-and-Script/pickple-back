@@ -3,8 +3,8 @@ POST http://localhost:8080/crews
 Content-Type: application/json
 
 {
-  "name": "노드크루",
-  "content": "안녕하세요, 노드크루입니다. 백둥체육관 201호에서 진행합니다.",
+  "name": "넥스트 js 크루",
+  "content": "안녕하세요, 넥스트 js크루입니다. 백둥체육관 201호에서 진행합니다.",
   "maxMemberCount": 15,
   "leaderId": 1,
   "addressDepth1": "서울시",

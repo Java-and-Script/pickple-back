@@ -1,17 +1,6 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.crew.domain.CrewStatus.*;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -21,6 +10,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
+import static kr.pickple.back.crew.domain.CrewStatus.OPEN;
 
 @Getter
 @Entity
@@ -50,8 +42,8 @@ public class Crew extends BaseEntity {
     private String backgroundImageUrl;
 
     @NotNull
-    @Enumerated(value = EnumType.STRING)
     @Column(length = 10)
+    @Convert(converter = CrewStatus.CrewStatusConverter.class)
     private CrewStatus status = OPEN;
 
     @NotNull
@@ -104,18 +96,10 @@ public class Crew extends BaseEntity {
         this.addressDepth2 = addressDepth2;
     }
 
-    public CrewStatus validateCrewStatus(Integer maxMemberCount) {
-        if (maxMemberCount == 1) {
+    public CrewStatus validateCrewStatus(final Integer maxMemberCount) {
+        if (memberCount == maxMemberCount) {
             status = CLOSED;
         }
         return this.status;
-    }
-
-    public void addCrewDefaultProfileImage(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
-
-    public void addCrewDefaultBackgroundImage(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
     }
 }
