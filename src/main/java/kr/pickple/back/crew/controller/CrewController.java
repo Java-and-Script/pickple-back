@@ -56,4 +56,14 @@ public class CrewController {
     ) {
         return crewMemberService.applyForCrewMemberShip(crewId, crewApplyRequest);
     }
+
+    @PostMapping("/{crewId}/members")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+
+    public CrewMemberIdResponse applyForCrewMemberShip(
+            @PathVariable("crewId") Long crewId,
+            @Valid @RequestBody CrewApplyRequest crewApplyRequest
+    ) {
+        return crewMemberService.applyForCrewMemberShip(crewId, crewApplyRequest);
+    }
 }
