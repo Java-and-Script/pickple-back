@@ -73,10 +73,10 @@ public class OauthController {
             @CookieValue("refresh-token") final String refreshToken,
             @RequestHeader("Authorization") final String authorizationHeader
     ) {
-        final AccessTokenResponse modifiedAccessToken = oauthService.regenerateAccessToken(refreshToken,
+        final AccessTokenResponse regeneratedAccessToken = oauthService.regenerateAccessToken(refreshToken,
                 authorizationHeader);
 
         return ResponseEntity.status(CREATED)
-                .body(modifiedAccessToken);
+                .body(regeneratedAccessToken);
     }
 }
