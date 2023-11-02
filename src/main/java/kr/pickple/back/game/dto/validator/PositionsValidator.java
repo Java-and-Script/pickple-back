@@ -1,7 +1,9 @@
 package kr.pickple.back.game.dto.validator;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -27,9 +29,7 @@ public class PositionsValidator implements ConstraintValidator<PositionsValid, L
     }
 
     private boolean isDuplicate(final List<String> positions) {
-        List<String> distinctPositions = positions.stream()
-                .distinct()
-                .toList();
+        final Set<String> distinctPositions = new HashSet<>(positions);
 
         return positions.size() != distinctPositions.size();
     }
