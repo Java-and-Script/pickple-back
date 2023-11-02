@@ -76,10 +76,21 @@ public class GameService {
             final Long memberId,
             final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
     ) {
-        final GameMember gameMember = gameMemberRepository.findByMember_IdAndGame_Id(memberId, gameId)
-                .orElseThrow();//TODO: ExceptionCode가 생기면 예외 추가 예정 (11.03 김영주)
+        final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, memberId);
         final RegistrationStatus newStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
 
         gameMember.updateStatus(newStatus);
+    }
+
+    @Transactional
+    public void deleteGameMember(final Long gameId, final Long memberId) {
+        final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, memberId);
+
+        gameMemberRepository.delete(gameMember);
+    }
+
+    private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
+        return gameMemberRepository.findByMember_IdAndGame_Id(memberId, gameId)
+                .orElseThrow();//TODO: ExceptionCode가 생기면 예외 추가 예정 (11.03 김영주)
     }
 }

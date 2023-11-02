@@ -3,12 +3,12 @@ package kr.pickple.back.game.controller;
 import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
@@ -50,6 +50,14 @@ public class GameController {
             @Valid @RequestBody final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
     ) {
         gameService.updateGameMemberRegistrationStatus(gameId, memberId, gameMemberRegistrationStatusUpdateRequest);
+
+        return ResponseEntity.status(NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping("/{gameId}/members/{memberId}")
+    public ResponseEntity<Void> deleteGameMember(@PathVariable final Long gameId, @PathVariable final Long memberId) {
+        gameService.deleteGameMember(gameId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
