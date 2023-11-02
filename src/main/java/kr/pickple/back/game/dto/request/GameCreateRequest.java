@@ -4,12 +4,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.springframework.format.annotation.DateTimeFormat;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.game.domain.Game;
@@ -23,16 +25,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameCreateRequest {
 
-    @NotEmpty(message = "모집 글 내용은 null이거나 빈 문자열일 수 없음")
+    @NotBlank(message = "모집 글 내용은 null이거나, 빈 문자열이거나, 공백 문자만으로 이루어질 수 없음")
     @Size(max = 1000, message = "모집 글 내용은 1000자 이하")
     private String content;
 
     @NotNull(message = "경기 날짜는 null일 수 없음")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private LocalDate playDate;
 
     @NotNull(message = "경기 시간은 null일 수 없음")
-    @DateTimeFormat(pattern = "HH:mm")
+    @JsonFormat(pattern = "HH:mm", timezone = "Asia/Seoul")
     private LocalTime playStartTime;
 
     @NotNull(message = "경기 진행 시간(분)은 null일 수 없음")
@@ -40,7 +42,7 @@ public class GameCreateRequest {
     @Max(value = 360, message = "경기 진행 시간(분)은 1000자 이하")
     private Integer playTimeMinutes;
 
-    @NotEmpty(message = "메인 주소(도, 시, 구, 동, 번지)는 null이거나 빈 문자열일 수 없음")
+    @NotBlank(message = "메인 주소(도, 시, 구, 동, 번지)는 null이거나, 빈 문자열이거나, 공백 문자만으로 이루어질 수 없음")
     @Size(max = 50, message = "메인 주소(도, 시, 구, 동, 번지)는 50자 이하")
     private String mainAddress;
 
@@ -49,13 +51,11 @@ public class GameCreateRequest {
     private String detailAddress;
 
     @NotNull(message = "참여 비용은 null일 수 없음")
-    @Min(value = 0, message = "참여 비용은 0 원 이상")
-    @Max(value = 100_000, message = "참여 비용은 100,000 원 이하")
+    @PositiveOrZero(message = "참여 비용은 0원 이상, 100,000원 이하")
     private Integer cost;
 
     @NotNull(message = "모집 인원은 null일 수 없음")
-    @Min(value = 1, message = "모집 인원은 1 이상")
-    @Max(value = 15, message = "모집 인원은 15 이하")
+    @Positive(message = "모집 인원은 1 이상, 15이하")
     private Integer maxMemberCount;
 
     @PositionsValid(message = "포지션 목록은 null일 수 없음\n포지션 목록은 [C, PF, SF, PG, SG, 없음] 중 복수 선택. 같은 포지션을 2회 이상 중복 선택은 불가")

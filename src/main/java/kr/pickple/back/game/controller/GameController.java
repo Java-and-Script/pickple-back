@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.service.GameService;
@@ -21,7 +22,9 @@ public class GameController {
     private final GameService gameService;
 
     @PostMapping
-    public ResponseEntity<GameIdResponse> post(@RequestBody GameCreateRequest gameCreateRequest) {
+    public ResponseEntity<GameIdResponse> createGame(
+            @Valid @RequestBody GameCreateRequest gameCreateRequest
+    ) {
         return ResponseEntity.status(CREATED)
                 .body(gameService.createGame(gameCreateRequest));
     }
