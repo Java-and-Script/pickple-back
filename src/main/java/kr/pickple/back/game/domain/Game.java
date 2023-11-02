@@ -4,9 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,6 +16,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.game.util.GameStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -60,8 +60,8 @@ public class Game extends BaseEntity {
     private Double longitude;
 
     @NotNull
+    @Convert(converter = GameStatusConverter.class)
     @Column(length = 10)
-    @Enumerated(value = EnumType.STRING)
     private GameStatus status = GameStatus.OPEN;
 
     //todo 현호: 게시글 상세 조회 기능 구현시 viewCount 올리는 기능 구현
