@@ -1,18 +1,14 @@
 package kr.pickple.back.common.config;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@Configuration
+@ConfigurationProperties(prefix = "s3.default")
 public class S3Config {
 
     private final String profile;
     private final String background;
 
-    public S3Config(
-            @Value("${s3.default.profile}") String profile,
-            @Value("${s3.default.background}") String background
-    ) {
+    public S3Config(String profile, String background) {
         this.profile = profile;
         this.background = background;
     }
