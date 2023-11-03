@@ -100,6 +100,7 @@ public class Crew extends BaseEntity {
         if (memberCount == maxMemberCount) {
             status = CLOSED;
         }
+
         return this.status;
     }
 }

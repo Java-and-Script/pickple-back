@@ -33,6 +33,7 @@ public enum RegistrationStatus {
         if (registrationStatusMap.containsKey(description)) {
             return registrationStatusMap.get(description);
         }
+
         throw new CrewException(CREW_MEMBER_STATUS_NOT_FOUND, description);
     }
 }
