@@ -7,7 +7,10 @@ import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,7 +20,6 @@ public class CrewController {
     private final CrewService crewService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<CrewIdResponse> createCrew(
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {

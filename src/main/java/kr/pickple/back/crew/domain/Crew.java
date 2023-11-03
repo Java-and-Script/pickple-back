@@ -78,7 +78,6 @@ public class Crew extends BaseEntity {
             final Integer memberCount,
             final String profileImageUrl,
             final String backgroundImageUrl,
-            final CrewStatus status,
             final Integer likeCount,
             final Integer maxMemberCount,
             final Integer competitionPoint,
