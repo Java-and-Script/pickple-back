@@ -91,15 +91,6 @@ asciidoctor {
 	baseDirFollowsSourceFile()
 }
 
-bootJar {
-	dependsOn asciidoctor
-	dependsOn(':openapi3')
-
-	from("${asciidoctor.outputDir}") {
-		into 'static/docs'
-	}
-}
-
 openapi3 {
 	server = "https://api.pickple.kr"
 	title = "PICKPLE API 문서"
@@ -108,4 +99,24 @@ openapi3 {
 	outputFileNamePrefix = 'pickple'
 	format = 'yaml'
 	outputDirectory = 'build/resources/main/static/docs'
+}
+
+tasks.register('copyDocs') {
+	dependsOn(':openapi3')
+	doLast {
+		delete 'src/main/resources/static/docs/pickple.yaml'
+		copy {
+			from "build/resources/main/static/docs/pickple.yaml"
+			into "src/main/resources/static/docs/"
+		}
+	}
+}
+
+bootJar {
+	dependsOn asciidoctor
+	dependsOn(':openapi3')
+
+	from("${asciidoctor.outputDir}") {
+		into 'static/docs'
+	}
 }
