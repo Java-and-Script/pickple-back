@@ -97,16 +97,15 @@ openapi3 {
 	description = "PICKPLE 서비스의 API 문서입니다."
 	version = "0.0.1"
 	outputFileNamePrefix = 'pickple'
-	format = 'yaml'
 	outputDirectory = 'build/resources/main/static/docs/'
 }
 
 tasks.register('copyDocs') {
 	dependsOn(':openapi3')
 	doLast {
-		delete 'src/main/resources/static/docs/pickple.yaml'
+		delete 'src/main/resources/static/docs/pickple.json'
 		copy {
-			from "build/resources/main/static/docs/pickple.yaml"
+			from "build/resources/main/static/docs/pickple.json"
 			into "src/main/resources/static/docs/"
 		}
 	}
