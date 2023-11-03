@@ -113,7 +113,7 @@ tasks.register('copyDocs') {
 
 bootJar {
 	dependsOn asciidoctor
-	dependsOn(':openapi3')
+	dependsOn(':copyDocs')
 
 	from("${asciidoctor.outputDir}") {
 		into 'static/docs'
