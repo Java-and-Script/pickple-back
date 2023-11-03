@@ -14,6 +14,7 @@ import kr.pickple.back.auth.config.OauthProviderConverter;
 import kr.pickple.back.auth.config.property.CorsProperties;
 import kr.pickple.back.auth.config.resolver.LoginTokenArgumentResolver;
 import kr.pickple.back.auth.config.resolver.RegisterTokenArgumentResolver;
+import kr.pickple.back.common.util.RegistrationStatusConverter;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -42,6 +43,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(final FormatterRegistry registry) {
         registry.addConverter(new OauthProviderConverter());
+        registry.addConverter(new RegistrationStatusConverter());
     }
 
     @Override

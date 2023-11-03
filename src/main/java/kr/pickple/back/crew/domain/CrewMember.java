@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.common.util.RegistrationStatusConverter;
+import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -31,8 +31,8 @@ public class CrewMember extends BaseEntity {
     private Long id;
 
     @NotNull
+    @Convert(converter = RegistrationStatusAttributeConverter.class)
     @Column(length = 10)
-    @Convert(converter = RegistrationStatusConverter.class)
     private RegistrationStatus status = WAITING;
 
     @NotNull
