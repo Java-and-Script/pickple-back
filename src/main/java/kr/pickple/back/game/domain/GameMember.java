@@ -52,6 +52,10 @@ public class GameMember extends BaseEntity {
         this.game = game;
     }
 
+    public void updateStatus(final RegistrationStatus status) {
+        this.status = status;
+    }
+
     private RegistrationStatus getRegistrationStatus(final Member member, final Game game) {
         final Member host = game.getHost();
 

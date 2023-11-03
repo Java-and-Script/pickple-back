@@ -8,10 +8,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
+import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
@@ -66,5 +68,18 @@ public class GameService {
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    @Transactional
+    public void updateGameMemberRegistrationStatus(
+            final Long gameId,
+            final Long memberId,
+            final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
+    ) {
+        final GameMember gameMember = gameMemberRepository.findByMember_IdAndGame_Id(memberId, gameId)
+                .orElseThrow();//TODO: ExceptionCode가 생기면 예외 추가 예정 (11.03 김영주)
+        final RegistrationStatus newStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
+
+        gameMember.updateStatus(newStatus);
     }
 }
