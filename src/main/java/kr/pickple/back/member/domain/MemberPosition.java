@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.position.domain.Position;
-import kr.pickple.back.position.util.PositionStatusConverter;
+import kr.pickple.back.position.util.PositionConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -28,7 +28,7 @@ public class MemberPosition extends BaseEntity {
 
     @Getter
     @NotNull
-    @Convert(converter = PositionStatusConverter.class)
+    @Convert(converter = PositionConverter.class)
     @Column(length = 2)
     private Position position;
 
