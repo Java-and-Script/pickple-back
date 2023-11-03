@@ -106,7 +106,7 @@ bootJar {
 }
 
 openapi3 {
-	server = "https://pickple.kr"
+	server = "https://api.pickple.kr"
 	title = "PICKPLE API 문서"
 	description = "PICKPLE 서비스의 API 문서입니다."
 	version = "0.0.1"
