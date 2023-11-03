@@ -3,17 +3,14 @@ package kr.pickple.back.crew.dto.response;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewStatus;
 import kr.pickple.back.member.domain.Member;
-import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Getter
-@Builder
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(staticName = "from")
 public class CrewProfileResponse {
 
     private Long id;
@@ -32,22 +29,21 @@ public class CrewProfileResponse {
     private List<Member> members;
 
     public static CrewProfileResponse fromEntity(final Crew crew) {
-        return CrewProfileResponse.builder()
-                .id(crew.getId())
-                .name(crew.getName())
-                .content(crew.getContent())
-                .memberCount(crew.getMemberCount())
-                .maxMemberCount(crew.getMaxMemberCount())
-                .profileImageUrl(crew.getProfileImageUrl())
-                .backgroundImageUrl(crew.getBackgroundImageUrl())
-                .status(crew.getStatus())
-                .likeCount(crew.getLikeCount())
-                .competitionPoint(crew.getCompetitionPoint())
-                .leader(Member.builder().build())
-                .members(Arrays.asList(Member.builder().build()))
-                .addressDepth1(crew.getAddressDepth1().getName())
-                .addressDepth2(crew.getAddressDepth2().getName())
-                //TODO:추후 Member 도메인 완성되면 추가(11월 1일, 소재훈)
-                .build();
+        return CrewProfileResponse.from(
+                crew.getId(),
+                crew.getName(),
+                crew.getContent(),
+                crew.getMemberCount(),
+                crew.getMaxMemberCount(),
+                crew.getProfileImageUrl(),
+                crew.getBackgroundImageUrl(),
+                crew.getStatus(),
+                crew.getLikeCount(),
+                crew.getCompetitionPoint(),
+                Member.builder().build(), //TODO: 추후 Member 도메인과 leader 연결 작업 추가(11월 1일, 소재훈)
+                crew.getAddressDepth1().getName(),
+                crew.getAddressDepth2().getName(),
+                Arrays.asList(Member.builder().build()) //TODO:추후 Member 도메인과 members 도메인 연결 작업 추가(11월 1일, 소재훈)
+        );
     }
 }
