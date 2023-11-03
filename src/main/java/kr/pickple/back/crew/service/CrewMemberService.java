@@ -33,11 +33,9 @@ public class CrewMemberService {
     @Transactional
     public void applyForCrewMemberShip(final Long crewId, final CrewApplyRequest crewApplyRequest) {
         final Crew crew = findByExistCrew(crewId);
-
         final Member member = findByExistMember(crewApplyRequest.getMemberId());
 
         findByIsConfirmCrewMember(member, crew);
-
 
         final CrewMember crewMember = CrewMember.builder()
                 .crew(crew)
