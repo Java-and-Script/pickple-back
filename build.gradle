@@ -26,24 +26,24 @@ repositories {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 
 	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-    implementation 'io.jsonwebtoken:jjwt-api:0.12.1'
-    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.1'
-    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.1'
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.1'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.1'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.1'
 
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-    runtimeOnly 'com.h2database:h2'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
@@ -105,8 +105,8 @@ tasks.register('copyDocs') {
 	doLast {
 		delete 'src/main/resources/static/docs/pickple.json'
 		copy {
-			from "build/resources/main/static/docs/pickple.json"
-			into "src/main/resources/static/docs/"
+			from 'build/resources/main/static/docs/pickple.json'
+			into 'src/main/resources/static/docs/'
 		}
 	}
 }
