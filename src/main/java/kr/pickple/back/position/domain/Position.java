@@ -45,5 +45,4 @@ public enum Position {
 
         throw new PositionException(POSITION_NOT_FOUND, positionAcronym);
     }
-
 }
