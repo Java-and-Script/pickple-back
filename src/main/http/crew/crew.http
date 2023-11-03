@@ -13,3 +13,11 @@ Content-Type: application/json
 
 ### 크루 조회
 GET http://localhost:8080/crews/12
+
+### 크루가입 신청
+POST http://localhost:8080/crews/4/members
+Content-Type: application/json
+
+{
+  "memberId": 2
+}
