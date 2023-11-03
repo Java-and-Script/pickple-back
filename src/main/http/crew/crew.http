@@ -10,3 +10,6 @@ Content-Type: application/json
   "addressDepth1": "서울시",
   "addressDepth2": "강남구"
 }
+
+### 크루 조회
+GET http://localhost:8080/crews/3

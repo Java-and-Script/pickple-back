@@ -3,6 +3,7 @@ package kr.pickple.back.crew.controller;
 import jakarta.validation.Valid;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,5 +26,11 @@ public class CrewController {
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(crewService.createCrew(crewCreateRequest));
+    }
+
+    @GetMapping("/{crewId}")
+    @ResponseStatus(HttpStatus.OK)
+    public CrewProfileResponse findCrewById(@PathVariable Long crewId) {
+        return crewService.findCrewById(crewId);
     }
 }

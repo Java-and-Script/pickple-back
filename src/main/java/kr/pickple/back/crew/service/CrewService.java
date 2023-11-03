@@ -6,7 +6,9 @@ import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
+import kr.pickple.back.crew.exception.CrewExceptionCode;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
@@ -14,6 +16,8 @@ import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
@@ -44,6 +48,16 @@ public class CrewService {
         final Long crewId = crewRepository.save(crew).getId();
 
         return CrewIdResponse.from(crewId);
+    }
+
+    @Transactional
+    public CrewProfileResponse findCrewById(Long crewId) {
+        Crew crew = crewRepository.findById(crewId)
+                .orElseThrow(() -> new CrewException(CrewExceptionCode.CREW_NOT_FOUND));
+
+        List<Member> members = null;//TODO:추후 Member 도메인 완성되면 추가(11월 1일, 소재훈)
+
+        return CrewProfileResponse.fromEntity(crew);
     }
 
     private void validateIsDuplicatedCrewInfo(final String name) {
