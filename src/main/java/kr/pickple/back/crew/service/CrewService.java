@@ -2,7 +2,7 @@ package kr.pickple.back.crew.service;
 
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
-import kr.pickple.back.common.config.S3Config;
+import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
@@ -23,7 +23,7 @@ import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FO
 @RequiredArgsConstructor
 public class CrewService {
 
-    private final S3Config s3Config;
+    private final S3Properties s3Properties;
     private final CrewRepository crewRepository;
     private final AddressService addressService;
     private final MemberRepository memberRepository;
@@ -40,7 +40,7 @@ public class CrewService {
                 crewCreateRequest.getAddressDepth2()
         );
 
-        final Crew crew = crewCreateRequest.toEntity(leader, mainAddressResponse, s3Config.getProfile(), s3Config.getBackground());
+        final Crew crew = crewCreateRequest.toEntity(leader, mainAddressResponse, s3Properties.getProfile(), s3Properties.getBackground());
         final Long crewId = crewRepository.save(crew).getId();
 
         return CrewIdResponse.from(crewId);
