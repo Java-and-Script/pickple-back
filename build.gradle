@@ -80,11 +80,6 @@ task copySubmodule(type: Copy) {
     }
 }
 
-task copyHtml(type: Copy) {
-	from 'build/docs/asciidoc'
-	into 'build/resources/main/static/docs'
-}
-
 jar {
     enabled = false
 }
