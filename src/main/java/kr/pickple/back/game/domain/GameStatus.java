@@ -1,5 +1,7 @@
 package kr.pickple.back.game.domain;
 
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
+
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -10,7 +12,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import kr.pickple.back.game.exception.GameException;
-import kr.pickple.back.game.exception.GameExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -35,6 +36,6 @@ public enum GameStatus {
             return gameStatusMap.get(description);
         }
 
-        throw new GameException(GameExceptionCode.GAME_STATUS_NOT_FOUND, description);
+        throw new GameException(GAME_STATUS_NOT_FOUND, description);
     }
 }

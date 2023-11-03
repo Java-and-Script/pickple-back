@@ -1,5 +1,6 @@
 package kr.pickple.back.game.service;
 
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
+import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
@@ -54,7 +56,8 @@ public class GameService {
 
     @Transactional
     public void registerGameMember(final Long gameId, final GameMemberCreateRequest gameMemberCreateRequest) {
-        final Game game = gameRepository.findById(gameId).orElseThrow();//TODO: ExceptionCode가 생기면 예외 추가 예정 (11.02 김영주)
+        final Game game = gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
         final Member member = findMemberById(gameMemberCreateRequest.getMemberId());
 
         game.addGameMember(member);

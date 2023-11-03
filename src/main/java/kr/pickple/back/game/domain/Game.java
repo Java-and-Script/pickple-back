@@ -1,6 +1,7 @@
 package kr.pickple.back.game.domain;
 
 import static kr.pickple.back.game.domain.GameStatus.*;
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -22,6 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
@@ -162,12 +164,11 @@ public class Game extends BaseEntity {
     }
 
     private void validateIsAlreadyRegisteredGameMember(final Member member) {
-        final boolean isAlreadyRegisteredGameMember = gameMembers.stream()
+        final Boolean isAlreadyRegisteredGameMember = gameMembers.stream()
                 .anyMatch(gameMember -> member == gameMember.getMember());
 
         if (isAlreadyRegisteredGameMember) {
-            //TODO : ExceptionCode가 생기면 예외 변경 예정 (11.02 김영주)
-            throw new IllegalArgumentException("이미 해당 게스트 모집에 참여 신청한 회원입니다.");
+            throw new GameException(GAME_MEMBER_IS_EXISTED, member.getId());
         }
     }
 }
