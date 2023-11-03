@@ -14,7 +14,7 @@ public final class AddressParser {
                 .toList();
     }
 
-    private static String addCitySuffixToFirstAddress(String addressDepth1) {
+    private static String addCitySuffixToFirstAddress(final String addressDepth1) {
         return addressDepth1.equals("서울") ? "서울시" : addressDepth1;
     }
 }

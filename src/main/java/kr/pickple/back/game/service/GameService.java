@@ -40,22 +40,12 @@ public class GameService {
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest) {
         final Member host = findMemberById(gameCreateRequest.getHostId());
-
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
-        final Game game = gameCreateRequest.toEntity(mainAddressResponse, host);
-
-        game.addGamePositions(gameCreateRequest.getPositions());
-
+        final Game game = gameCreateRequest.toEntity(host, mainAddressResponse);
         final Game savedGame = gameRepository.save(game);
-
-        final GameMember gameMember = GameMember.builder()
-                .member(host)
-                .game(savedGame)
-                .build();
-
-        gameMemberRepository.save(gameMember);
+        savedGame.addGameMember(host);
 
         return GameIdResponse.from(savedGame.getId());
     }

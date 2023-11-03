@@ -5,7 +5,7 @@ import jakarta.persistence.Converter;
 import kr.pickple.back.position.domain.Position;
 
 @Converter
-public final class PositionStatusConverter implements AttributeConverter<Position, String> {
+public final class PositionConverter implements AttributeConverter<Position, String> {
 
     @Override
     public String convertToDatabaseColumn(final Position position) {

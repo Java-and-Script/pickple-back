@@ -15,8 +15,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.dto.validator.PositionsValid;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -58,13 +58,13 @@ public class GameCreateRequest {
     @Positive(message = "모집 인원은 1 이상, 15이하")
     private Integer maxMemberCount;
 
-    @PositionsValid(message = "포지션 목록은 null일 수 없음\n포지션 목록은 [C, PF, SF, PG, SG, 없음] 중 복수 선택. 같은 포지션을 2회 이상 중복 선택은 불가")
-    private List<String> positions;
+    @NotNull(message = "포지션 목록은 null일 수 없음")
+    private List<Position> positions;
 
     @NotNull(message = "호스트 ID는 null일 수 없음")
     private Long hostId;
 
-    public Game toEntity(final MainAddressResponse mainAddressResponse, final Member host) {
+    public Game toEntity(final Member host, final MainAddressResponse mainAddressResponse) {
         return Game.builder()
                 .content(content)
                 .playDate(playDate)
@@ -78,6 +78,7 @@ public class GameCreateRequest {
                 .host(host)
                 .addressDepth1(mainAddressResponse.getAddressDepth1())
                 .addressDepth2(mainAddressResponse.getAddressDepth2())
+                .positions(positions)
                 .build();
     }
 }
