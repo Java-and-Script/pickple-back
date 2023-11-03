@@ -1,5 +1,7 @@
 package kr.pickple.back.game.domain;
 
+import static kr.pickple.back.game.domain.GameStatus.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -67,7 +69,7 @@ public class Game extends BaseEntity {
     @NotNull
     @Convert(converter = GameStatusConverter.class)
     @Column(length = 10)
-    private GameStatus status = GameStatus.OPEN;
+    private GameStatus status = OPEN;
 
     //todo 현호: 게시글 상세 조회 기능 구현시 viewCount 올리는 기능 구현
     @NotNull
@@ -97,9 +99,16 @@ public class Game extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
+<<<<<<<HEAD
     @Getter
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GamePosition> gamePositions = new ArrayList<>();
+=======
+    @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<GameMember> gameMembers = new ArrayList<>();
+>>>>>>>52f41
+
+    c4(feat:game과 gameMember의 양방향 연관관계 추가)
 
     @Builder
     private Game(
@@ -131,6 +140,8 @@ public class Game extends BaseEntity {
         this.addressDepth2 = addressDepth2;
     }
 
+<<<<<<<HEAD
+
     public void addGamePosition(final GamePosition gamePosition) {
         gamePosition.setGame(this);
     }
@@ -147,6 +158,26 @@ public class Game extends BaseEntity {
 
         for (GamePosition gamePosition : gamePositions) {
             addGamePosition(gamePosition);
+=======
+            public void addGameMember ( final Member member){
+                validateIsAlreadyRegisteredGameMember(member);
+
+                final GameMember gameMember = GameMember.builder()
+                        .member(member)
+                        .game(this)
+                        .build();
+
+                this.gameMembers.add(gameMember);
+            }
+
+            private void validateIsAlreadyRegisteredGameMember ( final Member member){
+                final boolean isAlreadyRegisteredGameMember = gameMembers.stream()
+                        .anyMatch(gameMember -> member == gameMember.getMember());
+
+                if (isAlreadyRegisteredGameMember) {
+                    //TODO : ExceptionCode가 생기면 예외 변경 예정 (11.02 김영주)
+                    throw new IllegalArgumentException("이미 해당 게스트 모집에 참여 신청한 회원입니다.");
+>>>>>>>52f 41 c4(feat:game과 gameMember의 양방향 연관관계 추가)
+                }
+            }
         }
-    }
-}
