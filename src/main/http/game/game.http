@@ -36,3 +36,9 @@ Content-Type: application/json
 
 ### 게스트 모집 참여 신청 거절/취소
 DELETE http://localhost:8080/games/2/members/3
+
+### 게스트 모집에 참여 신청된 사용자 정보 목록 조회
+GET http://localhost:8080/games/2/members?status=대기
+
+### 게스트 모집에 확정된 사용자 정보 목록 조회
+GET http://localhost:8080/games/2/members?status=확정
