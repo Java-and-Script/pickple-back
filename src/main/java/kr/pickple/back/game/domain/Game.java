@@ -165,7 +165,7 @@ public class Game extends BaseEntity {
 
     private void validateIsAlreadyRegisteredGameMember(final Member member) {
         final Boolean isAlreadyRegisteredGameMember = gameMembers.stream()
-                .anyMatch(gameMember -> member == gameMember.getMember());
+                .anyMatch(gameMember -> member.equals(gameMember.getMember()));
 
         if (isAlreadyRegisteredGameMember) {
             throw new GameException(GAME_MEMBER_IS_EXISTED, member.getId());

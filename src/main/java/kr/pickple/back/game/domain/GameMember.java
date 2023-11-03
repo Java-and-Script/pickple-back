@@ -47,8 +47,18 @@ public class GameMember extends BaseEntity {
 
     @Builder
     private GameMember(final Member member, final Game game) {
-        this.status = member == game.getHost() ? CONFIRMED : status;
+        this.status = getRegistrationStatus(member, game);
         this.member = member;
         this.game = game;
+    }
+
+    private RegistrationStatus getRegistrationStatus(final Member member, final Game game) {
+        final Member host = game.getHost();
+
+        if (member.equals(host)) {
+            return CONFIRMED;
+        }
+
+        return status;
     }
 }

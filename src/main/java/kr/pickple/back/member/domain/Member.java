@@ -19,12 +19,14 @@ import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EqualsAndHashCode(of = "id")
 public class Member extends BaseEntity {
 
     @Id
