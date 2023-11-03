@@ -3,8 +3,8 @@ POST http://localhost:8080/crews
 Content-Type: application/json
 
 {
-  "name": "넥스트 js 크루",
-  "content": "안녕하세요, 넥스트 js크루입니다. 백둥체육관 201호에서 진행합니다.",
+  "name": "넥스트 크루",
+  "content": "안녕하세요, 넥스트 크루입니다. 백둥체육관 201호에서 진행합니다.",
   "maxMemberCount": 15,
   "leaderId": 1,
   "addressDepth1": "서울시",
@@ -15,7 +15,7 @@ Content-Type: application/json
 GET http://localhost:8080/crews/12
 
 ### 크루가입 신청
-POST http://localhost:8080/crews/4/members
+POST http://localhost:8080/crews/13/members
 Content-Type: application/json
 
 {

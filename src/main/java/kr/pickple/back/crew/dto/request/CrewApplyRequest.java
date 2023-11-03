@@ -7,7 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor(staticName = "to")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewApplyRequest {
 

@@ -4,12 +4,10 @@ import jakarta.validation.Valid;
 import kr.pickple.back.crew.dto.request.CrewApplyRequest;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
-import kr.pickple.back.crew.dto.response.CrewMemberIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.service.CrewMemberService;
 import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,8 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.http.HttpStatus.*;
 
-import static org.springframework.http.HttpStatus.CREATED;
-import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -48,22 +45,11 @@ public class CrewController {
     }
 
     @PostMapping("/{crewId}/members")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-
-    public CrewMemberIdResponse applyForCrewMemberShip(
-            @PathVariable("crewId") Long crewId,
-            @Valid @RequestBody CrewApplyRequest crewApplyRequest
+    public void applyForCrewMemberShip(
+            @PathVariable("crewId") final Long crewId,
+            @Valid @RequestBody final CrewApplyRequest crewApplyRequest
     ) {
-        return crewMemberService.applyForCrewMemberShip(crewId, crewApplyRequest);
-    }
-
-    @PostMapping("/{crewId}/members")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-
-    public CrewMemberIdResponse applyForCrewMemberShip(
-            @PathVariable("crewId") Long crewId,
-            @Valid @RequestBody CrewApplyRequest crewApplyRequest
-    ) {
-        return crewMemberService.applyForCrewMemberShip(crewId, crewApplyRequest);
+        crewMemberService.applyForCrewMemberShip(crewId, crewApplyRequest);
+        ResponseEntity.status(NO_CONTENT).build();
     }
 }

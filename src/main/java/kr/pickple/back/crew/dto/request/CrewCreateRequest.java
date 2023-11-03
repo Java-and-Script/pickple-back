@@ -34,7 +34,7 @@ public class CrewCreateRequest {
     @NotBlank(message = "해당 크루의 활동 장소(구) 정보는 필수입니다.")
     private String addressDepth2;
 
-    public Crew toEntity(final Member leader, final MainAddressResponse mainAddressResponse, String profile, String background) {
+    public Crew toEntity(final Member leader, final MainAddressResponse mainAddressResponse, final String profile, final String background) {
 
         return Crew.builder()
                 .name(name)
