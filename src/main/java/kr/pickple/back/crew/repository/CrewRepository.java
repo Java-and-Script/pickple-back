@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CrewRepository extends JpaRepository<Crew, Long> {
 
-    boolean existsByName(String name);
+    boolean existsByName(final String name);
 }

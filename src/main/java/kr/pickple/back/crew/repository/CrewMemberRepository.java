@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface CrewMemberRepository extends JpaRepository<CrewMember, Long> {
 
-    Optional<CrewMember> findByMemberAndCrew(Member member, Crew crew);
+    Optional<CrewMember> findByMemberAndCrew(final Member member, final Crew crew);
 }
