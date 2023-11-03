@@ -25,3 +25,11 @@ Content-Type: application/json
 {
   "memberId": 1
 }
+
+### 게스트 모집 참여 신청 수락
+PATCH http://localhost:8080/games/2/members/3
+Content-Type: application/json
+
+{
+  "status": "확정"
+}
