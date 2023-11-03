@@ -112,4 +112,8 @@ public class Member extends BaseEntity {
                 .map(MemberPosition::getPosition)
                 .toList();
     }
+
+    public void updateMannerScore(final Integer mannerScorePoints) {
+        this.mannerScore += mannerScorePoints;
+    }
 }

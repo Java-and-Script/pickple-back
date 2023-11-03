@@ -1,5 +1,6 @@
 package kr.pickple.back.game.service;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
@@ -16,6 +17,7 @@ import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
+import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
@@ -73,11 +75,6 @@ public class GameService {
         return GameResponse.of(game, memberResponses);
     }
 
-    private Game findGameById(final Long gameId) {
-        return gameRepository.findById(gameId)
-                .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
-    }
-
     @Transactional
     public void updateGameMemberRegistrationStatus(
             final Long gameId,
@@ -100,5 +97,28 @@ public class GameService {
     private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
         return gameMemberRepository.findByMemberIdAndGameId(memberId, gameId)
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
+    }
+
+    @Transactional
+    public void reviewMannerScores(final Long gameId, final List<MannerScoreReview> mannerScoreReviews) {
+        Game game = findGameById(gameId);
+
+        mannerScoreReviews.forEach(review -> {
+            final Member reviewedMember = getReviewedMember(game, review.getMemberId());
+            reviewedMember.updateMannerScore(review.getMannerScore());
+        });
+    }
+
+    private Game findGameById(final Long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
+    }
+
+    private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
+        return game.getMembers(CONFIRMED)
+                .stream()
+                .filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
+                .findFirst()
+                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
     }
 }

@@ -2,6 +2,8 @@ package kr.pickple.back.game.controller;
 
 import static org.springframework.http.HttpStatus.*;
 
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +20,8 @@ import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
+import kr.pickple.back.game.dto.request.MannerScoreReview;
+import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.service.GameService;
@@ -71,6 +75,18 @@ public class GameController {
     @DeleteMapping("/{gameId}/members/{memberId}")
     public ResponseEntity<Void> deleteGameMember(@PathVariable final Long gameId, @PathVariable final Long memberId) {
         gameService.deleteGameMember(gameId, memberId);
+
+        return ResponseEntity.status(NO_CONTENT)
+                .build();
+    }
+
+    @PatchMapping("/{gameId}/members/manner-scores")
+    public ResponseEntity<Void> reviewMannerScores(
+            @PathVariable final Long gameId,
+            @Valid @RequestBody final MannerScoreReviewsRequest mannerScoreReviewsRequest
+    ) {
+        final List<MannerScoreReview> mannerScoreReviews = mannerScoreReviewsRequest.getMannerScoreReviews();
+        gameService.reviewMannerScores(gameId, mannerScoreReviews);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
