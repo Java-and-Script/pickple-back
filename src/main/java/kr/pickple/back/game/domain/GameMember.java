@@ -14,7 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.common.util.RegistrationStatusConverter;
+import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,7 +30,7 @@ public class GameMember extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Convert(converter = RegistrationStatusConverter.class)
+    @Convert(converter = RegistrationStatusAttributeConverter.class)
     @Column(length = 10)
     private RegistrationStatus status = WAITING;
 

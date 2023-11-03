@@ -1,19 +1,15 @@
 package kr.pickple.back.common.util;
 
-import jakarta.persistence.AttributeConverter;
-import jakarta.persistence.Converter;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.stereotype.Component;
+
 import kr.pickple.back.common.domain.RegistrationStatus;
 
-@Converter
-public final class RegistrationStatusConverter implements AttributeConverter<RegistrationStatus, String> {
+@Component
+public class RegistrationStatusConverter implements Converter<String, RegistrationStatus> {
 
     @Override
-    public String convertToDatabaseColumn(RegistrationStatus registrationStatus) {
-        return registrationStatus.getDescription();
-    }
-
-    @Override
-    public RegistrationStatus convertToEntityAttribute(String description) {
-        return RegistrationStatus.from(description);
+    public RegistrationStatus convert(final String source) {
+        return RegistrationStatus.from(source);
     }
 }
