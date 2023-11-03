@@ -1,5 +1,7 @@
 package kr.pickple.back.game.domain;
 
+import java.util.Objects;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -15,6 +17,7 @@ import kr.pickple.back.position.domain.Position;
 import kr.pickple.back.position.util.PositionStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -25,6 +28,7 @@ public class GamePosition extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @NotNull
     @Convert(converter = PositionStatusConverter.class)
     @Column(length = 2)
@@ -38,5 +42,14 @@ public class GamePosition extends BaseEntity {
     private GamePosition(final Position position, final Game game) {
         this.position = position;
         this.game = game;
+    }
+
+    public void setGame(final Game game) {
+        if (Objects.nonNull(this.game)) {
+            this.game.getGamePositions().remove(this);
+        }
+
+        this.game = game;
+        game.getGamePositions().add(this);
     }
 }

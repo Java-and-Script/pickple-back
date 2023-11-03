@@ -2,7 +2,10 @@ package kr.pickple.back.game.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -12,12 +15,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.util.GameStatusConverter;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -92,6 +97,10 @@ public class Game extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
+    @Getter
+    @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<GamePosition> gamePositions = new ArrayList<>();
+
     @Builder
     private Game(
             final String content,
@@ -120,5 +129,24 @@ public class Game extends BaseEntity {
         this.host = host;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+    }
+
+    public void addGamePosition(final GamePosition gamePosition) {
+        gamePosition.setGame(this);
+    }
+
+    public void addGamePositions(final List<String> positions) {
+        final List<GamePosition> gamePositions = positions
+                .stream()
+                .distinct()
+                .map(position -> GamePosition.builder()
+                        .position(Position.from(position))
+                        .game(this)
+                        .build())
+                .toList();
+
+        for (GamePosition gamePosition : gamePositions) {
+            addGamePosition(gamePosition);
+        }
     }
 }
