@@ -99,16 +99,12 @@ public class Game extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
-<<<<<<<HEAD
     @Getter
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GamePosition> gamePositions = new ArrayList<>();
-=======
+
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GameMember> gameMembers = new ArrayList<>();
->>>>>>>52f41
-
-    c4(feat:game과 gameMember의 양방향 연관관계 추가)
 
     @Builder
     private Game(
@@ -140,44 +136,38 @@ public class Game extends BaseEntity {
         this.addressDepth2 = addressDepth2;
     }
 
-<<<<<<<HEAD
-
-    public void addGamePosition(final GamePosition gamePosition) {
-        gamePosition.setGame(this);
-    }
-
     public void addGamePositions(final List<String> positions) {
-        final List<GamePosition> gamePositions = positions
-                .stream()
+        positions.stream()
                 .distinct()
                 .map(position -> GamePosition.builder()
                         .position(Position.from(position))
                         .game(this)
                         .build())
-                .toList();
+                .forEach(this::addGamePosition);
+    }
 
-        for (GamePosition gamePosition : gamePositions) {
-            addGamePosition(gamePosition);
-=======
-            public void addGameMember ( final Member member){
-                validateIsAlreadyRegisteredGameMember(member);
+    private void addGamePosition(final GamePosition gamePosition) {
+        gamePosition.updateGame(this);
+    }
 
-                final GameMember gameMember = GameMember.builder()
-                        .member(member)
-                        .game(this)
-                        .build();
+    public void addGameMember(final Member member) {
+        validateIsAlreadyRegisteredGameMember(member);
 
-                this.gameMembers.add(gameMember);
-            }
+        final GameMember gameMember = GameMember.builder()
+                .member(member)
+                .game(this)
+                .build();
 
-            private void validateIsAlreadyRegisteredGameMember ( final Member member){
-                final boolean isAlreadyRegisteredGameMember = gameMembers.stream()
-                        .anyMatch(gameMember -> member == gameMember.getMember());
+        gameMembers.add(gameMember);
+    }
 
-                if (isAlreadyRegisteredGameMember) {
-                    //TODO : ExceptionCode가 생기면 예외 변경 예정 (11.02 김영주)
-                    throw new IllegalArgumentException("이미 해당 게스트 모집에 참여 신청한 회원입니다.");
->>>>>>>52f 41 c4(feat:game과 gameMember의 양방향 연관관계 추가)
-                }
-            }
+    private void validateIsAlreadyRegisteredGameMember(final Member member) {
+        final boolean isAlreadyRegisteredGameMember = gameMembers.stream()
+                .anyMatch(gameMember -> member == gameMember.getMember());
+
+        if (isAlreadyRegisteredGameMember) {
+            //TODO : ExceptionCode가 생기면 예외 변경 예정 (11.02 김영주)
+            throw new IllegalArgumentException("이미 해당 게스트 모집에 참여 신청한 회원입니다.");
         }
+    }
+}

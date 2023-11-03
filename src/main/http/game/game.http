@@ -1,4 +1,4 @@
-### 게임 생성
+### 게스트 모집하기
 POST http://localhost:8080/games
 Content-Type: application/json
 
@@ -16,4 +16,12 @@ Content-Type: application/json
     "PG"
   ],
   "hostId": 1
+}
+
+### 게스트 모집 참여 신청
+POST http://localhost:8080/games/2/members
+Content-Type: application/json
+
+{
+  "memberId": 1
 }
