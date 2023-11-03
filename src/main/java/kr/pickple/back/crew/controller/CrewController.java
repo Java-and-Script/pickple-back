@@ -6,12 +6,15 @@ import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,13 +27,15 @@ public class CrewController {
     public ResponseEntity<CrewIdResponse> createCrew(
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED)
+        return ResponseEntity.status(CREATED)
                 .body(crewService.createCrew(crewCreateRequest));
     }
 
     @GetMapping("/{crewId}")
-    @ResponseStatus(HttpStatus.OK)
-    public CrewProfileResponse findCrewById(@PathVariable Long crewId) {
-        return crewService.findCrewById(crewId);
+    public ResponseEntity<CrewProfileResponse> findCrewById(
+            @PathVariable final Long crewId
+    ) {
+        return ResponseEntity.status(OK)
+                .body(crewService.findCrewById(crewId));
     }
 }
