@@ -4,7 +4,6 @@ import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.request.CrewApplyRequest;
-import kr.pickple.back.crew.dto.response.CrewMemberIdResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
@@ -32,37 +31,35 @@ public class CrewMemberService {
     private final CrewMemberRepository crewMemberRepository;
 
     @Transactional
-    public CrewMemberIdResponse applyForCrewMemberShip(Long crewId, CrewApplyRequest crewApplyRequest) {
-        Crew crew = findByExistCrew(crewId);
+    public void applyForCrewMemberShip(final Long crewId, final CrewApplyRequest crewApplyRequest) {
+        final Crew crew = findByExistCrew(crewId);
 
-        Member member = findByExistMember(crewApplyRequest.getMemberId());
+        final Member member = findByExistMember(crewApplyRequest.getMemberId());
 
         findByIsConfirmCrewMember(member, crew);
 
 
-        CrewMember crewMember = CrewMember.builder()
+        final CrewMember crewMember = CrewMember.builder()
                 .crew(crew)
                 .member(member)
                 .status(RegistrationStatus.WAITING)
                 .build();
         crewMemberRepository.save(crewMember);
-
-        return CrewMemberIdResponse.from(crewApplyRequest.getMemberId());
     }
 
-    private Crew findByExistCrew(Long crewId) {
+    private Crew findByExistCrew(final Long crewId) {
         return crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
     }
 
-    private void findByIsConfirmCrewMember(Member member, Crew crew) {
+    private void findByIsConfirmCrewMember(final Member member, final Crew crew) {
         Optional<CrewMember> crewMember = crewMemberRepository.findByMemberAndCrew(member, crew);
         if (crewMember.isPresent() && crewMember.get().getStatus() == RegistrationStatus.CONFIRMED) {
             throw new CrewException(CREW_MEMBER_ALREADY_JOINED, member.getId());
         }
     }
 
-    private Member findByExistMember(Long memberId) {
+    private Member findByExistMember(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }

@@ -89,14 +89,14 @@ public class Crew extends BaseEntity {
         this.content = content;
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
-        this.status = validateCrewStatus(maxMemberCount);
+        this.status = updateStatusWhenMaxMembers(maxMemberCount);
         this.maxMemberCount = maxMemberCount;
         this.leader = leader;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
     }
 
-    public CrewStatus validateCrewStatus(final Integer maxMemberCount) {
+    public CrewStatus updateStatusWhenMaxMembers(final Integer maxMemberCount) {
         if (memberCount == maxMemberCount) {
             status = CLOSED;
         }

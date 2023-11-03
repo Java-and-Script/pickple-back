@@ -1,25 +1,17 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.util.CrewMemberStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
 
 @Getter
 @Entity
@@ -31,8 +23,8 @@ public class CrewMember extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Enumerated(value = EnumType.STRING)
     @Column(length = 10)
+    @Convert(converter = CrewMemberStatusConverter.class)
     private RegistrationStatus status = WAITING;
 
     @NotNull
