@@ -10,20 +10,19 @@ import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREADY_JOINED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREADY_EXISTED;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@RequiredArgsConstructor
 public class CrewMemberService {
 
     private final CrewRepository crewRepository;
@@ -33,9 +32,9 @@ public class CrewMemberService {
     @Transactional
     public void applyForCrewMemberShip(final Long crewId, final CrewApplyRequest crewApplyRequest) {
         final Crew crew = findByExistCrew(crewId);
-        final Member member = findByExistMember(crewApplyRequest.getMemberId());
+        final Member member = findMemberById(crewApplyRequest.getMemberId());
 
-        findByIsConfirmCrewMember(member, crew);
+        validateExistCrewMember(member, crew);
 
         final CrewMember crewMember = CrewMember.builder()
                 .crew(crew)
@@ -50,14 +49,15 @@ public class CrewMemberService {
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
     }
 
-    private void findByIsConfirmCrewMember(final Member member, final Crew crew) {
-        Optional<CrewMember> crewMember = crewMemberRepository.findByMemberAndCrew(member, crew);
-        if (crewMember.isPresent() && crewMember.get().getStatus() == RegistrationStatus.CONFIRMED) {
-            throw new CrewException(CREW_MEMBER_ALREADY_JOINED, member.getId());
+    private void validateExistCrewMember(final Member member, final Crew crew) {
+        final Optional<CrewMember> crewMember = crewMemberRepository.findByMemberAndCrew(member, crew);
+
+        if (crewMember.isPresent()) {
+            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, member.getId());
         }
     }
 
-    private Member findByExistMember(final Long memberId) {
+    private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
