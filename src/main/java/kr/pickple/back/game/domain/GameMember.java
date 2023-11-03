@@ -29,6 +29,7 @@ public class GameMember extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @NotNull
     @Convert(converter = RegistrationStatusAttributeConverter.class)
     @Column(length = 10)
@@ -54,6 +55,10 @@ public class GameMember extends BaseEntity {
 
     public void updateStatus(final RegistrationStatus status) {
         this.status = status;
+    }
+
+    public Boolean equalsStatus(final RegistrationStatus status) {
+        return this.status == status;
     }
 
     private RegistrationStatus getRegistrationStatus(final Member member, final Game game) {

@@ -4,18 +4,22 @@ import static org.springframework.http.HttpStatus.*;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
+import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +45,15 @@ public class GameController {
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
+    }
+
+    @GetMapping("/{gameId}/members")
+    public ResponseEntity<GameResponse> findAllGameMembers(
+            @PathVariable final Long gameId,
+            @RequestParam final RegistrationStatus status
+    ) {
+        return ResponseEntity.status(OK)
+                .body(gameService.findAllGameMembers(gameId, status));
     }
 
     @PatchMapping("/{gameId}/members/{memberId}")

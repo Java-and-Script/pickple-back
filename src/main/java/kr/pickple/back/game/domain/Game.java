@@ -23,6 +23,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
 import kr.pickple.back.member.domain.Member;
@@ -161,6 +162,19 @@ public class Game extends BaseEntity {
                 .build();
 
         gameMembers.add(gameMember);
+    }
+
+    public List<Position> getPositions() {
+        return gamePositions.stream()
+                .map(GamePosition::getPosition)
+                .toList();
+    }
+
+    public List<Member> getMembers(final RegistrationStatus status) {
+        return gameMembers.stream()
+                .filter(gameMember -> gameMember.equalsStatus(status))
+                .map(GameMember::getMember)
+                .toList();
     }
 
     private void validateIsAlreadyRegisteredGameMember(final Member member) {
