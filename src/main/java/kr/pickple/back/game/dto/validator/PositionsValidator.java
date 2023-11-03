@@ -21,21 +21,17 @@ public class PositionsValidator implements ConstraintValidator<PositionsValid, L
 
     @Override
     public boolean isValid(final List<String> positions, final ConstraintValidatorContext context) {
-        if (positions == null || isDuplicate(positions) || isInValidAcronyms(positions)) {
-            return false;
-        }
-
-        return true;
+        return positions != null && isNotDuplicate(positions) && isValidAcronyms(positions);
     }
 
-    private boolean isDuplicate(final List<String> positions) {
+    private boolean isNotDuplicate(final List<String> positions) {
         final Set<String> distinctPositions = new HashSet<>(positions);
 
-        return positions.size() != distinctPositions.size();
+        return positions.size() == distinctPositions.size();
     }
 
-    private boolean isInValidAcronyms(final List<String> positions) {
+    private boolean isValidAcronyms(final List<String> positions) {
         return positions.stream()
-                .anyMatch(position -> !positionAcronyms.contains(position));
+                .anyMatch(positionAcronyms::contains);
     }
 }
