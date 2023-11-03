@@ -10,13 +10,13 @@ public class PositionResponse {
     private String acronym;
     private String description;
 
-    private PositionResponse(Position position) {
+    private PositionResponse(final Position position) {
         this.name = position.getName();
         this.description = position.getDescription();
         this.acronym = position.getAcronym();
     }
 
-    public static PositionResponse from(Position position) {
+    public static PositionResponse from(final Position position) {
         return new PositionResponse(position);
     }
 }
