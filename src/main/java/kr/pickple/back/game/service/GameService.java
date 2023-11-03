@@ -10,6 +10,7 @@ import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
+import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
@@ -30,14 +31,15 @@ public class GameService {
 
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest) {
-        final Member host = memberRepository.findById(gameCreateRequest.getHostId())
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, gameCreateRequest.getHostId()));
+        final Member host = findMemberById(gameCreateRequest.getHostId());
 
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
         final Game game = gameCreateRequest.toEntity(mainAddressResponse, host);
+
         game.addGamePositions(gameCreateRequest.getPositions());
+
         final Game savedGame = gameRepository.save(game);
 
         final GameMember gameMember = GameMember.builder()
@@ -48,5 +50,18 @@ public class GameService {
         gameMemberRepository.save(gameMember);
 
         return GameIdResponse.from(savedGame.getId());
+    }
+
+    @Transactional
+    public void registerGameMember(final Long gameId, final GameMemberCreateRequest gameMemberCreateRequest) {
+        final Game game = gameRepository.findById(gameId).orElseThrow();//TODO: ExceptionCode가 생기면 예외 추가 예정 (11.02 김영주)
+        final Member member = findMemberById(gameMemberCreateRequest.getMemberId());
+
+        game.addGameMember(member);
+    }
+
+    private Member findMemberById(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 }

@@ -44,7 +44,7 @@ public class GamePosition extends BaseEntity {
         this.game = game;
     }
 
-    public void setGame(final Game game) {
+    public void updateGame(final Game game) {
         if (Objects.nonNull(this.game)) {
             this.game.getGamePositions().remove(this);
         }
