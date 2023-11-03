@@ -98,7 +98,7 @@ openapi3 {
 	version = "0.0.1"
 	outputFileNamePrefix = 'pickple'
 	format = 'yaml'
-	outputDirectory = 'build/resources/main/static/docs'
+	outputDirectory = 'build/resources/main/static/docs/'
 }
 
 tasks.register('copyDocs') {
