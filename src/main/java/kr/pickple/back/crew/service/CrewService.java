@@ -17,8 +17,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
@@ -50,12 +48,10 @@ public class CrewService {
         return CrewIdResponse.from(crewId);
     }
 
-    @Transactional
-    public CrewProfileResponse findCrewById(Long crewId) {
-        Crew crew = crewRepository.findById(crewId)
+    public CrewProfileResponse findCrewById(final Long crewId) {
+        final Crew crew = crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CrewExceptionCode.CREW_NOT_FOUND));
-
-        List<Member> members = null;//TODO:추후 Member 도메인 완성되면 추가(11월 1일, 소재훈)
+        //TODO:추후 Member 도메인 완성되면 추가(11월 1일, 소재훈)
 
         return CrewProfileResponse.fromEntity(crew);
     }
