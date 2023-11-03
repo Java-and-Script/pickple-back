@@ -1,0 +1,109 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "PICKPLE API 문서",
+    "description" : "PICKPLE 서비스의 API 문서입니다.",
+    "version" : "0.0.1"
+  },
+  "servers" : [ {
+    "url" : "https://api.pickple.kr"
+  } ],
+  "tags" : [ ],
+  "paths" : {
+    "/members/{memberId}" : {
+      "get" : {
+        "tags" : [ "Member" ],
+        "summary" : "회원 프로필 조회",
+        "description" : "회원 프로필을 조회한다",
+        "operationId" : "find-member",
+        "parameters" : [ {
+          "name" : "memberId",
+          "in" : "path",
+          "description" : "회원 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MemberProfileResponse"
+                },
+                "examples" : {
+                  "find-member" : {
+                    "value" : "{\n  \"id\" : 1,\n  \"email\" : \"pickple1@pickple.kr\",\n  \"nickname\" : \"백둥1\",\n  \"introduction\" : \"안녕하세요 백둥1입니다\",\n  \"profileImageUrl\" : \"http://profile1.image\",\n  \"mannerScore\" : 0,\n  \"mannerScoreCount\" : 0,\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"강남구\",\n  \"positions\" : [ ],\n  \"crews\" : null\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "MemberProfileResponse" : {
+        "title" : "MemberProfileResponse",
+        "type" : "object",
+        "properties" : {
+          "addressDepth2" : {
+            "type" : "string",
+            "description" : "주소2(구)"
+          },
+          "addressDepth1" : {
+            "type" : "string",
+            "description" : "주소1(도,시)"
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "positions" : {
+            "type" : "array",
+            "description" : "주 포지션 목록",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "mannerScore" : {
+            "type" : "number",
+            "description" : "매너 스코어"
+          },
+          "id" : {
+            "type" : "number",
+            "description" : "회원 ID"
+          },
+          "mannerScoreCount" : {
+            "type" : "number",
+            "description" : "매너 스코어 반영 개수"
+          },
+          "profileImageUrl" : {
+            "type" : "string",
+            "description" : "프로필 이미지 경로"
+          },
+          "introduction" : {
+            "type" : "string",
+            "description" : "자기소개"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "이메일"
+          }
+        }
+      }
+    }
+  }
+}
