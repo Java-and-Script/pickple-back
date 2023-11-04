@@ -4,6 +4,7 @@ import java.util.List;
 
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,11 @@ public class MemberProfileResponse {
     private List<Position> positions;
     private List<CrewResponse> crews; //TODO: 추후 Crew 도메인 완성 시, 해당 필드에 대한 로직 추가 예정 (10.31 김영주)
 
-    public static MemberProfileResponse of(final Member member, final List<Position> positions) {
+    public static MemberProfileResponse from(final Member member) {
+        final List<Position> positions = member.getMemberPositions().stream()
+                .map(MemberPosition::getPosition)
+                .toList();
+
         return MemberProfileResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
