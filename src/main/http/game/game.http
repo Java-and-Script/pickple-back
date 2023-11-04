@@ -18,6 +18,10 @@ Content-Type: application/json
   "hostId": 1
 }
 
+### 게스트 모집 상세 조회
+GET http://localhost:8080/games/1
+
+
 ### 게스트 모집 참여 신청
 POST http://localhost:8080/games/2/members
 Content-Type: application/json
