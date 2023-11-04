@@ -47,4 +47,13 @@ public class CrewController {
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
+
+    @GetMapping("/{crewId}/members")
+    public ResponseEntity<CrewProfileResponse> findAllApplyForCrewMemberShip(
+            @PathVariable final Long crewId,
+            @RequestParam(defaultValue = "대기") final String status
+    ) {
+        return ResponseEntity.status(OK)
+                .body(crewMemberService.findAllApplyForCrewMemberShip(crewId, status));
+    }
 }
