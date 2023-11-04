@@ -102,6 +102,20 @@ openapi3 {
 
 tasks.register('copyDocs') {
 	dependsOn(':openapi3')
+	doFirst {
+		def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.json")
+
+		def securitySchemesContent =  "  securitySchemes:\n" +  \
+                                      "    APIKey:\n" +  \
+                                      "      type: apiKey\n" +  \
+                                      "      name: Authorization\n" +  \
+                                      "      in: header\n" + \
+                                      "security:\n" +
+				"  - APIKey: []  # Apply the security scheme here"
+
+		swaggerUIFile.append securitySchemesContent
+	}
+
 	doLast {
 		delete 'src/main/resources/static/docs/pickple.json'
 		copy {

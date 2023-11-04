@@ -1,4 +1,10 @@
 == Member
 
-=== CREATE Member
+=== CREATE MEMBER
+operation::create-member[snippets='http-request,http-response']
+
+=== FIND MEMBER
 operation::find-member[snippets='http-request,http-response']
+
+
+
