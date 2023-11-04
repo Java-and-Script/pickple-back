@@ -37,9 +37,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-
-    //API테스트 시 AUT-007 : 유효하지 않은 RegisterToken 에러 발생.
-    //API테스트 하는 방법 파악한 뒤에 memberPositionRepository 없애는 방향으로 개선 예정.
+    
     @Transactional
     public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
         validateIsDuplicatedMemberInfo(
