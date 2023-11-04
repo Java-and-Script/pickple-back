@@ -11,6 +11,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,10 @@ public class AddressDepth2 extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_depth1_id")
     private AddressDepth1 addressDepth1;
+
+    @Builder
+    public AddressDepth2(final String name, final AddressDepth1 addressDepth1) {
+        this.name = name;
+        this.addressDepth1 = addressDepth1;
+    }
 }

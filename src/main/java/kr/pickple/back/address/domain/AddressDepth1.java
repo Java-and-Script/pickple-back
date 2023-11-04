@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,4 +24,9 @@ public class AddressDepth1 extends BaseEntity {
     @NotNull
     @Column(unique = true, length = 10)
     private String name;
+
+    @Builder
+    private AddressDepth1(final String name) {
+        this.name = name;
+    }
 }
