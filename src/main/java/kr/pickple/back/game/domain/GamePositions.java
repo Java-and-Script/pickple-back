@@ -1,11 +1,14 @@
 package kr.pickple.back.game.domain;
 
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
+import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.position.domain.Position;
 
 @Embeddable
@@ -21,10 +24,21 @@ public class GamePositions {
     }
 
     public void updateGamePositions(final Game game, final List<Position> positions) {
+        validateIsDuplicatedPositions(positions);
+
         positions.stream()
-                .distinct()
                 .map(position -> buildGamePosition(game, position))
                 .forEach(gamePositions::add);
+    }
+
+    private void validateIsDuplicatedPositions(final List<Position> positions) {
+        long distinctPositionsSize = positions.stream()
+                .distinct()
+                .count();
+
+        if (distinctPositionsSize < positions.size()) {
+            throw new GameException(GAME_POSITIONS_IS_DUPLICATED, positions);
+        }
     }
 
     private GamePosition buildGamePosition(final Game game, final Position position) {
