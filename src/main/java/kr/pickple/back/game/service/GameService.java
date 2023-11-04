@@ -98,7 +98,7 @@ public class GameService {
     }
 
     private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
-        return gameMemberRepository.findByMember_IdAndGame_Id(memberId, gameId)
+        return gameMemberRepository.findByMemberIdAndGameId(memberId, gameId)
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
     }
 }

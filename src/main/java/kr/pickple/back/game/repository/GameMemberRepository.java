@@ -8,5 +8,5 @@ import kr.pickple.back.game.domain.GameMember;
 
 public interface GameMemberRepository extends JpaRepository<GameMember, Long> {
 
-    Optional<GameMember> findByMember_IdAndGame_Id(final Long memberId, final Long gameId);
+    Optional<GameMember> findByMemberIdAndGameId(final Long memberId, final Long gameId);
 }
