@@ -1,5 +1,7 @@
 package kr.pickple.back.member.domain;
 
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +23,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
@@ -34,6 +37,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id")
 public class Member extends BaseEntity {
+
+    private static final List<Integer> MANNER_SCORE_POINT_RANGE = List.of(-1, 0, 1);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -113,7 +118,13 @@ public class Member extends BaseEntity {
                 .toList();
     }
 
-    public void updateMannerScore(final Integer mannerScorePoints) {
-        this.mannerScore += mannerScorePoints;
+    public void updateMannerScore(final Integer mannerScorePoint) {
+        if (MANNER_SCORE_POINT_RANGE.contains(mannerScorePoint)) {
+            this.mannerScore += mannerScorePoint;
+
+            return;
+        }
+
+        throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
     }
 }
