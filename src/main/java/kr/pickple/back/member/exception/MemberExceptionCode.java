@@ -15,6 +15,7 @@ public enum MemberExceptionCode implements ExceptionCode {
     MEMBER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "MEM-003", "사용자 상태는 활동이거나 탈퇴만 가능"),
     MEMBER_SIGNUP_OAUTH_SUBJECT_INVALID(HttpStatus.BAD_REQUEST, "MEM-004",
             "회원 가입 시, 사용자의 OAuth ID와 Provider의 정보가 유효하지 않음"),
+    MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "MEM-005", "매너 스코어 변경 포인트가 범위를 벗어남"),
     ;
 
     private final HttpStatus status;
