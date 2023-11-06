@@ -18,9 +18,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_NOT_FOUND;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
@@ -70,5 +71,26 @@ public class CrewMemberService {
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    @Transactional
+    public void deleteMemberShip(final Long crewId, final Long memberId) {
+        final Crew crew = findByExistCrew(crewId);
+        final Member member = findMemberById(memberId);
+        //TODO:추후, 크루장인지 검증 로직 추가(11월 2일, 소재훈)
+
+        final Optional<CrewMember> crewMember = crewMemberRepository.findByMemberAndCrew(member, crew);
+
+        if (!crewMember.isPresent()) {
+            throw new CrewException(CREW_MEMBER_NOT_FOUND, member.getId());
+        }
+
+        final CrewMember deleteCrewMember = crewMember.get();
+
+        if (deleteCrewMember.getStatus() != WAITING) {
+            throw new CrewException(CREW_MEMBER_ALREADY_CONFIRMED, member.getId());
+        }
+
+        crewMemberRepository.delete(deleteCrewMember);
     }
 }
