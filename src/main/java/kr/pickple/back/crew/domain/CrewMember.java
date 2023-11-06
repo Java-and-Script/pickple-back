@@ -59,7 +59,7 @@ public class CrewMember extends BaseEntity {
         this.status = RegistrationStatus.CONFIRMED;
     }
 
-    public void permitStatus(final RegistrationStatus registrationStatus) {
+    public void updateStatus(final RegistrationStatus registrationStatus) {
         this.status = registrationStatus;
     }
 }

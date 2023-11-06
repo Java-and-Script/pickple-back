@@ -48,6 +48,7 @@ public class CrewService {
 
         final Crew crew = crewCreateRequest.toEntity(leader, mainAddressResponse, s3Properties.getProfile(), s3Properties.getBackground());
         crew.addCrewMember(leader);
+
         final Long crewId = crewRepository.save(crew).getId();
 
         return CrewIdResponse.from(crewId);
