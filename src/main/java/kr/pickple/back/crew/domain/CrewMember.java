@@ -58,4 +58,8 @@ public class CrewMember extends BaseEntity {
     public void confirmRegistration() {
         this.status = RegistrationStatus.CONFIRMED;
     }
+
+    public void permitStatus(final RegistrationStatus registrationStatus) {
+        this.status = registrationStatus;
+    }
 }

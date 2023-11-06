@@ -24,3 +24,11 @@ Content-Type: application/json
 
 ### 크루원 가입 신청자 목록
 GET  http://localhost:8080/crews/17/members?status=대기
+
+### 크루원 가입 신청 수락
+PATCH http://localhost:8080/crews/14/members/2
+Content-Type: application/json
+
+{
+  "status": "확정"
+}
