@@ -32,3 +32,7 @@ Content-Type: application/json
 {
   "status": "대기"
 }
+
+### 크루원 가입 신청 거절/취소
+DELETE http://localhost:8080/crews/14/members/2
+Content-Type: application/json

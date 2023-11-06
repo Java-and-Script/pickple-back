@@ -11,6 +11,7 @@ import kr.pickple.back.crew.service.CrewMemberService;
 import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,6 +74,17 @@ public class CrewController {
             @Valid @RequestBody final CrewMemberUpdateStatusRequest crewMemberStatusUpdateRequest
     ) {
         crewMemberService.crewMemberStatusUpdate(crewId, memberId, crewMemberStatusUpdateRequest);
+
+        return ResponseEntity.status(NO_CONTENT)
+                .build();
+    }
+
+    @DeleteMapping("/{crewId}/members/{memberId}")
+    public ResponseEntity<Void> deleteCrewMemberShip(
+            @PathVariable final Long crewId,
+            @PathVariable final Long memberId
+    ) {
+        crewMemberService.deleteMemberShip(crewId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
