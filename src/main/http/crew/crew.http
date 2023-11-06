@@ -3,8 +3,8 @@ POST http://localhost:8080/crews
 Content-Type: application/json
 
 {
-  "name": "넥스트 크루",
-  "content": "안녕하세요, 넥스트 크루입니다. 백둥체육관 201호에서 진행합니다.",
+  "name": "쿠쿠 크루",
+  "content": "안녕하세요, 쿠쿠 크루입니다. 백둥체육관 201호에서 진행합니다.",
   "maxMemberCount": 15,
   "leaderId": 1,
   "addressDepth1": "서울시",
@@ -12,10 +12,10 @@ Content-Type: application/json
 }
 
 ### 크루 상세 조회
-GET http://localhost:8080/crews/13
+GET http://localhost:8080/crews/17
 
 ### 크루가입 신청
-POST http://localhost:8080/crews/13/members
+POST http://localhost:8080/crews/17/members
 Content-Type: application/json
 
 {
@@ -23,4 +23,4 @@ Content-Type: application/json
 }
 
 ### 크루원 가입 신청자 목록
-GET  http://localhost:8080/crews/13/members?status=대기
+GET  http://localhost:8080/crews/17/members?status=대기
