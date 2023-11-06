@@ -18,7 +18,7 @@ public class GameMembers {
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GameMember> gameMembers = new ArrayList<>();
 
-    public List<Member> getMembers(final RegistrationStatus status) {
+    public List<Member> getMembersByStatus(final RegistrationStatus status) {
         return gameMembers.stream()
                 .filter(gameMember -> gameMember.equalsStatus(status))
                 .map(GameMember::getMember)
