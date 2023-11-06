@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREADY_EXISTED;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_STATUS_NOT_FOUND;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_NOT_FOUND;
 
 @Embeddable
 public class CrewMembers {
@@ -22,7 +22,7 @@ public class CrewMembers {
     public List<Member> getCrewMembers(final RegistrationStatus status) {
 
         if (status != RegistrationStatus.WAITING && status != RegistrationStatus.CONFIRMED) {
-            throw new CrewException(CREW_MEMBER_STATUS_NOT_FOUND);
+            throw new CrewException(CREW_MEMBER_NOT_FOUND);
         }
 
         return crewMembers.stream()

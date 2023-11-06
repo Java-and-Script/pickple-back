@@ -4,7 +4,7 @@ import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.request.CrewApplyRequest;
-import kr.pickple.back.crew.dto.request.CrewMemberPermitRequest;
+import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
@@ -18,10 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_NOT_FOUND;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
@@ -43,7 +42,7 @@ public class CrewMemberService {
 
     public CrewProfileResponse findAllCrewMembers(final Long crewId, final RegistrationStatus status) {
         final Crew crew = findByExistCrew(crewId);
-        //TODO: 조회하는 사람이 크루장인지 검증 로직 추가(11월 7일,소재훈)
+        //TODO: 조회하는 사람이 크루장인지 검증 로직 추가(토큰,11월 7일,소재훈)
 
         final List<Member> members = crew.getCrewMembers().getCrewMembers(status);
         final List<MemberResponse> crewMemberResponses = members.stream()
@@ -54,29 +53,13 @@ public class CrewMemberService {
     }
 
     @Transactional
-    public void permitCrewMemberShip(final Long crewId, final Long memberId, final CrewMemberPermitRequest crewMemberPermitRequest) {
-        final Crew crew = findByExistCrew(crewId);
-        final Member member = findMemberById(memberId);
-        //TODO:추후, 크루장인지 검증 로직 추가(11월 2일, 소재훈)
+    public void crewMemberStatusUpdate(final Long crewId, final Long memberId, final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest) {
+        final CrewMember crewMember = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
+                .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
+        //TODO: 조회하는 사람이 크루장인지 검증 로직 추가(토큰,11월 7일, 소재훈)
 
-        validateCrewMembership(member, crew, WAITING);
+        crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
 
-        final CrewMember crewMember = crewMemberRepository.findByMemberAndCrew(member, crew).get();
-        crewMember.permitStatus(RegistrationStatus.from(crewMemberPermitRequest.getStatus()));
-    }
-
-    private void validateCrewMembership(final Member member, final Crew crew, final RegistrationStatus registrationStatus) {
-        final Optional<CrewMember> validateCrewMember = crewMemberRepository.findByMemberAndCrew(member, crew);
-
-        if (!validateCrewMember.isPresent()) {
-            throw new CrewException(CREW_MEMBER_STATUS_NOT_FOUND, member.getId());
-        }
-
-        final CrewMember crewMember = validateCrewMember.get();
-
-        if (crewMember.getStatus() != registrationStatus) {
-            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, member.getId());
-        }
     }
 
     private Crew findByExistCrew(final Long crewId) {

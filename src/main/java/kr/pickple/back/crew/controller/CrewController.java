@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.request.CrewApplyRequest;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
-import kr.pickple.back.crew.dto.request.CrewMemberPermitRequest;
+import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.service.CrewMemberService;
@@ -67,12 +67,12 @@ public class CrewController {
     }
 
     @PatchMapping("/{crewId}/members/{memberId}")
-    public ResponseEntity<Void> permitCrewMemberShip(
+    public ResponseEntity<Void> updateCrewMemberRegistrationStatus(
             @PathVariable final Long crewId,
             @PathVariable final Long memberId,
-            @Valid @RequestBody final CrewMemberPermitRequest crewMemberPermitRequest
+            @Valid @RequestBody final CrewMemberUpdateStatusRequest crewMemberStatusUpdateRequest
     ) {
-        crewMemberService.permitCrewMemberShip(crewId, memberId, crewMemberPermitRequest);
+        crewMemberService.crewMemberStatusUpdate(crewId, memberId, crewMemberStatusUpdateRequest);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
