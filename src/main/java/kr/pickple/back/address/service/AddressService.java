@@ -1,13 +1,5 @@
 package kr.pickple.back.address.service;
 
-import static kr.pickple.back.address.exception.AddressExceptionCode.*;
-
-import java.util.List;
-
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.address.dto.response.AllAddressResponse;
@@ -17,6 +9,13 @@ import kr.pickple.back.address.repository.AddressDepth1Repository;
 import kr.pickple.back.address.repository.AddressDepth2Repository;
 import kr.pickple.back.address.util.AddressParser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static kr.pickple.back.address.exception.AddressExceptionCode.ADDRESS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -62,5 +61,15 @@ public class AddressService {
         final List<String> depthedAddress = AddressParser.splitToAddressDepth1And2(mainAddress);
 
         return findMainAddressByNames(depthedAddress.get(0), depthedAddress.get(1));
+    }
+
+    public AddressDepth1 findByExistAddressDepth1(final String addressDepth1) {
+        return addressDepth1Repository.findByName(addressDepth1)
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND));
+    }
+
+    public AddressDepth2 findByExistAddressDepth2(final String addressDepth2, final AddressDepth1 addressDepth1) {
+        return addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2, addressDepth1)
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND));
     }
 }
