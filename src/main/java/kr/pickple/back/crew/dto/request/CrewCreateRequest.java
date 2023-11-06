@@ -1,6 +1,11 @@
 package kr.pickple.back.crew.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.domain.Member;

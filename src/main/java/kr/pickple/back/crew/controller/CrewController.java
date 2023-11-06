@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.request.CrewApplyRequest;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
+import kr.pickple.back.crew.dto.request.CrewMemberPermitRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.service.CrewMemberService;
@@ -11,6 +12,7 @@ import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,5 +64,17 @@ public class CrewController {
     ) {
         return ResponseEntity.status(OK)
                 .body(crewMemberService.findAllCrewMembers(crewId, status));
+    }
+
+    @PatchMapping("/{crewId}/members/{memberId}")
+    public ResponseEntity<Void> permitCrewMemberShip(
+            @PathVariable final Long crewId,
+            @PathVariable final Long memberId,
+            @Valid @RequestBody final CrewMemberPermitRequest crewMemberPermitRequest
+    ) {
+        crewMemberService.permitCrewMemberShip(crewId, memberId, crewMemberPermitRequest);
+
+        return ResponseEntity.status(NO_CONTENT)
+                .build();
     }
 }
