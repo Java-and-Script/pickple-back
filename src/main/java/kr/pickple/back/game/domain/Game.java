@@ -143,8 +143,8 @@ public class Game extends BaseEntity {
         return gamePositions.getPositions();
     }
 
-    public List<Member> getMembers(final RegistrationStatus status) {
-        return gameMembers.getMembers(status);
+    public List<Member> getMembersByStatus(final RegistrationStatus status) {
+        return gameMembers.getMembersByStatus(status);
     }
 
     public void addGameMember(final Member member) {

@@ -67,7 +67,7 @@ public class GameService {
 
     public GameResponse findAllGameMembers(final Long gameId, final RegistrationStatus status) {
         final Game game = findGameById(gameId);
-        final List<MemberResponse> memberResponses = game.getMembers(status)
+        final List<MemberResponse> memberResponses = game.getMembersByStatus(status)
                 .stream()
                 .map(MemberResponse::from)
                 .toList();
@@ -115,7 +115,7 @@ public class GameService {
     }
 
     private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
-        return game.getMembers(CONFIRMED)
+        return game.getMembersByStatus(CONFIRMED)
                 .stream()
                 .filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
                 .findFirst()
