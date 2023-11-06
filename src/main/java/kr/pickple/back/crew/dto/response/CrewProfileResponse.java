@@ -2,15 +2,15 @@ package kr.pickple.back.crew.dto.response;
 
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewStatus;
-import kr.pickple.back.crew.dto.CrewMemberRelationDto;
 import kr.pickple.back.member.domain.Member;
-import lombok.AllArgsConstructor;
+import kr.pickple.back.member.dto.response.MemberResponse;
+import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-@AllArgsConstructor(staticName = "from")
+@Builder
 public class CrewProfileResponse {
 
     private Long id;
@@ -26,24 +26,24 @@ public class CrewProfileResponse {
     private Member leader;
     private String addressDepth1;
     private String addressDepth2;
-    private List<CrewMemberRelationDto> crewMembers;
+    private List<MemberResponse> members;
 
-    public static CrewProfileResponse fromEntity(final Crew crew, final List<CrewMemberRelationDto> crewMemberList) {
-        return CrewProfileResponse.from(
-                crew.getId(),
-                crew.getName(),
-                crew.getContent(),
-                crew.getMemberCount(),
-                crew.getMaxMemberCount(),
-                crew.getProfileImageUrl(),
-                crew.getBackgroundImageUrl(),
-                crew.getStatus(),
-                crew.getLikeCount(),
-                crew.getCompetitionPoint(),
-                Member.builder().build(), //TODO: 추후 Member 도메인과 leader 연결 작업 추가(11월 1일, 소재훈)
-                crew.getAddressDepth1().getName(),
-                crew.getAddressDepth2().getName(),
-                crewMemberList
-        );
+    public static CrewProfileResponse fromEntity(final Crew crew, final List<MemberResponse> crewMemberList) {
+        return CrewProfileResponse.builder()
+                .id(crew.getId())
+                .name(crew.getName())
+                .content(crew.getContent())
+                .memberCount(crew.getMemberCount())
+                .maxMemberCount(crew.getMaxMemberCount())
+                .profileImageUrl(crew.getProfileImageUrl())
+                .backgroundImageUrl(crew.getBackgroundImageUrl())
+                .status(crew.getStatus())
+                .likeCount(crew.getLikeCount())
+                .competitionPoint(crew.getCompetitionPoint())
+                .leader(MemberResponse.from(crew.getLeader()))
+                .addressDepth1(crew.getAddressDepth1().getName())
+                .addressDepth2(crew.getAddressDepth2().getName())
+                .members(crewMemberList)
+                .build();
     }
 }

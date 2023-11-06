@@ -1,7 +1,5 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -20,6 +18,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
 
 @Getter
 @Entity
@@ -46,13 +46,16 @@ public class CrewMember extends BaseEntity {
     private Crew crew;
 
     @Builder
-    private CrewMember(
-            final Long id,
-            final RegistrationStatus status,
-            final Member member,
-            final Crew crew
-    ) {
+    private CrewMember(final Member member, final Crew crew) {
         this.member = member;
         this.crew = crew;
+    }
+
+    public Boolean equalsStatus(final RegistrationStatus status) {
+        return this.status == status;
+    }
+
+    public void confirmRegistration() {
+        this.status = RegistrationStatus.CONFIRMED;
     }
 }

@@ -1,16 +1,28 @@
 package kr.pickple.back.crew.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.util.CrewStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
 import static kr.pickple.back.crew.domain.CrewStatus.OPEN;
@@ -71,6 +83,9 @@ public class Crew extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
+    @Embedded
+    private CrewMembers crewMembers = new CrewMembers();
+
     @Builder
     private Crew(
             final String name,
@@ -102,5 +117,13 @@ public class Crew extends BaseEntity {
         }
 
         return this.status;
+    }
+
+    public List<Member> getCrewMembers(final RegistrationStatus status) {
+        return crewMembers.getCrewMembers(status);
+    }
+
+    public void addCrewMember(final Member member) {
+        crewMembers.addCrewMember(this, member);
     }
 }

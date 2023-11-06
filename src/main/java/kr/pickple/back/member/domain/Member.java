@@ -1,10 +1,5 @@
 package kr.pickple.back.member.domain;
 
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -23,6 +18,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import kr.pickple.back.position.domain.Position;
@@ -31,6 +27,11 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE;
 
 @Entity
 @Getter
@@ -90,6 +91,9 @@ public class Member extends BaseEntity {
 
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<MemberPosition> memberPositions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<CrewMember> crewMembers = new ArrayList<>();
 
     @Builder
     private Member(
