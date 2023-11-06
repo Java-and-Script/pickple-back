@@ -4,6 +4,7 @@ import static kr.pickple.back.address.exception.AddressExceptionCode.*;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +26,7 @@ public class AddressService {
     private final AddressDepth1Repository addressDepth1Repository;
     private final AddressDepth2Repository addressDepth2Repository;
 
+    @Cacheable(cacheNames = "address", key = "'all'")
     public AllAddressResponse findAllAddress() {
         final AddressDepth1 addressDepth1 = addressDepth1Repository.findAll()
                 .get(0);
