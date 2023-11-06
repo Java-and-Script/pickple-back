@@ -34,5 +34,5 @@ Content-Type: application/json
 }
 
 ### 크루원 가입 신청 거절/취소
-DELETE http://localhost:8080/crews/14/members/2
+DELETE http://localhost:8080/crews/17/members/3
 Content-Type: application/json
