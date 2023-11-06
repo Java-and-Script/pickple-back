@@ -34,7 +34,7 @@ public class AddressDepth2 extends BaseEntity {
     private AddressDepth1 addressDepth1;
 
     @Builder
-    public AddressDepth2(final String name, final AddressDepth1 addressDepth1) {
+    private AddressDepth2(final String name, final AddressDepth1 addressDepth1) {
         this.name = name;
         this.addressDepth1 = addressDepth1;
     }
