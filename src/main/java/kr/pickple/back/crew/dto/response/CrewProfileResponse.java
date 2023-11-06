@@ -2,7 +2,6 @@ package kr.pickple.back.crew.dto.response;
 
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewStatus;
-import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.Builder;
 import lombok.Getter;
@@ -23,7 +22,7 @@ public class CrewProfileResponse {
     private CrewStatus status;
     private Integer likeCount;
     private Integer competitionPoint;
-    private Member leader;
+    private MemberResponse leader;
     private String addressDepth1;
     private String addressDepth2;
     private List<MemberResponse> members;

@@ -14,4 +14,6 @@ public interface CrewMemberRepository extends JpaRepository<CrewMember, Long> {
     Optional<CrewMember> findByMemberAndCrew(final Member member, final Crew crew);
 
     List<CrewMember> findCrewMemberByStatusAndCrewId(final RegistrationStatus status, final Long crewId);
+
+    List<CrewMember> findAllByCrewAndStatus(final Crew crew, final RegistrationStatus registrationStatus);
 }

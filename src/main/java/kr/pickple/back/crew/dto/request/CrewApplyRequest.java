@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewApplyRequest {
 
-    @NotNull(message = "해당 크루의 ID는 필수입니다.")
+    @NotNull(message = "해당 크루에 가입하려는 사용자의 ID는 필수입니다.")
     private Long memberId;
 }
