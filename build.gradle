@@ -70,8 +70,16 @@ task copySubmodule(type: Copy) {
     copy {
         from './secret'
         include "application*.yml"
+		exclude "application-test.yml"
         into 'src/main/resources'
     }
+
+	copy {
+		from './secret'
+		include "application-test.yml"
+		into 'src/test/resources'
+		rename("application-test.yml", "application.yml")
+	}
 
     copy {
         from './secret'
