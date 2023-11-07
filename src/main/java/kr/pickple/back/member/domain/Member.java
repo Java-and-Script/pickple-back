@@ -2,10 +2,8 @@ package kr.pickple.back.member.domain;
 
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -18,7 +16,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -93,13 +90,13 @@ public class Member extends BaseEntity {
     private AddressDepth2 addressDepth2;
 
     @Embedded
+    private MemberPositions memberPositions = new MemberPositions();
+
+    @Embedded
     private MemberCrews memberCrews = new MemberCrews();
 
     @Embedded
     private MemberGames memberGames = new MemberGames();
-
-    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<MemberPosition> memberPositions = new ArrayList<>();
 
     @Builder
     private Member(
@@ -110,7 +107,8 @@ public class Member extends BaseEntity {
             final Long oauthId,
             final OauthProvider oauthProvider,
             final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2
+            final AddressDepth2 addressDepth2,
+            final List<Position> positions
     ) {
         this.email = email;
         this.nickname = nickname;
@@ -120,6 +118,11 @@ public class Member extends BaseEntity {
         this.oauthProvider = oauthProvider;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+        updateMemberPositions(positions);
+    }
+
+    private void updateMemberPositions(final List<Position> positions) {
+        memberPositions.updateMemberPositions(this, positions);
     }
 
     public List<Position> getPositions() {
@@ -142,6 +145,10 @@ public class Member extends BaseEntity {
 
     public List<Game> getCreatedGames() {
         return memberGames.getCreatedGamesByMember(this);
+    }
+
+    public List<Position> getPositions() {
+        return memberPositions.getPositions();
     }
 
     public void updateMannerScore(final Integer mannerScorePoint) {
