@@ -17,6 +17,8 @@ import kr.pickple.back.auth.repository.RefreshTokenRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
@@ -87,7 +89,6 @@ public class MemberService {
 
     public MemberProfileResponse findMemberProfileById(final Long memberId) {
         final Member member = findMemberById(memberId);
-
         final List<Position> positions = memberPositionRepository.findAllByMember(member)
                 .stream()
                 .map(MemberPosition::getPosition)
@@ -111,11 +112,6 @@ public class MemberService {
         return convertToCrewProfileResponses(crews, CONFIRMED);
     }
 
-    private Member findMemberById(final Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-    }
-
     private List<CrewProfileResponse> convertToCrewProfileResponses(final List<Crew> crews,
             final RegistrationStatus memberStatus) {
         return crews.stream()
@@ -125,6 +121,27 @@ public class MemberService {
 
     private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
         return crew.getCrewMembers(memberStatus)
+                .stream()
+                .map(MemberResponse::from)
+                .toList();
+    }
+
+    public List<GameResponse> findAllMemberGames(final Long memberId, final RegistrationStatus status) {
+        final Member member = findMemberById(memberId);
+        final List<Game> games = member.getGamesByStatus(status);
+
+        return games.stream()
+                .map(game -> GameResponse.of(game, getMemberResponses(game, status)))
+                .toList();
+    }
+
+    private Member findMemberById(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
+        return game.getMembersByStatus(status)
                 .stream()
                 .map(MemberResponse::from)
                 .toList();

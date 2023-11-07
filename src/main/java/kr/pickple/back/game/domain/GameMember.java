@@ -41,6 +41,7 @@ public class GameMember extends BaseEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    @Getter
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")

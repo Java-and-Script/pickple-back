@@ -22,6 +22,7 @@ import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.SignUp;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
@@ -88,5 +89,14 @@ public class MemberController {
     public ResponseEntity<List<CrewProfileResponse>> findCreatedCrewsByMemberId(@PathVariable final Long memberId) {
         return ResponseEntity.status(OK)
                 .body(memberService.findCreatedCrewsByMemberId(memberId));
+    }
+
+    @GetMapping("/{memberId}/games")
+    public ResponseEntity<List<GameResponse>> findAllMemberGames(
+            @PathVariable final Long memberId,
+            @RequestParam final RegistrationStatus status
+    ) {
+        return ResponseEntity.status(OK)
+                .body(memberService.findAllMemberGames(memberId, status));
     }
 }
