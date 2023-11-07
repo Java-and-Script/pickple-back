@@ -40,6 +40,12 @@ public class GameController {
                 .body(gameService.createGame(gameCreateRequest));
     }
 
+    @GetMapping("/{gameId}")
+    public ResponseEntity<GameResponse> findGameById(@PathVariable final Long gameId) {
+        return ResponseEntity.status(OK)
+                .body(gameService.findGameById(gameId));
+    }
+
     @PostMapping("/{gameId}/members")
     public ResponseEntity<Void> registerGameMember(
             @PathVariable final Long gameId,
