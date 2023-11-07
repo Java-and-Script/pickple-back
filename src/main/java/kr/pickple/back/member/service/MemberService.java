@@ -74,10 +74,13 @@ public class MemberService {
 
     public MemberProfileResponse findMemberProfileById(final Long memberId) {
         final Member member = findMemberById(memberId);
-        final List<Position> positions = memberPositionRepository.findAllByMember(member)
-                .stream()
-                .map(MemberPosition::getPosition)
-                .toList();
+
+        return MemberProfileResponse.from(member);
+    }
+
+    public MemberResponse findMemberResponseById(final Long memberId) {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
 
         return MemberResponse.from(member);
     }
