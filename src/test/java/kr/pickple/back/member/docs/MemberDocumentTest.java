@@ -109,7 +109,11 @@ class MemberDocumentTest {
                                                         .description("주소1(도,시)"),
                                                 fieldWithPath("addressDepth2").type(JsonFieldType.STRING)
                                                         .description("주소2(도,시)")
-                                        ).build()
+                                        )
+                                        .responseHeaders(
+                                                headerWithName("Set-Cookie").description("refreshToken")
+                                        )
+                                        .build()
                         )
                 )
         );
@@ -155,7 +159,8 @@ class MemberDocumentTest {
                                                 fieldWithPath("positions").type(JsonFieldType.ARRAY).description("주 포지션 목록"),
                                                 fieldWithPath("crews").type(JsonFieldType.NULL).description("사용자가 소속된 크루 목록")
                                                 //TODO: 추후 Crew 도메인 완성 시, 해당 필드에 대한 로직 추가 예정 (11.4 황창현)
-                                        ).build()
+                                        )
+                                        .build()
                         )
                 )
         );

@@ -1,0 +1,11 @@
+== Auth
+
+=== REDIRECT OAUTH PAGE
+operation::redirect-oauth-login-page[snippets='http-request,http-response']
+
+=== OAUTH LOGIN AUTHENTICATED
+operation::oauth-login-authenticated[snippets='http-request,http-response']
+
+=== OAUTH LOGIN REGISTRATION
+operation::oauth-login-registration[snippets='http-request,http-response']
+

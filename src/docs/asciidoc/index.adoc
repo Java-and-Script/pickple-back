@@ -5,4 +5,5 @@
 :toclevels: 2
 :sectlinks:
 
+include::auth.adoc[]
 include::member.adoc[]
