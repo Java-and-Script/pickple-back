@@ -154,4 +154,8 @@ public class Game extends BaseEntity {
     public Boolean isHost(final Member member) {
         return member.equals(host);
     }
+
+    public void increaseViewCount() {
+        viewCount++;
+    }
 }
