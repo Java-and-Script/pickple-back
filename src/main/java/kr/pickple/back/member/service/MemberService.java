@@ -20,7 +20,6 @@ import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
@@ -28,7 +27,6 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
-import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -56,18 +54,10 @@ public class MemberService {
         );
 
         final Member member = memberCreateRequest.toEntity(mainAddressResponse);
+
+        member.addMemberPositions(memberCreateRequest.getPositions());
+
         final Member savedMember = memberRepository.save(member);
-
-        final List<MemberPosition> positions = memberCreateRequest.getPositions()
-                .stream()
-                .distinct()
-                .map(position -> MemberPosition.builder()
-                        .position(Position.from(position))
-                        .member(savedMember)
-                        .build())
-                .toList();
-
-        memberPositionRepository.saveAll(positions);
 
         final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(savedMember.getId()));
 
@@ -94,7 +84,7 @@ public class MemberService {
                 .map(MemberPosition::getPosition)
                 .toList();
 
-        return MemberProfileResponse.of(member, positions);
+        return MemberResponse.from(member);
     }
 
     public List<CrewProfileResponse> findAllCrewsByMemberId(
