@@ -26,6 +26,7 @@ import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import kr.pickple.back.position.domain.Position;
@@ -91,11 +92,14 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
-    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<MemberPosition> memberPositions = new ArrayList<>();
-
     @Embedded
     private MemberCrews memberCrews = new MemberCrews();
+
+    @Embedded
+    private MemberGames memberGames = new MemberGames();
+
+    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<MemberPosition> memberPositions = new ArrayList<>();
 
     @Builder
     private Member(
@@ -118,14 +122,6 @@ public class Member extends BaseEntity {
         this.addressDepth2 = addressDepth2;
     }
 
-    public List<Crew> getCrewsByStatus(RegistrationStatus status) {
-        return memberCrews.getCrewsByStatus(status);
-    }
-
-    public List<Crew> getCreatedCrews() {
-        return memberCrews.getCreatedCrewsByMember(this);
-    }
-
     public List<Position> getPositions() {
         return memberPositions.stream()
                 .map(MemberPosition::getPosition)
@@ -140,5 +136,17 @@ public class Member extends BaseEntity {
         }
 
         throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
+    }
+
+    public List<Crew> getCrewsByStatus(RegistrationStatus status) {
+        return memberCrews.getCrewsByStatus(status);
+    }
+
+    public List<Crew> getCreatedCrews() {
+        return memberCrews.getCreatedCrewsByMember(this);
+    }
+
+    public List<Game> getGamesByStatus(final RegistrationStatus status) {
+        return memberGames.getGamesByStatus(status);
     }
 }
