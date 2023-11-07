@@ -81,7 +81,7 @@ public class MemberController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findJoinedCrewsByMemberId(memberId, status));
+                .body(memberService.findAllCrewsByMemberId(memberId, status));
     }
 
     @GetMapping("/{memberId}/created-crews")
