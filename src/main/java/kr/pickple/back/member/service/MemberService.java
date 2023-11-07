@@ -37,7 +37,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtProvider jwtProvider;
-    
+
     @Transactional
     public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
         validateIsDuplicatedMemberInfo(
