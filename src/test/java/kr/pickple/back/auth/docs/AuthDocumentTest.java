@@ -24,8 +24,11 @@ import org.springframework.test.web.servlet.ResultActions;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
 
+import jakarta.servlet.http.Cookie;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
+import kr.pickple.back.auth.dto.response.AccessTokenResponse;
 import kr.pickple.back.auth.service.OauthService;
+import kr.pickple.back.fixture.dto.AuthDtoFixtures;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 
@@ -191,6 +194,46 @@ public class AuthDocumentTest {
                                                         .description("주소1(도,시)"),
                                                 fieldWithPath("addressDepth2").type(JsonFieldType.NULL)
                                                         .description("주소2(도,시)")
+                                        )
+                                        .build()
+                        )
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("accessToken이 만료되었을 때 새로 갱신 할 수 있다.")
+    void regenerateAccessToken() throws Exception {
+        // given
+        final AccessTokenResponse accessTokenResponse = AuthDtoFixtures.accessTokenResponseBuild();
+        final String accessTokenRequest = "accessToken";
+
+        given(oauthService.regenerateAccessToken(anyString(), anyString())).willReturn(accessTokenResponse);
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                        post("/auth/refresh")
+                                .header("Authorization", "Bearer " + accessTokenRequest)
+                                .cookie(new Cookie("refresh-token", "refreshToken")))
+                .andExpect(status().isCreated());
+
+        // then
+        resultActions.andDo(document("oauth-access-token-refresh",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Auth")
+                                        .summary("accessToken 갱신")
+                                        .description("accessToken이 만료되었을 때 새로 갱신할 수 있다.")
+                                        .requestHeaders(
+                                                headerWithName("Authorization")
+                                                        .type(SimpleType.STRING)
+                                                        .description("Register Token")
+                                        )
+                                        .responseFields(
+                                                fieldWithPath("accessToken").type(JsonFieldType.STRING)
+                                                        .description("AccessToken")
                                         )
                                         .build()
                         )

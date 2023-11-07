@@ -9,3 +9,6 @@ operation::oauth-login-authenticated[snippets='http-request,http-response']
 === OAUTH LOGIN REGISTRATION
 operation::oauth-login-registration[snippets='http-request,http-response']
 
+=== OAUTH ACCESS TOKEN REFRESH
+operation::oauth-access-token-refresh[snippets='http-request,http-response']
+
