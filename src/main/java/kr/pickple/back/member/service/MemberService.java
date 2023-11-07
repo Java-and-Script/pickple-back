@@ -101,7 +101,14 @@ public class MemberService {
         final Member member = findMemberById(memberId);
         final List<Crew> crews = member.getCrewsByStatus(memberStatus);
 
-        return convertToCrewProfileResponses(crews);
+        return convertToCrewProfileResponses(crews, memberStatus);
+    }
+
+    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long memberId) {
+        final Member member = findMemberById(memberId);
+        final List<Crew> crews = member.getCreatedCrews();
+
+        return convertToCrewProfileResponses(crews, CONFIRMED);
     }
 
     private Member findMemberById(final Long memberId) {
@@ -109,14 +116,15 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    private List<CrewProfileResponse> convertToCrewProfileResponses(final List<Crew> crews) {
+    private List<CrewProfileResponse> convertToCrewProfileResponses(final List<Crew> crews,
+            final RegistrationStatus memberStatus) {
         return crews.stream()
-                .map(crew -> CrewProfileResponse.fromEntity(crew, getMemberResponsesByCrew(crew)))
+                .map(crew -> CrewProfileResponse.fromEntity(crew, getMemberResponsesByCrew(crew, memberStatus)))
                 .toList();
     }
 
-    private List<MemberResponse> getMemberResponsesByCrew(final Crew crew) {
-        return crew.getCrewMembers(CONFIRMED)
+    private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
+        return crew.getCrewMembers(memberStatus)
                 .stream()
                 .map(MemberResponse::from)
                 .toList();
