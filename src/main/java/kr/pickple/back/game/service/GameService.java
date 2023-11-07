@@ -67,12 +67,15 @@ public class GameService {
 
     public GameResponse findAllGameMembers(final Long gameId, final RegistrationStatus status) {
         final Game game = findGameById(gameId);
-        final List<MemberResponse> memberResponses = game.getMembersByStatus(status)
+
+        return GameResponse.of(game, getMemberResponses(game, status));
+    }
+
+    private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
+        return game.getMembersByStatus(status)
                 .stream()
                 .map(MemberResponse::from)
                 .toList();
-
-        return GameResponse.of(game, memberResponses);
     }
 
     @Transactional
