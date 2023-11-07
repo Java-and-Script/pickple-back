@@ -1,10 +1,14 @@
+import org.yaml.snakeyaml.Yaml
+
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.5'
-	id 'io.spring.dependency-management' version '1.1.3'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
-	id 'com.epages.restdocs-api-spec' version "0.18.2"
-	id 'org.hidetake.swagger.generator' version '2.18.2'
+    id 'java'
+    id "org.sonarqube" version "4.2.1.3168"
+    id 'jacoco'
+    id 'org.springframework.boot' version '3.1.5'
+    id 'io.spring.dependency-management' version '1.1.3'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+    id 'com.epages.restdocs-api-spec' version "0.18.2"
+    id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'kr.pickple'
@@ -15,10 +19,10 @@ java {
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-	asciidoctorExt
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    asciidoctorExt
 }
 
 repositories {
@@ -26,40 +30,40 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
-	implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation group: 'org.flywaydb', name: 'flyway-mysql', version: '9.10.2'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
-	implementation 'io.jsonwebtoken:jjwt-api:0.12.1'
-	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.1'
-	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.1'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.1'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.1'
 
-	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
 
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2'
 
-	asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
-	testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+    testImplementation 'com.epages:restdocs-api-spec-mockmvc:0.18.2'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 ext {
-	set('snippetsDir', file('build/generated-snippets'))
+    set('snippetsDir', file('build/generated-snippets'))
 }
 
 tasks.named('test') {
-	outputs.dir snippetsDir
-	useJUnitPlatform()
+    outputs.dir snippetsDir
+    useJUnitPlatform()
 }
 
 tasks.named('compileJava') {
@@ -70,16 +74,16 @@ task copySubmodule(type: Copy) {
     copy {
         from './secret'
         include "application*.yml"
-		exclude "application-test.yml"
+        exclude "application-test.yml"
         into 'src/main/resources'
     }
 
-	copy {
-		from './secret'
-		include "application-test.yml"
-		into 'src/test/resources'
-		rename("application-test.yml", "application.yml")
-	}
+    copy {
+        from './secret'
+        include "application-test.yml"
+        into 'src/test/resources'
+        rename("application-test.yml", "application.yml")
+    }
 
     copy {
         from './secret'
@@ -93,51 +97,68 @@ jar {
 }
 
 asciidoctor {
-	dependsOn test
-	inputs.dir snippetsDir
-	configurations 'asciidoctorExt'
-	baseDirFollowsSourceFile()
+    dependsOn test
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    baseDirFollowsSourceFile()
 }
 
 openapi3 {
-	server = "https://dev.pickple.kr"
-	title = "PICKPLE API 문서"
-	description = "PICKPLE 서비스의 API 문서입니다."
-	version = "0.0.1"
-	outputFileNamePrefix = 'pickple'
-	outputDirectory = 'build/resources/main/static/docs/'
+    server = "https://dev.pickple.kr"
+    title = "PICKPLE API 문서"
+    description = "PICKPLE 서비스의 API 문서입니다."
+    version = "0.0.1"
+    outputFileNamePrefix = 'pickple'
+    outputDirectory = 'build/resources/main/static/docs/'
 }
 
 tasks.register('copyDocs') {
-	dependsOn(':openapi3')
-	doFirst {
-		def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.json")
+    dependsOn(':openapi3')
+    doFirst {
+        def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.json")
 
-		def securitySchemesContent =  "  securitySchemes:\n" +  \
-                                      "    APIKey:\n" +  \
-                                      "      type: apiKey\n" +  \
-                                      "      name: Authorization\n" +  \
-                                      "      in: header\n" + \
-                                      "security:\n" +
-				"  - APIKey: []  # Apply the security scheme here"
+        def securitySchemesContent = "  securitySchemes:\n" +       \
+                                           "    APIKey:\n" +       \
+                                           "      type: apiKey\n" +       \
+                                           "      name: Authorization\n" +       \
+                                           "      in: header\n" +      \
+                                           "security:\n" +
+                "  - APIKey: []  # Apply the security scheme here"
 
-		swaggerUIFile.append securitySchemesContent
-	}
+        swaggerUIFile.append securitySchemesContent
+    }
 
-	doLast {
-		delete 'src/main/resources/static/docs/pickple.json'
-		copy {
-			from 'build/resources/main/static/docs/pickple.json'
-			into 'src/main/resources/static/docs/'
-		}
-	}
+    doLast {
+        delete 'src/main/resources/static/docs/pickple.json'
+        copy {
+            from 'build/resources/main/static/docs/pickple.json'
+            into 'src/main/resources/static/docs/'
+        }
+    }
 }
 
 bootJar {
-	dependsOn asciidoctor
-	dependsOn(':copyDocs')
+    dependsOn asciidoctor
+    dependsOn(':copyDocs')
 
-	from("${asciidoctor.outputDir}") {
-		into 'static/docs'
-	}
+    from("${asciidoctor.outputDir}") {
+        into 'static/docs'
+    }
+}
+
+tasks.named('sonarqube').configure {
+    doFirst {
+        def yaml = new Yaml()
+        def secrets = yaml.load(new FileInputStream('pickple-back/secret/application.yml'))
+
+        sonarqube {
+            properties {
+                property 'sonar.host.url', 'https://sonarcloud.io'
+                property 'sonar.organizationKey', 'programmerstylerteam'
+                property 'sonar.projectKey', 'Java-and-Script_pickple-back'
+                property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+                property 'sonar.exclusions', '**/PickpleBackApplication.class, **/kr/pickple/back/common/**'
+            }
+        }
+    }
 }
