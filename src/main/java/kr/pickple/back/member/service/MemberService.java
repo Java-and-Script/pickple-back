@@ -17,6 +17,7 @@ import kr.pickple.back.auth.repository.RefreshTokenRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.domain.Member;
@@ -74,12 +75,12 @@ public class MemberService {
 
     public MemberProfileResponse findMemberProfileById(final Long memberId) {
         final Member member = findMemberById(memberId);
+        final List<CrewResponse> crewResponses = member.getAllCrews()
+                .stream()
+                .map(CrewResponse::from)
+                .toList();
 
-        return MemberProfileResponse.from(member);
-    }
-
-    public MemberResponse findMemberResponseById(final Long memberId) {
-        return MemberResponse.from(findMemberById(memberId));
+        return MemberProfileResponse.of(member, crewResponses);
     }
 
     public List<CrewProfileResponse> findAllCrewsByMemberId(
@@ -104,7 +105,7 @@ public class MemberService {
             final RegistrationStatus memberStatus
     ) {
         return crews.stream()
-                .map(crew -> CrewProfileResponse.fromEntity(crew, getMemberResponsesByCrew(crew, memberStatus)))
+                .map(crew -> CrewProfileResponse.of(crew, getMemberResponsesByCrew(crew, memberStatus)))
                 .toList();
     }
 
