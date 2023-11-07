@@ -21,6 +21,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.SimpleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.pickple.back.auth.domain.token.AuthTokens;
@@ -78,6 +79,7 @@ class MemberDocumentTest {
                                         .responseSchema(schema("MemberProfileResponse"))
                                         .requestHeaders(
                                                 headerWithName("Authorization")
+                                                        .type(SimpleType.STRING)
                                                         .description("Register Token"))
                                         .requestFields(
                                                 fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임"),
