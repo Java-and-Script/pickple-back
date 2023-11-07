@@ -29,7 +29,6 @@ import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
-import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -46,9 +45,6 @@ public class MemberServiceTest {
 
     @Mock
     private AddressService addressService;
-
-    @Mock
-    private MemberPositionRepository memberPositionRepository;
 
     @Mock
     private RefreshTokenRepository refreshTokenRepository;
@@ -75,7 +71,6 @@ public class MemberServiceTest {
 
         given(addressService.findMainAddressByNames(anyString(), anyString())).willReturn(mainAddressResponse);
         given(memberRepository.save(any(Member.class))).willReturn(member);
-        given(memberPositionRepository.saveAll(any())).willReturn(memberPositions);
         given(jwtProvider.createLoginToken(anyString())).willReturn(authTokens);
         given(refreshTokenRepository.save(any(RefreshToken.class))).will(invocation -> null);
 
@@ -102,7 +97,6 @@ public class MemberServiceTest {
         final List<MemberPosition> memberPositions = new ArrayList<>();
 
         given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
-        given(memberPositionRepository.findAllByMember(any(Member.class))).willReturn(memberPositions);
 
         // when
         MemberProfileResponse memberProfileResponse = memberService.findMemberProfileById(1L);

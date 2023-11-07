@@ -5,6 +5,7 @@ import java.util.List;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
+import kr.pickple.back.position.domain.Position;
 
 public class MemberDtoFixtures {
 
@@ -13,7 +14,7 @@ public class MemberDtoFixtures {
                 .nickname("강백둥")
                 .profileImageUrl("https://amazon.image/1")
                 .email("pickple1@pickple.kr")
-                .positions(List.of("SG", "C"))
+                .positions(List.of(Position.CENTER, Position.POINT_GUARD))
                 .oauthId(1L)
                 .oauthProvider(OauthProvider.KAKAO)
                 .addressDepth1("서울시")

@@ -1,11 +1,8 @@
 package kr.pickple.back.member.controller;
 
-import static kr.pickple.back.position.domain.Position.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,12 +18,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
-import kr.pickple.back.fixture.domain.MemberPositionFixtures;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
-import kr.pickple.back.fixture.setup.MemberPositionSetup;
 import kr.pickple.back.fixture.setup.MemberSetup;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 
 @Transactional
@@ -41,9 +35,6 @@ class MemberControllerTest {
 
     @Autowired
     private MemberSetup memberSetup;
-
-    @Autowired
-    private MemberPositionSetup memberPositionSetup;
 
     @Autowired
     private JwtProvider jwtProvider;
@@ -93,10 +84,6 @@ class MemberControllerTest {
         // given
         final Member savedMember = memberSetup.save();
 
-        final List<MemberPosition> memberPositions = MemberPositionFixtures.memberPositionsBuild(savedMember,
-                List.of(CENTER, POINT_GUARD));
-        final List<MemberPosition> savedPositions = memberPositionSetup.save(memberPositions);
-
         // when
         final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{members}", savedMember.getId()));
 
@@ -112,8 +99,8 @@ class MemberControllerTest {
                 .andExpect(jsonPath("mannerScoreCount").value(savedMember.getMannerScoreCount()))
                 .andExpect(jsonPath("addressDepth1").value(savedMember.getAddressDepth1().getName()))
                 .andExpect(jsonPath("addressDepth2").value(savedMember.getAddressDepth2().getName()))
-                .andExpect(jsonPath("positions[0]").value(savedPositions.get(0).getPosition().getAcronym()))
-                .andExpect(jsonPath("positions[1]").value(savedPositions.get(1).getPosition().getAcronym()))
+                .andExpect(jsonPath("positions[0]").value(savedMember.getPositions().get(0).getAcronym()))
+                .andExpect(jsonPath("positions[1]").value(savedMember.getPositions().get(1).getAcronym()))
                 //TODO: 추후 Crew 도메인 완성 시, 해당 필드에 대한 로직 추가 예정 (11.4 황창현)
                 .andDo(print());
     }
