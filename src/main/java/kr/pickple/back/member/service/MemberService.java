@@ -52,9 +52,6 @@ public class MemberService {
         );
 
         final Member member = memberCreateRequest.toEntity(mainAddressResponse);
-
-        member.addMemberPositions(memberCreateRequest.getPositions());
-
         final Member savedMember = memberRepository.save(member);
 
         final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(savedMember.getId()));
