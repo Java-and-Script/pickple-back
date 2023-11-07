@@ -78,14 +78,9 @@ public class CrewService {
         );
 
         return crews.stream()
-                .map(crew -> {
-                    final List<Member> confirmedCrewMembers = crew.getCrewMembers(CONFIRMED);
-                    final List<MemberResponse> crewMembers = confirmedCrewMembers.stream()
-                            .map(MemberResponse::from)
-                            .toList();
-
-                    return CrewProfileResponse.fromEntity(crew, crewMembers);
-                })
+                .map(crew -> CrewProfileResponse.fromEntity(crew, crew.getCrewMembers(CONFIRMED).stream()
+                        .map(MemberResponse::from)
+                        .toList()))
                 .toList();
     }
 
