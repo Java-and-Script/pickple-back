@@ -124,4 +124,17 @@ public class GameService {
                 .findFirst()
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
     }
+
+    @Transactional
+    public GameResponse findGameDetailsById(final Long gameId) {
+        final Game game = findGameById(gameId);
+        final List<MemberResponse> memberResponses = game.getMembersByStatus(CONFIRMED)
+                .stream()
+                .map(MemberResponse::from)
+                .toList();
+
+        game.increaseViewCount();
+
+        return GameResponse.of(game, memberResponses);
+    }
 }

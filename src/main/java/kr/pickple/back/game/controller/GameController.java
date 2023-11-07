@@ -41,9 +41,9 @@ public class GameController {
     }
 
     @GetMapping("/{gameId}")
-    public ResponseEntity<GameResponse> findGameById(@PathVariable final Long gameId) {
+    public ResponseEntity<GameResponse> findGameDetailsById(@PathVariable final Long gameId) {
         return ResponseEntity.status(OK)
-                .body(gameService.findGameById(gameId));
+                .body(gameService.findGameDetailsById(gameId));
     }
 
     @PostMapping("/{gameId}/members")
