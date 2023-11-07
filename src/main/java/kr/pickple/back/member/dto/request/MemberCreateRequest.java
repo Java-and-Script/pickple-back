@@ -9,6 +9,7 @@ import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberStatus;
+import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +32,7 @@ public class MemberCreateRequest {
     private String email;
 
     @NotNull(message = "포지션은 null일 수 없음")
-    private List<String> positions;
+    private List<Position> positions;
 
     @NotNull(message = "oauth id는 null일 수 없음")
     @Positive(message = "oauth id는 값이 없거나 음수일 수 없음")
@@ -56,6 +57,7 @@ public class MemberCreateRequest {
                 .oauthProvider(oauthProvider)
                 .addressDepth1(mainAddressResponse.getAddressDepth1())
                 .addressDepth2(mainAddressResponse.getAddressDepth2())
+                .positions(positions)
                 .build();
     }
 }
