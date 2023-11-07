@@ -18,7 +18,7 @@ public class MemberCrews {
 
     public List<Crew> getCrewsByStatus(final RegistrationStatus status) {
         return memberCrews.stream()
-                .filter(crewMember -> crewMember.equalsStatus(status))
+                .filter(memberCrew -> memberCrew.equalsStatus(status))
                 .map(CrewMember::getCrew)
                 .toList();
     }
