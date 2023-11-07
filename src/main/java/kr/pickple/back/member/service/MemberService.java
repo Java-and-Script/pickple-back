@@ -79,10 +79,7 @@ public class MemberService {
     }
 
     public MemberResponse findMemberResponseById(final Long memberId) {
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-
-        return MemberResponse.from(member);
+        return MemberResponse.from(findMemberById(memberId));
     }
 
     public List<CrewProfileResponse> findAllCrewsByMemberId(
