@@ -1,8 +1,14 @@
 package kr.pickple.back.member.domain;
 
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -18,7 +24,8 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import kr.pickple.back.position.domain.Position;
@@ -27,11 +34,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE;
 
 @Entity
 @Getter
@@ -92,8 +94,8 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<MemberPosition> memberPositions = new ArrayList<>();
 
-    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<CrewMember> crewMembers = new ArrayList<>();
+    @Embedded
+    private MemberCrews memberCrews = new MemberCrews();
 
     @Builder
     private Member(
@@ -114,6 +116,10 @@ public class Member extends BaseEntity {
         this.oauthProvider = oauthProvider;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+    }
+
+    public List<Crew> getCrewsByStatus(RegistrationStatus status) {
+        return memberCrews.getCrewsByStatus(status);
     }
 
     public List<Position> getPositions() {

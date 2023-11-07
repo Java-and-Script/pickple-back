@@ -1,5 +1,6 @@
 package kr.pickple.back.member.service;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
@@ -13,11 +14,15 @@ import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.domain.token.RefreshToken;
 import kr.pickple.back.auth.repository.RefreshTokenRepository;
+import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
+import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
@@ -81,8 +86,7 @@ public class MemberService {
     }
 
     public MemberProfileResponse findMemberProfileById(final Long memberId) {
-        final Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+        final Member member = findMemberById(memberId);
 
         final List<Position> positions = memberPositionRepository.findAllByMember(member)
                 .stream()
@@ -90,5 +94,31 @@ public class MemberService {
                 .toList();
 
         return MemberProfileResponse.of(member, positions);
+    }
+
+    public List<CrewProfileResponse> findJoinedCrewsByMemberId(final Long memberId,
+            final RegistrationStatus memberStatus) {
+        final Member member = findMemberById(memberId);
+        final List<Crew> crews = member.getCrewsByStatus(memberStatus);
+
+        return convertToCrewProfileResponses(crews);
+    }
+
+    private Member findMemberById(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    private List<CrewProfileResponse> convertToCrewProfileResponses(final List<Crew> crews) {
+        return crews.stream()
+                .map(crew -> CrewProfileResponse.fromEntity(crew, getMemberResponsesByCrew(crew)))
+                .toList();
+    }
+
+    private List<MemberResponse> getMemberResponsesByCrew(final Crew crew) {
+        return crew.getCrewMembers(CONFIRMED)
+                .stream()
+                .map(MemberResponse::from)
+                .toList();
     }
 }

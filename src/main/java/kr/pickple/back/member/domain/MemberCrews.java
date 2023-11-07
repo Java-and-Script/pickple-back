@@ -1,0 +1,25 @@
+package kr.pickple.back.member.domain;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Embeddable;
+import jakarta.persistence.OneToMany;
+import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
+
+@Embeddable
+public class MemberCrews {
+
+    @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<CrewMember> crewMembers = new ArrayList<>();
+
+    public List<Crew> getCrewsByStatus(final RegistrationStatus status) {
+        return crewMembers.stream()
+                .filter(crewMember -> crewMember.equalsStatus(status))
+                .map(CrewMember::getCrew)
+                .toList();
+    }
+}
