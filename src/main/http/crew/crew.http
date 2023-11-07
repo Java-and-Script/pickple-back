@@ -38,4 +38,4 @@ DELETE http://localhost:8080/crews/17/members/3
 Content-Type: application/json
 
 ### 사용자 근처 크루 목록 조회
-GET http://localhost:8080/crews?addressDepth1=서울시&addressDepth2=강남구&page=1&size=5
+GET http://localhost:8080/crews?addressDepth1=서울시&addressDepth2=강남구&page=0&size=10

@@ -10,6 +10,7 @@ import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.service.CrewMemberService;
 import kr.pickple.back.crew.service.CrewService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -92,14 +93,13 @@ public class CrewController {
                 .build();
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<CrewProfileResponse>> findCrewsByAddress(
-            @RequestParam(name = "addressDepth1") final String addressDepth1,
-            @RequestParam(name = "addressDepth2") final String addressDepth2,
-            @RequestParam(defaultValue = "1") final int page,
-            @RequestParam(defaultValue = "10") final int size
+            @RequestParam final String addressDepth1,
+            @RequestParam final String addressDepth2,
+            Pageable pageable
     ) {
         return ResponseEntity.status(OK)
-                .body(crewService.findCrewByAddress(addressDepth1, addressDepth2, page, size));
+                .body(crewService.findCrewByAddress(addressDepth1, addressDepth2,pageable));
     }
 }

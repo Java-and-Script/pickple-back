@@ -62,14 +62,4 @@ public class AddressService {
 
         return findMainAddressByNames(depthedAddress.get(0), depthedAddress.get(1));
     }
-
-    public AddressDepth1 findByExistAddressDepth1(final String addressDepth1) {
-        return addressDepth1Repository.findByName(addressDepth1)
-                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND));
-    }
-
-    public AddressDepth2 findByExistAddressDepth2(final String addressDepth2, final AddressDepth1 addressDepth1) {
-        return addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2, addressDepth1)
-                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND));
-    }
 }
