@@ -1,7 +1,5 @@
 package kr.pickple.back.member.domain;
 
-import java.util.Objects;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -42,14 +40,5 @@ public class MemberPosition extends BaseEntity {
     private MemberPosition(final Position position, final Member member) {
         this.position = position;
         this.member = member;
-    }
-
-    public void updateMember(final Member member) {
-        if (Objects.nonNull(this.member)) {
-            this.member.getMemberPositions().remove(this);
-        }
-
-        this.member = member;
-        member.getMemberPositions().add(this);
     }
 }
