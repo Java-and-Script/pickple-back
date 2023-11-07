@@ -96,7 +96,7 @@ public class MemberService {
         return MemberProfileResponse.of(member, positions);
     }
 
-    public List<CrewProfileResponse> findJoinedCrewsByMemberId(final Long memberId,
+    public List<CrewProfileResponse> findAllCrewsByMemberId(final Long memberId,
             final RegistrationStatus memberStatus) {
         final Member member = findMemberById(memberId);
         final List<Crew> crews = member.getCrewsByStatus(memberStatus);
