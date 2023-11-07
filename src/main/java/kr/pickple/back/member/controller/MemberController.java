@@ -78,8 +78,15 @@ public class MemberController {
     @GetMapping("/{memberId}/crews")
     public ResponseEntity<List<CrewProfileResponse>> findJoinedCrewsByMemberId(
             @PathVariable final Long memberId,
-            @RequestParam final RegistrationStatus status) {
+            @RequestParam final RegistrationStatus status
+    ) {
         return ResponseEntity.status(OK)
                 .body(memberService.findJoinedCrewsByMemberId(memberId, status));
+    }
+
+    @GetMapping("/{memberId}/created-crews")
+    public ResponseEntity<List<CrewProfileResponse>> findCreatedCrewsByMemberId(@PathVariable final Long memberId) {
+        return ResponseEntity.status(OK)
+                .body(memberService.findCreatedCrewsByMemberId(memberId));
     }
 }

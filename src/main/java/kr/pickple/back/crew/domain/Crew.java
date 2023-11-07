@@ -1,5 +1,9 @@
 package kr.pickple.back.crew.domain;
 
+import static kr.pickple.back.crew.domain.CrewStatus.*;
+
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -21,11 +25,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-
-import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
-import static kr.pickple.back.crew.domain.CrewStatus.OPEN;
 
 @Getter
 @Entity
@@ -125,5 +124,9 @@ public class Crew extends BaseEntity {
 
     public void addCrewMember(final Member member) {
         crewMembers.addCrewMember(this, member);
+    }
+
+    public Boolean isLeader(final Member member) {
+        return member.equals(leader);
     }
 }

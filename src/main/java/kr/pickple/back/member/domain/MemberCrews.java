@@ -22,4 +22,11 @@ public class MemberCrews {
                 .map(CrewMember::getCrew)
                 .toList();
     }
+
+    public List<Crew> getCreatedCrewsByMember(final Member member) {
+        return crewMembers.stream()
+                .map(CrewMember::getCrew)
+                .filter(crew -> crew.isLeader(member))
+                .toList();
+    }
 }
