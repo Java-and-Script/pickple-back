@@ -76,7 +76,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/crews")
-    public ResponseEntity<List<CrewProfileResponse>> findJoinedCrewsByMemberId(
+    public ResponseEntity<List<CrewProfileResponse>> findAllCrewsByMemberId(
             @PathVariable final Long memberId,
             @RequestParam final RegistrationStatus status
     ) {
