@@ -1,13 +1,9 @@
 package kr.pickple.back.crew.service;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.common.config.property.S3Properties;
-import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
@@ -20,13 +16,11 @@ import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
@@ -74,22 +68,25 @@ public class CrewService {
         return CrewProfileResponse.fromEntity(crew, crewMembers);
     }
 
-    public List<CrewProfileResponse> findCrewByAddress(final String addressDepth1, final String addressDepth2, final int page, final int size) {
-        final AddressDepth1 depth1 = addressService.findByExistAddressDepth1(addressDepth1);
-        final AddressDepth2 depth2 = addressService.findByExistAddressDepth2(addressDepth2, depth1);
+    public List<CrewProfileResponse> findCrewByAddress(final String addressDepth1, final String addressDepth2, final Pageable pageable) {
+        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1, addressDepth2);
 
-        final Pageable pageable = PageRequest.of(page - 1, size);
-        final Page<Crew> crewPage = crewRepository.findByAddressDepth1AndAddressDepth2(depth1, depth2, pageable);
+        final Page<Crew> crews = crewRepository.findByAddressDepth1AndAddressDepth2(
+                mainAddressResponse.getAddressDepth1(),
+                mainAddressResponse.getAddressDepth2(),
+                pageable
+        );
 
-        return crewPage.stream()
+        return crews.stream()
                 .map(crew -> {
-                    final List<CrewMember> crewMemberList = crewMemberRepository.findCrewMemberByStatusAndCrewId(RegistrationStatus.CONFIRMED, crew.getId());
-                    final List<CrewMemberRelationDto> crewMembers = crewMemberList.stream()
-                            .map(CrewMemberRelationDto::fromEntity)
-                            .collect(Collectors.toList());
+                    final List<Member> confirmedCrewMembers = crew.getCrewMembers(CONFIRMED);
+                    final List<MemberResponse> crewMembers = confirmedCrewMembers.stream()
+                            .map(MemberResponse::from)
+                            .toList();
+
                     return CrewProfileResponse.fromEntity(crew, crewMembers);
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private void validateIsDuplicatedCrewInfo(final String name) {
