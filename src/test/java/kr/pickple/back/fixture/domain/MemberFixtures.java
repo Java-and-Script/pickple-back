@@ -9,6 +9,7 @@ import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberStatus;
+import kr.pickple.back.position.domain.Position;
 
 public class MemberFixtures {
 
@@ -25,6 +26,7 @@ public class MemberFixtures {
                 .oauthProvider(OauthProvider.KAKAO)
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
+                .positions(List.of(Position.CENTER, Position.POINT_GUARD))
                 .build();
     }
 
@@ -46,6 +48,7 @@ public class MemberFixtures {
                             .oauthProvider(OauthProvider.KAKAO)
                             .addressDepth1(addressDepth1)
                             .addressDepth2(addressDepth2)
+                            .positions(List.of(Position.CENTER, Position.POINT_GUARD))
                             .build()
             );
         });
