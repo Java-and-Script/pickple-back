@@ -125,12 +125,6 @@ public class Member extends BaseEntity {
         memberPositions.updateMemberPositions(this, positions);
     }
 
-    public List<Position> getPositions() {
-        return memberPositions.stream()
-                .map(MemberPosition::getPosition)
-                .toList();
-    }
-
     public List<Crew> getCrewsByStatus(RegistrationStatus status) {
         return memberCrews.getCrewsByStatus(status);
     }
