@@ -1,5 +1,3 @@
-import org.yaml.snakeyaml.Yaml
-
 plugins {
     id 'java'
     id "org.sonarqube" version "4.2.1.3168"
@@ -117,12 +115,12 @@ tasks.register('copyDocs') {
     doFirst {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.json")
 
-        def securitySchemesContent = "  securitySchemes:\n" +       \
-                                           "    APIKey:\n" +       \
-                                           "      type: apiKey\n" +       \
-                                           "      name: Authorization\n" +       \
-                                           "      in: header\n" +      \
-                                           "security:\n" +
+        def securitySchemesContent = "  securitySchemes:\n" +              \
+                                                  "    APIKey:\n" +              \
+                                                  "      type: apiKey\n" +              \
+                                                  "      name: Authorization\n" +              \
+                                                  "      in: header\n" +             \
+                                                  "security:\n" +
                 "  - APIKey: []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
@@ -146,19 +144,49 @@ bootJar {
     }
 }
 
-tasks.named('sonarqube').configure {
-    doFirst {
-        def yaml = new Yaml()
-        def secrets = yaml.load(new FileInputStream('pickple-back/secret/application.yml'))
+jar {
+    enabled = false
+}
 
-        sonarqube {
-            properties {
-                property 'sonar.host.url', 'https://sonarcloud.io'
-                property 'sonar.organizationKey', 'programmerstylerteam'
-                property 'sonar.projectKey', 'Java-and-Script_pickple-back'
-                property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
-                property 'sonar.exclusions', '**/PickpleBackApplication.class, **/kr/pickple/back/common/**'
+jacoco {
+    toolVersion = '0.8.10'
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            enabled = true
+            element = 'BUNDLE'
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.00 //fixme: 테스트 코드 진행 후, 테스트 커버리지 상향 조정
             }
         }
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+    finalizedBy jacocoTestReport
+}
+
+sonarqube {
+    properties {
+        property 'sonar.host.url', 'https://sonarcloud.io'
+        property 'sonar.organization', 'programmerstylerteam'
+        property 'sonar.projectKey', 'Java-and-Script_pickple-back'
+        property "sonar.coverage.jacoco.xmlReportPaths", "${buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
