@@ -22,4 +22,11 @@ public class MemberGames {
                 .map(GameMember::getGame)
                 .toList();
     }
+
+    public List<Game> getCreatedGamesByMember(final Member member) {
+        return memberGames.stream()
+                .map(GameMember::getGame)
+                .filter(game -> game.isHost(member))
+                .toList();
+    }
 }

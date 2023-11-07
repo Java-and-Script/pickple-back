@@ -99,4 +99,10 @@ public class MemberController {
         return ResponseEntity.status(OK)
                 .body(memberService.findAllMemberGames(memberId, status));
     }
+
+    @GetMapping("/{memberId}/created-games")
+    public ResponseEntity<List<GameResponse>> findAllCreatedGames(@PathVariable final Long memberId) {
+        return ResponseEntity.status(OK)
+                .body(memberService.findAllCreatedGames(memberId));
+    }
 }

@@ -128,16 +128,6 @@ public class Member extends BaseEntity {
                 .toList();
     }
 
-    public void updateMannerScore(final Integer mannerScorePoint) {
-        if (MANNER_SCORE_POINT_RANGE.contains(mannerScorePoint)) {
-            this.mannerScore += mannerScorePoint;
-
-            return;
-        }
-
-        throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
-    }
-
     public List<Crew> getCrewsByStatus(RegistrationStatus status) {
         return memberCrews.getCrewsByStatus(status);
     }
@@ -148,5 +138,19 @@ public class Member extends BaseEntity {
 
     public List<Game> getGamesByStatus(final RegistrationStatus status) {
         return memberGames.getGamesByStatus(status);
+    }
+
+    public List<Game> getCreatedGames() {
+        return memberGames.getCreatedGamesByMember(this);
+    }
+
+    public void updateMannerScore(final Integer mannerScorePoint) {
+        if (MANNER_SCORE_POINT_RANGE.contains(mannerScorePoint)) {
+            this.mannerScore += mannerScorePoint;
+
+            return;
+        }
+
+        throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
     }
 }

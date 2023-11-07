@@ -97,8 +97,10 @@ public class MemberService {
         return MemberProfileResponse.of(member, positions);
     }
 
-    public List<CrewProfileResponse> findAllCrewsByMemberId(final Long memberId,
-            final RegistrationStatus memberStatus) {
+    public List<CrewProfileResponse> findAllCrewsByMemberId(
+            final Long memberId,
+            final RegistrationStatus memberStatus
+    ) {
         final Member member = findMemberById(memberId);
         final List<Crew> crews = member.getCrewsByStatus(memberStatus);
 
@@ -112,8 +114,10 @@ public class MemberService {
         return convertToCrewProfileResponses(crews, CONFIRMED);
     }
 
-    private List<CrewProfileResponse> convertToCrewProfileResponses(final List<Crew> crews,
-            final RegistrationStatus memberStatus) {
+    private List<CrewProfileResponse> convertToCrewProfileResponses(
+            final List<Crew> crews,
+            final RegistrationStatus memberStatus
+    ) {
         return crews.stream()
                 .map(crew -> CrewProfileResponse.fromEntity(crew, getMemberResponsesByCrew(crew, memberStatus)))
                 .toList();
@@ -126,13 +130,18 @@ public class MemberService {
                 .toList();
     }
 
-    public List<GameResponse> findAllMemberGames(final Long memberId, final RegistrationStatus status) {
+    public List<GameResponse> findAllMemberGames(final Long memberId, final RegistrationStatus memberStatus) {
         final Member member = findMemberById(memberId);
-        final List<Game> games = member.getGamesByStatus(status);
+        final List<Game> games = member.getGamesByStatus(memberStatus);
 
-        return games.stream()
-                .map(game -> GameResponse.of(game, getMemberResponses(game, status)))
-                .toList();
+        return convertToGameResponses(games, memberStatus);
+    }
+
+    public List<GameResponse> findAllCreatedGames(final Long memberId) {
+        final Member member = findMemberById(memberId);
+        final List<Game> games = member.getCreatedGames();
+
+        return convertToGameResponses(games, CONFIRMED);
     }
 
     private Member findMemberById(final Long memberId) {
@@ -140,8 +149,14 @@ public class MemberService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
-        return game.getMembersByStatus(status)
+    private List<GameResponse> convertToGameResponses(final List<Game> games, final RegistrationStatus memberStatus) {
+        return games.stream()
+                .map(game -> GameResponse.of(game, getMemberResponsesByGame(game, memberStatus)))
+                .toList();
+    }
+
+    private List<MemberResponse> getMemberResponsesByGame(final Game game, final RegistrationStatus memberStatus) {
+        return game.getMembersByStatus(memberStatus)
                 .stream()
                 .map(MemberResponse::from)
                 .toList();
