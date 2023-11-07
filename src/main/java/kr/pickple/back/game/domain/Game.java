@@ -150,4 +150,8 @@ public class Game extends BaseEntity {
     public void addGameMember(final Member member) {
         gameMembers.addGameMember(this, member);
     }
+
+    public Boolean isHost(final Member member) {
+        return member.equals(host);
+    }
 }
