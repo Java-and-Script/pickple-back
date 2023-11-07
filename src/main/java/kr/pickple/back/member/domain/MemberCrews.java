@@ -29,4 +29,10 @@ public class MemberCrews {
                 .filter(crew -> crew.isLeader(member))
                 .toList();
     }
+
+    public List<Crew> getAllCrews() {
+        return memberCrews.stream()
+                .map(CrewMember::getCrew)
+                .toList();
+    }
 }

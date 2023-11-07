@@ -65,7 +65,7 @@ public class CrewService {
                 .map(MemberResponse::from)
                 .toList();
 
-        return CrewProfileResponse.fromEntity(crew, crewMembers);
+        return CrewProfileResponse.of(crew, crewMembers);
     }
 
     public List<CrewProfileResponse> findCrewByAddress(final String addressDepth1, final String addressDepth2, final Pageable pageable) {
@@ -78,7 +78,7 @@ public class CrewService {
         );
 
         return crews.stream()
-                .map(crew -> CrewProfileResponse.fromEntity(crew, crew.getCrewMembers(CONFIRMED).stream()
+                .map(crew -> CrewProfileResponse.of(crew, crew.getCrewMembers(CONFIRMED).stream()
                         .map(MemberResponse::from)
                         .toList()))
                 .toList();

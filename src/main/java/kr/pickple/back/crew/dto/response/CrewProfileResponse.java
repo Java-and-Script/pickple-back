@@ -1,12 +1,12 @@
 package kr.pickple.back.crew.dto.response;
 
+import java.util.List;
+
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewStatus;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.util.List;
 
 @Getter
 @Builder
@@ -27,7 +27,7 @@ public class CrewProfileResponse {
     private String addressDepth2;
     private List<MemberResponse> members;
 
-    public static CrewProfileResponse fromEntity(final Crew crew, final List<MemberResponse> crewMemberList) {
+    public static CrewProfileResponse of(final Crew crew, final List<MemberResponse> crewMemberList) {
         return CrewProfileResponse.builder()
                 .id(crew.getId())
                 .name(crew.getName())

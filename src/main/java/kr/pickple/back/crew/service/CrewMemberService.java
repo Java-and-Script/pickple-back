@@ -49,7 +49,7 @@ public class CrewMemberService {
                 .map(MemberResponse::from)
                 .toList();
 
-        return CrewProfileResponse.fromEntity(crew, crewMemberResponses);
+        return CrewProfileResponse.of(crew, crewMemberResponses);
     }
 
     @Transactional
