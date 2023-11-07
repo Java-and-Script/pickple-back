@@ -97,9 +97,9 @@ public class CrewController {
     public ResponseEntity<List<CrewProfileResponse>> findCrewsByAddress(
             @RequestParam final String addressDepth1,
             @RequestParam final String addressDepth2,
-            Pageable pageable
+            final Pageable pageable
     ) {
         return ResponseEntity.status(OK)
-                .body(crewService.findCrewByAddress(addressDepth1, addressDepth2,pageable));
+                .body(crewService.findCrewByAddress(addressDepth1, addressDepth2, pageable));
     }
 }
