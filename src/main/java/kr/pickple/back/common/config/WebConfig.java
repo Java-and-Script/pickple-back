@@ -15,6 +15,7 @@ import kr.pickple.back.auth.config.property.CorsProperties;
 import kr.pickple.back.auth.config.resolver.LoginTokenArgumentResolver;
 import kr.pickple.back.auth.config.resolver.RegisterTokenArgumentResolver;
 import kr.pickple.back.common.util.RegistrationStatusConverter;
+import kr.pickple.back.game.util.CategoryConverter;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -44,6 +45,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addFormatters(final FormatterRegistry registry) {
         registry.addConverter(new OauthProviderConverter());
         registry.addConverter(new RegistrationStatusConverter());
+        registry.addConverter(new CategoryConverter());
     }
 
     @Override

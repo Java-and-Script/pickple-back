@@ -1,6 +1,5 @@
 package kr.pickple.back.game.controller;
 
-import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
@@ -26,7 +26,6 @@ import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
-import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 
@@ -51,18 +50,12 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity<List<GameResponse>> findGamesByCategory(
-            @RequestParam("category") final String category,
-            @RequestParam("value") final String value,
+            @RequestParam final Category category,
+            @RequestParam final String value,
             final Pageable pageable
     ) {
-        switch (category) {
-            //현호 todo: playDate, positions 조건으로 조회하는 기능 추가 (MVP 미포함 기능)
-            case "location":
-                return ResponseEntity.status(OK)
-                        .body(gameService.findGamesByAddress(value, pageable));
-            default:
-                throw new GameException(GAME_SEARCH_CATEGORY_IS_INVALID, category);
-        }
+        return ResponseEntity.status(OK)
+                .body(gameService.findGamesByCategory(category, value, pageable));
     }
 
     @PostMapping("/{gameId}/members")
