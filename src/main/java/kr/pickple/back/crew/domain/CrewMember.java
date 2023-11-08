@@ -62,6 +62,10 @@ public class CrewMember extends BaseEntity {
     public void updateStatus(final RegistrationStatus registrationStatus) {
         this.status = registrationStatus;
 
+        changeCrewMemberCount(registrationStatus);
+    }
+
+    private void changeCrewMemberCount(final RegistrationStatus registrationStatus) {
         if (registrationStatus == CONFIRMED) {
             this.crew.increaseMemberCount();
         }
