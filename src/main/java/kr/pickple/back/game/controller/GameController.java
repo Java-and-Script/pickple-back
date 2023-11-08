@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.validation.Valid;
+import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
@@ -37,13 +38,18 @@ public class GameController {
     private final GameService gameService;
 
     @PostMapping
-    public ResponseEntity<GameIdResponse> createGame(@Valid @RequestBody final GameCreateRequest gameCreateRequest) {
+    public ResponseEntity<GameIdResponse> createGame(
+            @Login final Long loggedInMemberId,
+            @Valid @RequestBody final GameCreateRequest gameCreateRequest
+    ) {
         return ResponseEntity.status(CREATED)
                 .body(gameService.createGame(gameCreateRequest));
     }
 
     @GetMapping("/{gameId}")
-    public ResponseEntity<GameResponse> findGameDetailsById(@PathVariable final Long gameId) {
+    public ResponseEntity<GameResponse> findGameDetailsById(
+            @PathVariable final Long gameId
+    ) {
         return ResponseEntity.status(OK)
                 .body(gameService.findGameDetailsById(gameId));
     }
@@ -60,6 +66,7 @@ public class GameController {
 
     @PostMapping("/{gameId}/members")
     public ResponseEntity<Void> registerGameMember(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long gameId,
             @Valid @RequestBody final GameMemberCreateRequest gameMemberCreateRequest
     ) {
@@ -71,6 +78,7 @@ public class GameController {
 
     @GetMapping("/{gameId}/members")
     public ResponseEntity<GameResponse> findAllGameMembers(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long gameId,
             @RequestParam final RegistrationStatus status
     ) {
@@ -80,6 +88,7 @@ public class GameController {
 
     @PatchMapping("/{gameId}/members/{memberId}")
     public ResponseEntity<Void> updateGameMemberRegistrationStatus(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long gameId,
             @PathVariable final Long memberId,
             @Valid @RequestBody final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
@@ -91,7 +100,11 @@ public class GameController {
     }
 
     @DeleteMapping("/{gameId}/members/{memberId}")
-    public ResponseEntity<Void> deleteGameMember(@PathVariable final Long gameId, @PathVariable final Long memberId) {
+    public ResponseEntity<Void> deleteGameMember(
+            @Login final Long loggedInMemberId,
+            @PathVariable final Long gameId,
+            @PathVariable final Long memberId
+    ) {
         gameService.deleteGameMember(gameId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
@@ -100,6 +113,7 @@ public class GameController {
 
     @PatchMapping("/{gameId}/members/manner-scores")
     public ResponseEntity<Void> reviewMannerScores(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long gameId,
             @Valid @RequestBody final MannerScoreReviewsRequest mannerScoreReviewsRequest
     ) {
