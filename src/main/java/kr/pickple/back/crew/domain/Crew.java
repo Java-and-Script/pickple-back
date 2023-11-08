@@ -1,6 +1,7 @@
 package kr.pickple.back.crew.domain;
 
 import static kr.pickple.back.crew.domain.CrewStatus.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.util.CrewStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
@@ -127,7 +129,34 @@ public class Crew extends BaseEntity {
     }
 
     public void increaseMemberCount() {
+        validateCrewIsClosedOrFull();
+
         this.memberCount++;
+
+        updateStatusIfCrewMemberFull();
+    }
+
+    private void updateStatusIfCrewMemberFull() {
+        if (memberCount == maxMemberCount) {
+            this.status = CLOSED;
+        }
+    }
+
+    private void validateCrewIsClosedOrFull() {
+        validateCrewClosed();
+        validateCrewFull();
+    }
+
+    private void validateCrewClosed() {
+        if (status == CLOSED) {
+            throw new CrewException(CREW_STATUS_IS_CLOSED, status);
+        }
+    }
+
+    private void validateCrewFull() {
+        if (memberCount == maxMemberCount) {
+            throw new CrewException(CREW_CAPACITY_LIMIT_REACHED, memberCount);
+        }
     }
 
     public Boolean isLeader(final Member member) {
