@@ -9,9 +9,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import lombok.RequiredArgsConstructor;
 
@@ -35,18 +32,8 @@ public class LoginTokenArgumentResolver implements HandlerMethodArgumentResolver
             final NativeWebRequest webRequest,
             final WebDataBinderFactory binderFactory
     ) {
-        final Cookie[] cookies = webRequest.getNativeRequest(HttpServletRequest.class)
-                .getCookies();
-
         final String accessToken = tokenExtractor.extractAccessToken(webRequest.getHeader(AUTHORIZATION));
-        final String refreshToken = tokenExtractor.extractRefreshToken(cookies);
-
-        final AuthTokens authTokens = AuthTokens.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
-
-        jwtProvider.validateTokens(authTokens);
+        jwtProvider.validateAccessToken(accessToken);
 
         return Long.parseLong(jwtProvider.getSubject(accessToken));
     }

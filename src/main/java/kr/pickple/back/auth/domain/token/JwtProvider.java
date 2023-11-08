@@ -81,7 +81,7 @@ public class JwtProvider {
         validateRefreshToken(authTokens.getRefreshToken());
     }
 
-    private void validateAccessToken(final String accessToken) {
+    public void validateAccessToken(final String accessToken) {
         try {
             parseToken(accessToken);
         } catch (final ExpiredJwtException e) {
