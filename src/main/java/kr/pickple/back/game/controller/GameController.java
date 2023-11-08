@@ -1,9 +1,11 @@
 package kr.pickple.back.game.controller;
 
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static org.springframework.http.HttpStatus.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +26,7 @@ import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
+import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 
@@ -44,6 +47,22 @@ public class GameController {
     public ResponseEntity<GameResponse> findGameDetailsById(@PathVariable final Long gameId) {
         return ResponseEntity.status(OK)
                 .body(gameService.findGameDetailsById(gameId));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<GameResponse>> findGamesByCategory(
+            @RequestParam("category") final String category,
+            @RequestParam("value") final String value,
+            final Pageable pageable
+    ) {
+        switch (category) {
+            //현호 todo: playDate, positions 조건으로 조회하는 기능 추가 (MVP 미포함 기능)
+            case "location":
+                return ResponseEntity.status(OK)
+                        .body(gameService.findGamesByAddress(value, pageable));
+            default:
+                throw new GameException(GAME_SEARCH_CATEGORY_IS_INVALID, category);
+        }
     }
 
     @PostMapping("/{gameId}/members")
