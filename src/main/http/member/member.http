@@ -1,6 +1,7 @@
 ### 회원 생성
 POST http://localhost:8080/members
 Content-Type: application/json
+Authorization:
 
 {
 	"email":"changhyeon.h@kakao.com",
@@ -18,12 +19,16 @@ GET http://localhost:8080/members/1
 
 ### 사용자가 가입한 크루 목록
 GET http://localhost:8080/members/1/crews?status=확정
+Authorization:
 
 ### 사용자가 만든 크루 목록 조회
 GET http://localhost:8080/members/1/created-crews
+Authorization:
 
 ### 사용자의 참여 확정 게스트 모집글 목록 조회
 GET http://localhost:8080/members/1/games?status=확정
+Authorization:
 
 ### 사용자가 만든 게스트 모집글 목록 조회
 GET http://localhost:8080/members/1/created-games
+Authorization:
