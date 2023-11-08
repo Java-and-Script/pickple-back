@@ -75,7 +75,7 @@ public class MemberService {
 
     public MemberProfileResponse findMemberProfileById(final Long memberId) {
         final Member member = findMemberById(memberId);
-        final List<CrewResponse> crewResponses = member.getAllCrews()
+        final List<CrewResponse> crewResponses = member.getCrewsByStatus(CONFIRMED)
                 .stream()
                 .map(CrewResponse::from)
                 .toList();
