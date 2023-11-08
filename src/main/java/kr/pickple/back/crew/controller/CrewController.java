@@ -1,15 +1,9 @@
 package kr.pickple.back.crew.controller;
 
-import jakarta.validation.Valid;
-import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.dto.request.CrewApplyRequest;
-import kr.pickple.back.crew.dto.request.CrewCreateRequest;
-import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
-import kr.pickple.back.crew.dto.response.CrewIdResponse;
-import kr.pickple.back.crew.dto.response.CrewProfileResponse;
-import kr.pickple.back.crew.service.CrewMemberService;
-import kr.pickple.back.crew.service.CrewService;
-import lombok.RequiredArgsConstructor;
+import static org.springframework.http.HttpStatus.*;
+
+import java.util.List;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,9 +16,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
-import static org.springframework.http.HttpStatus.*;
+import jakarta.validation.Valid;
+import kr.pickple.back.auth.config.resolver.Login;
+import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.dto.request.CrewApplyRequest;
+import kr.pickple.back.crew.dto.request.CrewCreateRequest;
+import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
+import kr.pickple.back.crew.dto.response.CrewIdResponse;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.crew.service.CrewMemberService;
+import kr.pickple.back.crew.service.CrewService;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +38,7 @@ public class CrewController {
 
     @PostMapping
     public ResponseEntity<CrewIdResponse> createCrew(
+            @Login final Long loggedInMemberId,
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
         return ResponseEntity.status(CREATED)
@@ -52,6 +55,7 @@ public class CrewController {
 
     @PostMapping("/{crewId}/members")
     public ResponseEntity<Void> applyForCrewMemberShip(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long crewId,
             @Valid @RequestBody final CrewApplyRequest crewApplyRequest
     ) {
@@ -63,6 +67,7 @@ public class CrewController {
 
     @GetMapping("/{crewId}/members")
     public ResponseEntity<CrewProfileResponse> findAllCrewMembers(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long crewId,
             @RequestParam final RegistrationStatus status
     ) {
@@ -72,6 +77,7 @@ public class CrewController {
 
     @PatchMapping("/{crewId}/members/{memberId}")
     public ResponseEntity<Void> updateCrewMemberRegistrationStatus(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long crewId,
             @PathVariable final Long memberId,
             @Valid @RequestBody final CrewMemberUpdateStatusRequest crewMemberStatusUpdateRequest
@@ -84,6 +90,7 @@ public class CrewController {
 
     @DeleteMapping("/{crewId}/members/{memberId}")
     public ResponseEntity<Void> deleteCrewMemberShip(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long crewId,
             @PathVariable final Long memberId
     ) {
@@ -95,6 +102,7 @@ public class CrewController {
 
     @GetMapping
     public ResponseEntity<List<CrewProfileResponse>> findCrewsByAddress(
+            @Login final Long loggedInMemberId,
             @RequestParam final String addressDepth1,
             @RequestParam final String addressDepth2,
             final Pageable pageable

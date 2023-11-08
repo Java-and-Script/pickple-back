@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.property.JwtProperties;
+import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.config.resolver.SignUp;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
@@ -78,6 +79,7 @@ public class MemberController {
 
     @GetMapping("/{memberId}/crews")
     public ResponseEntity<List<CrewProfileResponse>> findAllCrewsByMemberId(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @RequestParam final RegistrationStatus status
     ) {
@@ -86,13 +88,17 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/created-crews")
-    public ResponseEntity<List<CrewProfileResponse>> findCreatedCrewsByMemberId(@PathVariable final Long memberId) {
+    public ResponseEntity<List<CrewProfileResponse>> findCreatedCrewsByMemberId(
+            @Login final Long loggedInMemberId,
+            @PathVariable final Long memberId
+    ) {
         return ResponseEntity.status(OK)
                 .body(memberService.findCreatedCrewsByMemberId(memberId));
     }
 
     @GetMapping("/{memberId}/games")
     public ResponseEntity<List<GameResponse>> findAllMemberGames(
+            @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @RequestParam final RegistrationStatus status
     ) {
@@ -101,7 +107,10 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/created-games")
-    public ResponseEntity<List<GameResponse>> findAllCreatedGames(@PathVariable final Long memberId) {
+    public ResponseEntity<List<GameResponse>> findAllCreatedGames(
+            @Login final Long loggedInMemberId,
+            @PathVariable final Long memberId
+    ) {
         return ResponseEntity.status(OK)
                 .body(memberService.findAllCreatedGames(memberId));
     }
