@@ -6,6 +6,8 @@ import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -69,6 +71,22 @@ public class GameService {
         final Game game = findGameById(gameId);
 
         return GameResponse.of(game, getMemberResponses(game, status));
+    }
+
+    public List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
+        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(address);
+
+        final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2(
+                mainAddressResponse.getAddressDepth1(),
+                mainAddressResponse.getAddressDepth2(),
+                pageable
+        );
+
+        return games.stream()
+                .map(game -> GameResponse.of(game, game.getMembersByStatus(CONFIRMED).stream()
+                        .map(MemberResponse::from)
+                        .toList()))
+                .toList();
     }
 
     private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
@@ -137,4 +155,5 @@ public class GameService {
 
         return GameResponse.of(game, memberResponses);
     }
+
 }
