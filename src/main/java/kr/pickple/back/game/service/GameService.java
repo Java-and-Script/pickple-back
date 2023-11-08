@@ -18,7 +18,6 @@ import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
-import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.response.GameIdResponse;
@@ -43,8 +42,8 @@ public class GameService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public GameIdResponse createGame(final GameCreateRequest gameCreateRequest) {
-        final Member host = findMemberById(gameCreateRequest.getHostId());
+    public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
+        final Member host = findMemberById(loggedInMemberId);
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
@@ -56,9 +55,9 @@ public class GameService {
     }
 
     @Transactional
-    public void registerGameMember(final Long gameId, final GameMemberCreateRequest gameMemberCreateRequest) {
+    public void registerGameMember(final Long gameId, final Long loggedInMemberId) {
         final Game game = findGameById(gameId);
-        final Member member = findMemberById(gameMemberCreateRequest.getMemberId());
+        final Member member = findMemberById(loggedInMemberId);
 
         game.addGameMember(member);
     }

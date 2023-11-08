@@ -1,12 +1,12 @@
 ### 크루 생성
 POST http://localhost:8080/crews
 Content-Type: application/json
+Authorization:
 
 {
   "name": "쿠쿠 크루",
   "content": "안녕하세요, 쿠쿠 크루입니다. 백둥체육관 201호에서 진행합니다.",
   "maxMemberCount": 15,
-  "leaderId": 1,
   "addressDepth1": "서울시",
   "addressDepth2": "강남구"
 }
@@ -18,10 +18,6 @@ GET http://localhost:8080/crews/1
 POST http://localhost:8080/crews/1/members
 Content-Type: application/json
 Authorization:
-
-{
-  "memberId": 1
-}
 
 ### 크루원 가입 신청자 목록
 GET  http://localhost:8080/crews/1/members?status=대기

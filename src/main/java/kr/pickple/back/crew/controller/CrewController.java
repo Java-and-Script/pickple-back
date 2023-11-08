@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.dto.request.CrewApplyRequest;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
@@ -42,7 +41,7 @@ public class CrewController {
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
         return ResponseEntity.status(CREATED)
-                .body(crewService.createCrew(crewCreateRequest));
+                .body(crewService.createCrew(crewCreateRequest, loggedInMemberId));
     }
 
     @GetMapping("/{crewId}")
@@ -56,10 +55,9 @@ public class CrewController {
     @PostMapping("/{crewId}/members")
     public ResponseEntity<Void> applyForCrewMemberShip(
             @Login final Long loggedInMemberId,
-            @PathVariable final Long crewId,
-            @Valid @RequestBody final CrewApplyRequest crewApplyRequest
+            @PathVariable final Long crewId
     ) {
-        crewMemberService.applyForCrewMemberShip(crewId, crewApplyRequest);
+        crewMemberService.applyForCrewMemberShip(crewId, loggedInMemberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();

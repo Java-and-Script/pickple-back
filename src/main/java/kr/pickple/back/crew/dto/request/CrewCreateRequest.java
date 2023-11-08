@@ -4,7 +4,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.crew.domain.Crew;
@@ -29,17 +28,17 @@ public class CrewCreateRequest {
     @Max(value = 30, message = "크루의 인원은 최대 30명까지만 가능합니다.")
     private Integer maxMemberCount;
 
-    @NotNull
-    @Positive(message = "크루장의 ID는 1 이상이어야 합니다.")
-    private Long leaderId;
-
     @NotBlank(message = "해당 크루의 활동 장소(도,시) 정보는 필수입니다.")
     private String addressDepth1;
 
     @NotBlank(message = "해당 크루의 활동 장소(구) 정보는 필수입니다.")
     private String addressDepth2;
 
-    public Crew toEntity(final Member leader, final MainAddressResponse mainAddressResponse, final String profile, final String background) {
+    public Crew toEntity(
+            final Member leader,
+            final MainAddressResponse mainAddressResponse,
+            final String profile,
+            final String background) {
 
         return Crew.builder()
                 .name(name)
