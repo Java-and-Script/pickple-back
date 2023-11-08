@@ -126,6 +126,10 @@ public class Crew extends BaseEntity {
         crewMembers.addCrewMember(this, member);
     }
 
+    public void increaseMemberCount() {
+        this.memberCount++;
+    }
+
     public Boolean isLeader(final Member member) {
         return member.equals(leader);
     }
