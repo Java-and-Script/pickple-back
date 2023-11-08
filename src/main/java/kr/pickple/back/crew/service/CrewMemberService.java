@@ -36,7 +36,7 @@ public class CrewMemberService {
         final Crew crew = findByExistCrew(crewId);
         final Member member = findMemberById(loggedInMemberId);
 
-        crew.getCrewMembers().addCrewMember(crew, member);
+        crew.addCrewMember(member);
     }
 
     public CrewProfileResponse findAllCrewMembers(final Long crewId, final RegistrationStatus status) {

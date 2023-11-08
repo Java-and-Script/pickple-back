@@ -1,10 +1,5 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.crew.domain.CrewStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -27,6 +22,13 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
+import static kr.pickple.back.crew.domain.CrewStatus.OPEN;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_CAPACITY_LIMIT_REACHED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_STATUS_IS_CLOSED;
 
 @Getter
 @Entity
