@@ -75,14 +75,13 @@ public class GameService {
     }
 
     public List<GameResponse> findGamesByCategory(final Category category, final String value,
-            final Pageable pageable) {
-        switch (category) {
+            final Pageable pageable
+    ) {
+        return switch (category) {
             //현호 todo: playDate, positions 조건으로 조회하는 기능 추가 (MVP 미포함 기능)
-            case ADDRESS:
-                return findGamesByAddress(value, pageable);
-            default:
-                throw new GameException(GAME_SEARCH_CATEGORY_IS_INVALID, category);
-        }
+            case ADDRESS -> findGamesByAddress(value, pageable);
+            default -> throw new GameException(GAME_SEARCH_CATEGORY_IS_INVALID, category);
+        };
     }
 
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
