@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
@@ -73,7 +74,18 @@ public class GameService {
         return GameResponse.of(game, getMemberResponses(game, status));
     }
 
-    public List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
+    public List<GameResponse> findGamesByCategory(final Category category, final String value,
+            final Pageable pageable) {
+        switch (category) {
+            //현호 todo: playDate, positions 조건으로 조회하는 기능 추가 (MVP 미포함 기능)
+            case ADDRESS:
+                return findGamesByAddress(value, pageable);
+            default:
+                throw new GameException(GAME_SEARCH_CATEGORY_IS_INVALID, category);
+        }
+    }
+
+    private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(address);
 
         final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2(
@@ -83,9 +95,7 @@ public class GameService {
         );
 
         return games.stream()
-                .map(game -> GameResponse.of(game, game.getMembersByStatus(CONFIRMED).stream()
-                        .map(MemberResponse::from)
-                        .toList()))
+                .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
     }
 
@@ -155,5 +165,4 @@ public class GameService {
 
         return GameResponse.of(game, memberResponses);
     }
-
 }
