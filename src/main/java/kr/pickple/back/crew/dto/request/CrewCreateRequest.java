@@ -38,7 +38,8 @@ public class CrewCreateRequest {
             final Member leader,
             final MainAddressResponse mainAddressResponse,
             final String profile,
-            final String background) {
+            final String background
+    ) {
 
         return Crew.builder()
                 .name(name)
