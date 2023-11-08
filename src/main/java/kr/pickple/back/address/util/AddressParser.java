@@ -6,9 +6,10 @@ import java.util.List;
 public final class AddressParser {
 
     public static final int ADDRESS_DEPTH_SIZE = 2;
+    private static final String ADDRESS_DELIMITER_REGEX = "[\\s+]";
 
     public static List<String> splitToAddressDepth1And2(final String mainAddress) {
-        return Arrays.stream(mainAddress.split(" "))
+        return Arrays.stream(mainAddress.split(ADDRESS_DELIMITER_REGEX))
                 .limit(ADDRESS_DEPTH_SIZE)
                 .map(AddressParser::addCitySuffixToFirstAddress)
                 .toList();
