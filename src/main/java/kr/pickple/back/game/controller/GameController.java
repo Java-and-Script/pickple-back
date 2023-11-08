@@ -19,7 +19,6 @@ import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
-import kr.pickple.back.game.dto.request.GameMemberCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
@@ -41,7 +40,7 @@ public class GameController {
             @Valid @RequestBody final GameCreateRequest gameCreateRequest
     ) {
         return ResponseEntity.status(CREATED)
-                .body(gameService.createGame(gameCreateRequest));
+                .body(gameService.createGame(gameCreateRequest, loggedInMemberId));
     }
 
     @GetMapping("/{gameId}")
@@ -55,10 +54,9 @@ public class GameController {
     @PostMapping("/{gameId}/members")
     public ResponseEntity<Void> registerGameMember(
             @Login final Long loggedInMemberId,
-            @PathVariable final Long gameId,
-            @Valid @RequestBody final GameMemberCreateRequest gameMemberCreateRequest
+            @PathVariable final Long gameId
     ) {
-        gameService.registerGameMember(gameId, gameMemberCreateRequest);
+        gameService.registerGameMember(gameId, loggedInMemberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();

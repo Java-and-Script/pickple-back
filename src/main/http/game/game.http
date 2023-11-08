@@ -15,8 +15,7 @@ Authorization:
   "positions": [
     "C",
     "PG"
-  ],
-  "hostId": 1
+  ]
 }
 
 ### 게스트 모집 상세 조회
@@ -26,10 +25,6 @@ GET http://localhost:8080/games/1
 POST http://localhost:8080/games/38/members
 Content-Type: application/json
 Authorization:
-
-{
-  "memberId": 2
-}
 
 ### 게스트 모집 참여 신청 수락
 PATCH http://localhost:8080/games/38/members/2

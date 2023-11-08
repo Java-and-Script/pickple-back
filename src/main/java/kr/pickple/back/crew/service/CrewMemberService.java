@@ -1,9 +1,16 @@
 package kr.pickple.back.crew.service;
 
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
-import kr.pickple.back.crew.dto.request.CrewApplyRequest;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
@@ -14,14 +21,6 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_NOT_FOUND;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,9 +32,9 @@ public class CrewMemberService {
     private final CrewMemberRepository crewMemberRepository;
 
     @Transactional
-    public void applyForCrewMemberShip(final Long crewId, final CrewApplyRequest crewApplyRequest) {
+    public void applyForCrewMemberShip(final Long crewId, final Long loggedInMemberId) {
         final Crew crew = findByExistCrew(crewId);
-        final Member member = findMemberById(crewApplyRequest.getMemberId());
+        final Member member = findMemberById(loggedInMemberId);
 
         crew.getCrewMembers().addCrewMember(crew, member);
     }
@@ -53,7 +52,8 @@ public class CrewMemberService {
     }
 
     @Transactional
-    public void crewMemberStatusUpdate(final Long crewId, final Long memberId, final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest) {
+    public void crewMemberStatusUpdate(final Long crewId, final Long memberId,
+            final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest) {
         final CrewMember crewMember = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
                 .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
         //TODO: 조회하는 사람이 크루장인지 검증 로직 추가(토큰,11월 7일, 소재훈)

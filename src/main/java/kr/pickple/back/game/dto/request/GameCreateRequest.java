@@ -60,10 +60,7 @@ public class GameCreateRequest {
 
     @NotNull(message = "포지션 목록은 null일 수 없음")
     private List<Position> positions;
-
-    @NotNull(message = "호스트 ID는 null일 수 없음")
-    private Long hostId;
-
+    
     public Game toEntity(final Member host, final MainAddressResponse mainAddressResponse) {
         return Game.builder()
                 .content(content)
