@@ -1,6 +1,7 @@
 ### 게스트 모집하기
 POST http://localhost:8080/games
 Content-Type: application/json
+Authorization:
 
 {
   "content": "재밌는 농구 경기 해요~! 다 초보입니다",
@@ -21,18 +22,19 @@ Content-Type: application/json
 ### 게스트 모집 상세 조회
 GET http://localhost:8080/games/1
 
-
 ### 게스트 모집 참여 신청
-POST http://localhost:8080/games/2/members
+POST http://localhost:8080/games/38/members
 Content-Type: application/json
+Authorization:
 
 {
-  "memberId": 1
+  "memberId": 2
 }
 
 ### 게스트 모집 참여 신청 수락
-PATCH http://localhost:8080/games/2/members/2
+PATCH http://localhost:8080/games/38/members/2
 Content-Type: application/json
+Authorization:
 
 {
   "status": "확정"
@@ -40,16 +42,20 @@ Content-Type: application/json
 
 ### 게스트 모집 참여 신청 거절/취소
 DELETE http://localhost:8080/games/2/members/3
+Authorization:
 
 ### 게스트 모집에 참여 신청된 사용자 정보 목록 조회
 GET http://localhost:8080/games/2/members?status=대기
+Authorization:
 
 ### 게스트 모집에 확정된 사용자 정보 목록 조회
 GET http://localhost:8080/games/2/members?status=확정
+Authorization:
 
 ### 다른 사용자(호스트, 게스트) 매너 스코어 리뷰
 PATCH http://localhost:8080/games/1/members/manner-scores
 Content-Type: application/json
+Authorization:
 
 {
   "mannerScoreReviews": [
