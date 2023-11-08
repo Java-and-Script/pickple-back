@@ -63,3 +63,6 @@ Content-Type: application/json
     }
   ]
 }
+
+### 조건별 게스트 모집글 조회(장소)
+GET http://localhost:8080/games?category=location&value=서울시+영등포구&page=0&size=3
