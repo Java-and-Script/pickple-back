@@ -1,9 +1,15 @@
 package kr.pickple.back.crew.controller;
 
-import static org.springframework.http.HttpStatus.*;
-
-import java.util.List;
-
+import jakarta.validation.Valid;
+import kr.pickple.back.auth.config.resolver.Login;
+import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.dto.request.CrewCreateRequest;
+import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
+import kr.pickple.back.crew.dto.response.CrewIdResponse;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.crew.service.CrewMemberService;
+import kr.pickple.back.crew.service.CrewService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,16 +22,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import jakarta.validation.Valid;
-import kr.pickple.back.auth.config.resolver.Login;
-import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.dto.request.CrewCreateRequest;
-import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
-import kr.pickple.back.crew.dto.response.CrewIdResponse;
-import kr.pickple.back.crew.dto.response.CrewProfileResponse;
-import kr.pickple.back.crew.service.CrewMemberService;
-import kr.pickple.back.crew.service.CrewService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
+import static org.springframework.http.HttpStatus.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -70,7 +69,7 @@ public class CrewController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(crewMemberService.findAllCrewMembers(crewId, status));
+                .body(crewMemberService.findAllCrewMembers(loggedInMemberId, crewId, status));
     }
 
     @PatchMapping("/{crewId}/members/{memberId}")
@@ -80,7 +79,7 @@ public class CrewController {
             @PathVariable final Long memberId,
             @Valid @RequestBody final CrewMemberUpdateStatusRequest crewMemberStatusUpdateRequest
     ) {
-        crewMemberService.crewMemberStatusUpdate(crewId, memberId, crewMemberStatusUpdateRequest);
+        crewMemberService.crewMemberStatusUpdate(loggedInMemberId, crewId, memberId, crewMemberStatusUpdateRequest);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -92,7 +91,7 @@ public class CrewController {
             @PathVariable final Long crewId,
             @PathVariable final Long memberId
     ) {
-        crewMemberService.deleteMemberShip(crewId, memberId);
+        crewMemberService.deleteMemberShip(loggedInMemberId, crewId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -106,6 +105,6 @@ public class CrewController {
             final Pageable pageable
     ) {
         return ResponseEntity.status(OK)
-                .body(crewService.findCrewByAddress(addressDepth1, addressDepth2, pageable));
+                .body(crewService.findCrewByAddress(loggedInMemberId,addressDepth1, addressDepth2, pageable));
     }
 }

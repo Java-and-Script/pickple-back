@@ -1,16 +1,16 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.member.domain.Member;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREADY_EXISTED;
 
 @Embeddable
 public class CrewMembers {
