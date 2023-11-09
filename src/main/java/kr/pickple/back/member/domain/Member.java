@@ -1,9 +1,5 @@
 package kr.pickple.back.member.domain;
 
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -32,6 +28,10 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE;
 
 @Entity
 @Getter
