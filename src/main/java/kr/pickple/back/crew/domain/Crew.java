@@ -161,6 +161,10 @@ public class Crew extends BaseEntity {
         }
     }
 
+    public Boolean isLeader(final Member member) {
+        return member.equals(leader);
+    }
+
     public Boolean isLeader(final Long memberId) {
         return this.leader.getId().equals(memberId);
     }

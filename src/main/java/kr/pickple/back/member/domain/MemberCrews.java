@@ -26,7 +26,7 @@ public class MemberCrews {
     public List<Crew> getCreatedCrewsByMember(final Member member) {
         return memberCrews.stream()
                 .map(CrewMember::getCrew)
-                .filter(crew -> crew.isLeader(member.getId()))
+                .filter(crew -> crew.isLeader(member))
                 .toList();
     }
 }
