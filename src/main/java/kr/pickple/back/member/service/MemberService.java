@@ -93,8 +93,10 @@ public class MemberService {
         return convertToCrewProfileResponses(crews, memberStatus);
     }
 
-    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long memberId) {
+    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long loggedInMember, final Long memberId) {
         final Member member = findMemberById(memberId);
+        member.validateIdentity(loggedInMember);
+
         final List<Crew> crews = member.getCreatedCrews();
 
         return convertToCrewProfileResponses(crews, CONFIRMED);
@@ -123,8 +125,10 @@ public class MemberService {
         return convertToGameResponses(games, memberStatus);
     }
 
-    public List<GameResponse> findAllCreatedGames(final Long memberId) {
+    public List<GameResponse> findAllCreatedGames(final Long loggedInMember, final Long memberId) {
         final Member member = findMemberById(memberId);
+        member.validateIdentity(loggedInMember);
+
         final List<Game> games = member.getCreatedGames();
 
         return convertToGameResponses(games, CONFIRMED);

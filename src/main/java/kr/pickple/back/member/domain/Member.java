@@ -154,4 +154,10 @@ public class Member extends BaseEntity {
 
         throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
     }
+
+    public void validateIdentity(Long loggedInMemberId) {
+        if (!id.equals(loggedInMemberId)) {
+            throw new MemberException(MEMBER_MISMATCH, loggedInMemberId, id);
+        }
+    }
 }

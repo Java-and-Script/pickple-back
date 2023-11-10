@@ -93,7 +93,7 @@ public class MemberController {
             @PathVariable final Long memberId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findCreatedCrewsByMemberId(memberId));
+                .body(memberService.findCreatedCrewsByMemberId(loggedInMemberId, memberId));
     }
 
     @GetMapping("/{memberId}/games")
@@ -112,6 +112,6 @@ public class MemberController {
             @PathVariable final Long memberId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findAllCreatedGames(memberId));
+                .body(memberService.findAllCreatedGames(loggedInMemberId, memberId));
     }
 }
