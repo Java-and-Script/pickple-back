@@ -31,6 +31,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_MISMATCH;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE;
 
 @Entity
