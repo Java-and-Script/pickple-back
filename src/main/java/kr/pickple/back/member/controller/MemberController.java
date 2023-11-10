@@ -1,21 +1,5 @@
 package kr.pickple.back.member.controller;
 
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.HttpStatus.*;
-
-import java.util.List;
-
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.property.JwtProperties;
@@ -30,6 +14,16 @@ import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_SIGNUP_OAUTH_SUBJECT_INVALID;
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
+import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequiredArgsConstructor

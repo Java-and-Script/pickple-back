@@ -1,13 +1,5 @@
 package kr.pickple.back.member.service;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.auth.domain.token.AuthTokens;
@@ -28,6 +20,14 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_IS_EXISTED;
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
