@@ -18,7 +18,7 @@ public enum CrewExceptionCode implements ExceptionCode {
     CREW_STATUS_IS_CLOSED(HttpStatus.BAD_REQUEST, "CRE-007", "해당 크루는 모집중이 아님"),
     CREW_IS_NOT_LEADER(HttpStatus.BAD_REQUEST, "CRE-008", "해당 크루의 크루장이 아님"),
     CREW_MEMBER_NOT_ALLOWED(HttpStatus.FORBIDDEN, "CRE-009", "해당 사용자는 크루 가입 신청을 거절하거나 취소할 권한 없음"),
-    CREW_MEMBER_NOT_APPLIED(HttpStatus.BAD_REQUEST, "CREW-010", "가입 신청을 한 상태가 아니므로, 가입 신청을 취소할 수 없음"),
+    CREW_MEMBER_NOT_APPLIED(HttpStatus.BAD_REQUEST, "CRE-010", "가입 신청을 한 상태가 아니므로, 가입 신청을 취소할 수 없음"),
     ;
 
     private final HttpStatus status;

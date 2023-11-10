@@ -54,8 +54,12 @@ public class CrewMemberService {
     }
 
     @Transactional
-    public void crewMemberStatusUpdate(final Long loggedInMemberId, final Long crewId, final Long memberId,
-                                       final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest) {
+    public void crewMemberStatusUpdate(
+            final Long loggedInMemberId,
+            final Long crewId,
+            final Long memberId,
+            final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
+    ) {
         final CrewMember crewMember = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
                 .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
 

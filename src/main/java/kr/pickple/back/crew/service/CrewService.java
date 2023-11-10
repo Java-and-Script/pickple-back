@@ -73,8 +73,12 @@ public class CrewService {
         return CrewProfileResponse.of(crew, crewMembers);
     }
 
-    public List<CrewProfileResponse> findCrewByAddress(final Long loggedInMemberId, final String addressDepth1, final String addressDepth2,
-                                                       final Pageable pageable) {
+    public List<CrewProfileResponse> findCrewByAddress(
+            final Long loggedInMemberId,
+            final String addressDepth1,
+            final String addressDepth2,
+            final Pageable pageable
+    ) {
         final Member member = memberRepository.findById(loggedInMemberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, loggedInMemberId));
 
