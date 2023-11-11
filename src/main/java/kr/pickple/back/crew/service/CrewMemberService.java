@@ -94,9 +94,7 @@ public class CrewMemberService {
         final Crew crew = crewMember.getCrew();
 
         if (crew.isLeader(loggedInMemberId)) {
-            if (loggedInMemberId.equals(memberId)) {
-                throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, loggedInMemberId);
-            }
+            validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
 
             deleteCrewMember(crewMember);
             return;
@@ -115,9 +113,15 @@ public class CrewMemberService {
                 .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
     }
 
+    private void validateIsLeaderSelfDeleted(Long loggedInMemberId, Long memberId) {
+        if (loggedInMemberId.equals(memberId)) {
+            throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, loggedInMemberId);
+        }
+    }
+
     private void cancelCrewMember(final CrewMember crewMember) {
         if (crewMember.getStatus() != WAITING) {
-            throw new CrewException(CREW_MEMBER_NOT_APPLIED);
+            throw new CrewException(CREW_MEMBER_STATUS_IS_NOT_WAITING);
         }
 
         deleteCrewMember(crewMember);
