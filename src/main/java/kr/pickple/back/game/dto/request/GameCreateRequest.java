@@ -18,10 +18,14 @@ import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameCreateRequest {
 
@@ -60,7 +64,7 @@ public class GameCreateRequest {
 
     @NotNull(message = "포지션 목록은 null일 수 없음")
     private List<Position> positions;
-    
+
     public Game toEntity(final Member host, final MainAddressResponse mainAddressResponse) {
         return Game.builder()
                 .content(content)
