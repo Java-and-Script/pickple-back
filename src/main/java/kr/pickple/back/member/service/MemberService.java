@@ -1,5 +1,13 @@
 package kr.pickple.back.member.service;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.auth.domain.token.AuthTokens;
@@ -20,14 +28,6 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_IS_EXISTED;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -41,11 +41,7 @@ public class MemberService {
 
     @Transactional
     public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
-        validateIsDuplicatedMemberInfo(
-                memberCreateRequest.getEmail(),
-                memberCreateRequest.getNickname(),
-                memberCreateRequest.getOauthId()
-        );
+        validateIsDuplicatedMemberInfo(memberCreateRequest);
 
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
                 memberCreateRequest.getAddressDepth1(),
@@ -67,7 +63,11 @@ public class MemberService {
         return AuthenticatedMemberResponse.of(savedMember, loginTokens);
     }
 
-    private void validateIsDuplicatedMemberInfo(final String email, final String nickname, final Long oauthId) {
+    private void validateIsDuplicatedMemberInfo(final MemberCreateRequest memberCreateRequest) {
+        final String email = memberCreateRequest.getEmail();
+        final String nickname = memberCreateRequest.getNickname();
+        final Long oauthId = memberCreateRequest.getOauthId();
+
         if (memberRepository.existsByEmailOrNicknameOrOauthId(email, nickname, oauthId)) {
             throw new MemberException(MEMBER_IS_EXISTED, email, nickname, oauthId);
         }
@@ -84,19 +84,22 @@ public class MemberService {
     }
 
     public List<CrewProfileResponse> findAllCrewsByMemberId(
+            final Long loggedInMemberId,
             final Long memberId,
             final RegistrationStatus memberStatus
     ) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
+
         final Member member = findMemberById(memberId);
         final List<Crew> crews = member.getCrewsByStatus(memberStatus);
 
         return convertToCrewProfileResponses(crews, memberStatus);
     }
 
-    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long loggedInMember, final Long memberId) {
-        final Member member = findMemberById(memberId);
-        member.validateIdentity(loggedInMember);
+    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long loggedInMemberId, final Long memberId) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
 
+        final Member member = findMemberById(memberId);
         final List<Crew> crews = member.getCreatedCrews();
 
         return convertToCrewProfileResponses(crews, CONFIRMED);
@@ -118,20 +121,32 @@ public class MemberService {
                 .toList();
     }
 
-    public List<GameResponse> findAllMemberGames(final Long memberId, final RegistrationStatus memberStatus) {
+    public List<GameResponse> findAllMemberGames(
+            final Long loggedInMemberId,
+            final Long memberId,
+            final RegistrationStatus memberStatus
+    ) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
+
         final Member member = findMemberById(memberId);
         final List<Game> games = member.getGamesByStatus(memberStatus);
 
         return convertToGameResponses(games, memberStatus);
     }
 
-    public List<GameResponse> findAllCreatedGames(final Long loggedInMember, final Long memberId) {
-        final Member member = findMemberById(memberId);
-        member.validateIdentity(loggedInMember);
+    public List<GameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
 
+        final Member member = findMemberById(memberId);
         final List<Game> games = member.getCreatedGames();
 
         return convertToGameResponses(games, CONFIRMED);
+    }
+
+    private void validateSelfMemberAccess(Long loggedInMemberId, Long memberId) {
+        if (!loggedInMemberId.equals(memberId)) {
+            throw new MemberException(MEMBER_MISMATCH, loggedInMemberId, memberId);
+        }
     }
 
     private Member findMemberById(final Long memberId) {
