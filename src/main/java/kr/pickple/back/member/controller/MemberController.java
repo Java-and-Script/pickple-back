@@ -78,7 +78,7 @@ public class MemberController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findAllCrewsByMemberId(memberId, status));
+                .body(memberService.findAllCrewsByMemberId(loggedInMemberId, memberId, status));
     }
 
     @GetMapping("/{memberId}/created-crews")
@@ -97,7 +97,7 @@ public class MemberController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findAllMemberGames(memberId, status));
+                .body(memberService.findAllMemberGames(loggedInMemberId, memberId, status));
     }
 
     @GetMapping("/{memberId}/created-games")
