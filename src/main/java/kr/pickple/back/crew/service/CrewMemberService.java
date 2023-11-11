@@ -1,5 +1,14 @@
 package kr.pickple.back.crew.service;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -13,14 +22,6 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,19 +34,22 @@ public class CrewMemberService {
 
     @Transactional
     public void applyForCrewMemberShip(final Long crewId, final Long loggedInMemberId) {
-        final Crew crew = findByExistCrew(crewId);
+        final Crew crew = findCrewById(crewId);
         final Member member = findMemberById(loggedInMemberId);
 
         crew.addCrewMember(member);
     }
 
-    public CrewProfileResponse findAllCrewMembers(final Long loggedInMemberId, final Long crewId, final RegistrationStatus status) {
-        final Crew crew = findByExistCrew(crewId);
-        if (!crew.isLeader(loggedInMemberId)) {
-            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
-        }
+    public CrewProfileResponse findAllCrewMembers(
+            final Long loggedInMemberId,
+            final Long crewId,
+            final RegistrationStatus status
+    ) {
+        final Crew crew = findCrewById(crewId);
 
-        final List<Member> members = crew.getCrewMembers().getCrewMembers(status);
+        validateIsLeader(loggedInMemberId, crew);
+
+        final List<Member> members = crew.getCrewMembers(status);
         final List<MemberResponse> crewMemberResponses = members.stream()
                 .map(MemberResponse::from)
                 .toList();
@@ -53,44 +57,7 @@ public class CrewMemberService {
         return CrewProfileResponse.of(crew, crewMemberResponses);
     }
 
-    @Transactional
-    public void crewMemberStatusUpdate(
-            final Long loggedInMemberId,
-            final Long crewId,
-            final Long memberId,
-            final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
-    ) {
-        final CrewMember crewMember = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
-                .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
-
-        final Crew crew = crewMember.getCrew();
-        if (!crew.isLeader(loggedInMemberId)) {
-            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
-        }
-
-        crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
-    }
-
-    @Transactional
-    public void deleteMemberShip(final Long loggedInMemberId, final Long crewId, final Long memberId) {
-        final CrewMember crewMember = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
-                .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
-
-        final Crew crew = crewMember.getCrew();
-        if (crew.isLeader(loggedInMemberId)) {
-            deleteCrewMemberByLeader(crewMember);
-            return;
-        }
-
-        if (memberId.equals(loggedInMemberId)) {
-            cancelCrewMemberShipByUser(crewMember);
-            return;
-        }
-
-        throw new CrewException(CREW_MEMBER_NOT_ALLOWED, loggedInMemberId);
-    }
-
-    private Crew findByExistCrew(final Long crewId) {
+    private Crew findCrewById(final Long crewId) {
         return crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
     }
@@ -100,15 +67,63 @@ public class CrewMemberService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    private void deleteCrewMemberByLeader(final CrewMember crewMember) {
-        crewMemberRepository.delete(crewMember);
+    @Transactional
+    public void crewMemberStatusUpdate(
+            final Long loggedInMemberId,
+            final Long crewId,
+            final Long memberId,
+            final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
+    ) {
+        final CrewMember crewMember = findCrewMemberByCrewIdAndMemberId(crewId, memberId);
+        final Crew crew = crewMember.getCrew();
+
+        validateIsLeader(loggedInMemberId, crew);
+
+        crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
     }
 
-    private void cancelCrewMemberShipByUser(final CrewMember crewMember) {
+    private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
+        if (!crew.isLeader(loggedInMemberId)) {
+            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
+        }
+    }
+
+    @Transactional
+    public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
+        final CrewMember crewMember = findCrewMemberByCrewIdAndMemberId(crewId, memberId);
+        final Crew crew = crewMember.getCrew();
+
+        if (crew.isLeader(loggedInMemberId)) {
+            if (loggedInMemberId.equals(memberId)) {
+                throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, loggedInMemberId);
+            }
+
+            deleteCrewMember(crewMember);
+            return;
+        }
+
+        if (loggedInMemberId.equals(memberId)) {
+            cancelCrewMember(crewMember);
+            return;
+        }
+
+        throw new CrewException(CREW_MEMBER_NOT_ALLOWED, loggedInMemberId);
+    }
+
+    private CrewMember findCrewMemberByCrewIdAndMemberId(final Long crewId, final Long memberId) {
+        return crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
+                .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
+    }
+
+    private void cancelCrewMember(final CrewMember crewMember) {
         if (crewMember.getStatus() != WAITING) {
             throw new CrewException(CREW_MEMBER_NOT_APPLIED);
         }
 
+        deleteCrewMember(crewMember);
+    }
+
+    private void deleteCrewMember(final CrewMember crewMember) {
         crewMemberRepository.delete(crewMember);
     }
 }
