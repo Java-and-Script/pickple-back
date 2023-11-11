@@ -16,11 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.fixture.setup.GameSetup;
 import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.member.domain.Member;
 
 @Transactional
 @SpringBootTest
 @AutoConfigureMockMvc
-public class GameControllerTest {
+class GameControllerTest {
 
     private static final String BASE_URL = "/games";
 
@@ -31,43 +32,48 @@ public class GameControllerTest {
     private GameSetup gameSetup;
 
     @Test
-    @DisplayName("게임 상세 정보를 조회할 수 있다.")
-    void findGameById_ReturnGameResponse() throws Exception {
+    @DisplayName("게스트 모집글의 상세 정보를 조회할 수 있다.")
+    void findGameDetailsById_ReturnGameResponse() throws Exception {
         // given
-        final Game savedGame = gameSetup.save();
+        final Game game = gameSetup.saveWithConfirmedMembers(2);
+        final Member guest = game.getGameMembers()
+                .get(1)
+                .getMember();
 
         // when
-        final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{games}", savedGame.getId()));
+        final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{gameId}", game.getId()));
 
         // then
         resultActions.andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("id").value(savedGame.getId()))
-                .andExpect(jsonPath("content").value(savedGame.getContent()))
-                .andExpect(jsonPath("playDate").value(savedGame.getPlayDate().toString()))
-                .andExpect(jsonPath("playStartTime").value(savedGame.getPlayStartTime().toString() + ":00"))
-                .andExpect(jsonPath("playEndTime").value(savedGame.getPlayEndTime().toString() + ":00"))
-                .andExpect(jsonPath("playTimeMinutes").value(savedGame.getPlayTimeMinutes()))
-                .andExpect(jsonPath("mainAddress").value(savedGame.getMainAddress()))
-                .andExpect(jsonPath("detailAddress").value(savedGame.getDetailAddress()))
-                .andExpect(jsonPath("latitude").value(savedGame.getLatitude()))
-                .andExpect(jsonPath("longitude").value(savedGame.getLongitude()))
-                .andExpect(jsonPath("status").value(savedGame.getStatus().getDescription()))
-                .andExpect(jsonPath("viewCount").value(savedGame.getViewCount()))
-                .andExpect(jsonPath("cost").value(savedGame.getCost()))
-                .andExpect(jsonPath("memberCount").value(savedGame.getMemberCount()))
-                .andExpect(jsonPath("maxMemberCount").value(savedGame.getMaxMemberCount()))
-                .andExpect(jsonPath("host.id").value(savedGame.getHost().getId()))
-                .andExpect(jsonPath("host.email").value(savedGame.getHost().getEmail()))
-                .andExpect(jsonPath("host.nickname").value(savedGame.getHost().getNickname()))
-                .andExpect(jsonPath("host.introduction").value(savedGame.getHost().getIntroduction()))
-                .andExpect(jsonPath("host.profileImageUrl").value(savedGame.getHost().getProfileImageUrl()))
-                .andExpect(jsonPath("host.mannerScore").value(savedGame.getHost().getMannerScore()))
-                .andExpect(jsonPath("host.mannerScoreCount").value(savedGame.getHost().getMannerScoreCount()))
-                .andExpect(jsonPath("addressDepth1").value(savedGame.getAddressDepth1().getName()))
-                .andExpect(jsonPath("addressDepth2").value(savedGame.getAddressDepth2().getName()))
-                .andExpect(jsonPath("positions[0]").value(savedGame.getPositions().get(0).getAcronym()))
-                .andExpect(jsonPath("positions[1]").value(savedGame.getPositions().get(1).getAcronym()))
+                .andExpect(jsonPath("id").value(game.getId()))
+                .andExpect(jsonPath("content").value(game.getContent()))
+                .andExpect(jsonPath("playDate").value(game.getPlayDate().toString()))
+                .andExpect(jsonPath("playStartTime").value(game.getPlayStartTime().toString() + ":00"))
+                .andExpect(jsonPath("playEndTime").value(game.getPlayEndTime().toString() + ":00"))
+                .andExpect(jsonPath("playTimeMinutes").value(game.getPlayTimeMinutes()))
+                .andExpect(jsonPath("mainAddress").value(game.getMainAddress()))
+                .andExpect(jsonPath("detailAddress").value(game.getDetailAddress()))
+                .andExpect(jsonPath("latitude").value(game.getLatitude()))
+                .andExpect(jsonPath("longitude").value(game.getLongitude()))
+                .andExpect(jsonPath("status").value(game.getStatus().getDescription()))
+                .andExpect(jsonPath("viewCount").value(game.getViewCount()))
+                .andExpect(jsonPath("cost").value(game.getCost()))
+                .andExpect(jsonPath("memberCount").value(game.getMemberCount()))
+                .andExpect(jsonPath("maxMemberCount").value(game.getMaxMemberCount()))
+                .andExpect(jsonPath("host.id").value(game.getHost().getId()))
+                .andExpect(jsonPath("host.email").value(game.getHost().getEmail()))
+                .andExpect(jsonPath("host.nickname").value(game.getHost().getNickname()))
+                .andExpect(jsonPath("host.introduction").value(game.getHost().getIntroduction()))
+                .andExpect(jsonPath("host.profileImageUrl").value(game.getHost().getProfileImageUrl()))
+                .andExpect(jsonPath("host.mannerScore").value(game.getHost().getMannerScore()))
+                .andExpect(jsonPath("host.mannerScoreCount").value(game.getHost().getMannerScoreCount()))
+                .andExpect(jsonPath("addressDepth1").value(game.getAddressDepth1().getName()))
+                .andExpect(jsonPath("addressDepth2").value(game.getAddressDepth2().getName()))
+                .andExpect(jsonPath("positions[0]").value(game.getPositions().get(0).getAcronym()))
+                .andExpect(jsonPath("positions[1]").value(game.getPositions().get(1).getAcronym()))
+                .andExpect(jsonPath("members[0].id").value(game.getHost().getId()))
+                .andExpect(jsonPath("members[1].id").value(guest.getId()))
                 .andDo(print());
     }
 }
