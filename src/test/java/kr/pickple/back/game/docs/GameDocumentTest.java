@@ -40,7 +40,7 @@ public class GameDocumentTest {
     @DisplayName("게스트 모집글 상세 조회")
     void findGameById_ReturnGameResponse() throws Exception {
         // given
-        Game game = gameSetup.save();
+        final Game game = gameSetup.save();
 
         // when
         final ResultActions resultActions = mockMvc.perform(get("/games/{gameId}", game.getId()))
