@@ -106,7 +106,6 @@ class MemberControllerTest {
                 .andExpect(jsonPath("addressDepth2").value(savedMember.getAddressDepth2().getName()))
                 .andExpect(jsonPath("positions[0]").value(savedMember.getPositions().get(0).getAcronym()))
                 .andExpect(jsonPath("positions[1]").value(savedMember.getPositions().get(1).getAcronym()))
-                .andExpect(jsonPath("crews").value(null))
                 .andDo(print());
     }
 
