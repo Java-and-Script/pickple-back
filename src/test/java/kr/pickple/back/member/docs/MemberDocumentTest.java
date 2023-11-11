@@ -28,6 +28,7 @@ import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.fixture.setup.MemberSetup;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 
 @Transactional
@@ -125,10 +126,10 @@ class MemberDocumentTest {
     @DisplayName("회원 프로필 조회")
     void findMemberById_ReturnMemberProfileResponse() throws Exception {
         // given
-        memberSetup.save();
+        final Member member = memberSetup.save();
 
         // when
-        final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}", 1L))
+        final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}", member.getId()))
                 .andExpect(status().isOk());
 
         // then
