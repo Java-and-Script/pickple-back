@@ -1,5 +1,9 @@
 package kr.pickple.back.member.domain;
 
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.List;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -19,6 +23,7 @@ import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
@@ -28,11 +33,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_MISMATCH;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE;
 
 @Entity
 @Getter
@@ -154,5 +154,9 @@ public class Member extends BaseEntity {
         }
 
         throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
+    }
+
+    public void addCrewMember(final CrewMember crewMember) {
+        memberCrews.addCrewMember(crewMember);
     }
 }
