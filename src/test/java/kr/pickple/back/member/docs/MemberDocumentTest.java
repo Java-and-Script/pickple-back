@@ -6,6 +6,7 @@ import static com.epages.restdocs.apispec.Schema.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +28,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
+import kr.pickple.back.fixture.setup.CrewSetup;
 import kr.pickple.back.fixture.setup.MemberSetup;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
@@ -42,6 +44,9 @@ class MemberDocumentTest {
 
     @Autowired
     private MemberSetup memberSetup;
+
+    @Autowired
+    private CrewSetup crewSetup;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -150,7 +155,6 @@ class MemberDocumentTest {
                                                 fieldWithPath("email").type(JsonFieldType.STRING).description("이메일"),
                                                 fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임"),
                                                 fieldWithPath("introduction").type(JsonFieldType.VARIES).description("자기 소개"),
-                                                //TODO: 추후 introduction 저장시 null이 아닌 빈 값 저장 필요 (11.4 황창현)
                                                 fieldWithPath("profileImageUrl").type(JsonFieldType.STRING)
                                                         .description("프로필 이미지 경로"),
                                                 fieldWithPath("mannerScore").type(JsonFieldType.NUMBER).description("매너 스코어"),
@@ -166,5 +170,203 @@ class MemberDocumentTest {
                         )
                 )
         );
+    }
+
+    @Test
+    @DisplayName("회원이 가입한 크루 목록을 조회할 수 있다.")
+    void findAllCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
+        // given
+        final Member member = memberSetup.save();
+        crewSetup.save(member);
+
+        final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/crews", member.getId())
+                        .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                        .queryParam("status", "확정")
+                )
+                .andExpect(status().isOk());
+
+        // then
+        resultActions.andDo(document("find-all-crews-by-member-id",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Member")
+                                        .summary("회원이 가입한 크루 목록 조회")
+                                        .description("회원이 가입한 크루 목록을 조회 할 수 있다.")
+                                        .responseSchema(schema("CrewProfile"))
+                                        .requestHeaders(
+                                                headerWithName("Authorization").description("AccessToken")
+                                        )
+                                        .pathParameters(
+                                                parameterWithName("memberId").description("회원 ID")
+                                        )
+                                        .queryParameters(
+                                                parameterWithName("status").description("가입 상태")
+                                        )
+                                        .responseFields(
+                                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("크루 ID"),
+                                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("크루 명"),
+                                                fieldWithPath("[].content").type(JsonFieldType.STRING).description("크루 소개글"),
+                                                fieldWithPath("[].memberCount").type(JsonFieldType.NUMBER).description("멤버 수"),
+                                                fieldWithPath("[].maxMemberCount").type(JsonFieldType.NUMBER)
+                                                        .description("최대 인원 수"),
+                                                fieldWithPath("[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루 프로필 이미지"),
+                                                fieldWithPath("[].backgroundImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루 배경 이미지"),
+                                                fieldWithPath("[].status").type(JsonFieldType.STRING)
+                                                        .description("크루 모집 상태(모집 중, 모집 마감"),
+                                                fieldWithPath("[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                                fieldWithPath("[].competitionPoint").type(JsonFieldType.NUMBER)
+                                                        .description("경쟁 점수"),
+                                                fieldWithPath("[].leader.id").type(JsonFieldType.NUMBER).description("크루장 ID"),
+                                                fieldWithPath("[].leader.nickname").type(JsonFieldType.STRING)
+                                                        .description("크루장 닉네임"),
+                                                fieldWithPath("[].leader.email").type(JsonFieldType.STRING)
+                                                        .description("크루장 이메일"),
+                                                fieldWithPath("[].leader.introduction").type(JsonFieldType.VARIES)
+                                                        .description("크루장 소개"),
+                                                fieldWithPath("[].leader.profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루장 프로필 이미지"),
+                                                fieldWithPath("[].leader.mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 매너 점수"),
+                                                fieldWithPath("[].leader.mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 매너 스코어 반영 횟수"),
+                                                fieldWithPath("[].leader.addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루장 주 활동지역 주소1"),
+                                                fieldWithPath("[].leader.addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루장 주 활동지역 주소2"),
+                                                subsectionWithPath("[].leader.positions").type(JsonFieldType.ARRAY)
+                                                        .description("크루장 주 포지션 목록"),
+                                                fieldWithPath("[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루 주 활동지역 주소1"),
+                                                fieldWithPath("[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루 주 활동지역 주소2"),
+                                                fieldWithPath("[].members[].id").type(JsonFieldType.NUMBER)
+                                                        .description("크루원 ID"),
+                                                fieldWithPath("[].members[].nickname").type(JsonFieldType.STRING)
+                                                        .description("크루원 닉네임"),
+                                                fieldWithPath("[].members[].email").type(JsonFieldType.STRING)
+                                                        .description("크루원 이메일"),
+                                                fieldWithPath("[].members[].introduction").type(JsonFieldType.VARIES)
+                                                        .description("크루원 소개"),
+                                                fieldWithPath("[].members[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루원 프로필 이미지"),
+                                                fieldWithPath("[].members[].mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("크루원 매너 점수"),
+                                                fieldWithPath("[].members[].mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("크루원 매너 스코어 반영 횟수"),
+                                                fieldWithPath("[].members[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루원 주 활동지역 주소1"),
+                                                fieldWithPath("[].members[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루원 주 활동지역 주소2"),
+                                                subsectionWithPath("[].members[].positions").type(JsonFieldType.ARRAY)
+                                                        .description("크루원 주 포지션 목록")
+                                        )
+                                        .build()
+                        )
+                )
+        ).andDo(print());
+    }
+
+    @Test
+    @DisplayName("회원이 만든 크루 목록을 조회할 수 있다.")
+    void findCreatedCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
+        // given
+        final Member member = memberSetup.save();
+        crewSetup.save(member);
+
+        final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/created-crews", member.getId())
+                        .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                )
+                .andExpect(status().isOk());
+
+        // then
+        resultActions.andDo(document("find-created-crews-by-member-id",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Member")
+                                        .summary("회원이 만든 크루 목록 조회")
+                                        .description("회원이 만든 크루 목록을 조회 할 수 있다.")
+                                        .responseSchema(schema("CrewProfile"))
+                                        .requestHeaders(
+                                                headerWithName("Authorization").description("AccessToken")
+                                        )
+                                        .pathParameters(
+                                                parameterWithName("memberId").description("회원 ID")
+                                        )
+                                        .responseFields(
+                                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("크루 ID"),
+                                                fieldWithPath("[].name").type(JsonFieldType.STRING).description("크루 명"),
+                                                fieldWithPath("[].content").type(JsonFieldType.STRING).description("크루 소개글"),
+                                                fieldWithPath("[].memberCount").type(JsonFieldType.NUMBER).description("멤버 수"),
+                                                fieldWithPath("[].maxMemberCount").type(JsonFieldType.NUMBER)
+                                                        .description("최대 인원 수"),
+                                                fieldWithPath("[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루 프로필 이미지"),
+                                                fieldWithPath("[].backgroundImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루 배경 이미지"),
+                                                fieldWithPath("[].status").type(JsonFieldType.STRING)
+                                                        .description("크루 모집 상태(모집 중, 모집 마감"),
+                                                fieldWithPath("[].likeCount").type(JsonFieldType.NUMBER).description("좋아요 수"),
+                                                fieldWithPath("[].competitionPoint").type(JsonFieldType.NUMBER)
+                                                        .description("경쟁 점수"),
+                                                fieldWithPath("[].leader.id").type(JsonFieldType.NUMBER).description("크루장 ID"),
+                                                fieldWithPath("[].leader.nickname").type(JsonFieldType.STRING)
+                                                        .description("크루장 닉네임"),
+                                                fieldWithPath("[].leader.email").type(JsonFieldType.STRING)
+                                                        .description("크루장 이메일"),
+                                                fieldWithPath("[].leader.introduction").type(JsonFieldType.VARIES)
+                                                        .description("크루장 소개"),
+                                                fieldWithPath("[].leader.profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루장 프로필 이미지"),
+                                                fieldWithPath("[].leader.mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 매너 점수"),
+                                                fieldWithPath("[].leader.mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 매너 스코어 반영 횟수"),
+                                                fieldWithPath("[].leader.addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루장 주 활동지역 주소1"),
+                                                fieldWithPath("[].leader.addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루장 주 활동지역 주소2"),
+                                                subsectionWithPath("[].leader.positions").type(JsonFieldType.ARRAY)
+                                                        .description("크루장 주 포지션 목록"),
+                                                fieldWithPath("[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루 주 활동지역 주소1"),
+                                                fieldWithPath("[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루 주 활동지역 주소2"),
+                                                fieldWithPath("[].members[].id").type(JsonFieldType.NUMBER)
+                                                        .description("크루원 ID"),
+                                                fieldWithPath("[].members[].nickname").type(JsonFieldType.STRING)
+                                                        .description("크루원 닉네임"),
+                                                fieldWithPath("[].members[].email").type(JsonFieldType.STRING)
+                                                        .description("크루원 이메일"),
+                                                fieldWithPath("[].members[].introduction").type(JsonFieldType.VARIES)
+                                                        .description("크루원 소개"),
+                                                fieldWithPath("[].members[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루원 프로필 이미지"),
+                                                fieldWithPath("[].members[].mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("크루원 매너 점수"),
+                                                fieldWithPath("[].members[].mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("크루원 매너 스코어 반영 횟수"),
+                                                fieldWithPath("[].members[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루원 주 활동지역 주소1"),
+                                                fieldWithPath("[].members[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루원 주 활동지역 주소2"),
+                                                subsectionWithPath("[].members[].positions").type(JsonFieldType.ARRAY)
+                                                        .description("크루원 주 포지션 목록")
+                                        )
+                                        .build()
+                        )
+                )
+        ).andDo(print());
     }
 }
