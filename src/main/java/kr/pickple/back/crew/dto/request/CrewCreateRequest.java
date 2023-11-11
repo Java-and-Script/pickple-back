@@ -9,10 +9,14 @@ import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class CrewCreateRequest {
 

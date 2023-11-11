@@ -11,11 +11,11 @@ public class MemberDtoFixtures {
 
     public static MemberCreateRequest memberCreateRequestBuild() {
         return MemberCreateRequest.builder()
-                .nickname("강백둥")
+                .nickname("백둥")
                 .profileImageUrl("https://amazon.image/1")
-                .email("pickple1@pickple.kr")
+                .email("pickple@pickple.kr")
                 .positions(List.of(Position.CENTER, Position.POINT_GUARD))
-                .oauthId(1L)
+                .oauthId(999999L)
                 .oauthProvider(OauthProvider.KAKAO)
                 .addressDepth1("서울시")
                 .addressDepth2("영등포구")

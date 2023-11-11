@@ -31,6 +31,7 @@ public class CrewMembers {
         final CrewMember crewMember = buildCrewMember(crew, member);
         if (member.equals(crew.getLeader())) {
             crewMember.confirmRegistration();
+            member.addCrewMember(crewMember);
         }
 
         crewMembers.add(crewMember);
