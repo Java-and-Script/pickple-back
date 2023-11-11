@@ -4,7 +4,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
+import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
+import kr.pickple.back.game.dto.request.MannerScoreReview;
+import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 
 public class GameDtoFixtures {
@@ -20,6 +25,27 @@ public class GameDtoFixtures {
                 .cost(100)
                 .maxMemberCount(5)
                 .positions(List.of(Position.CENTER, Position.POINT_GUARD))
+                .build();
+    }
+
+    public static GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequestBuild(
+            final RegistrationStatus status
+    ) {
+        return GameMemberRegistrationStatusUpdateRequest.builder()
+                .status(status)
+                .build();
+    }
+
+    public static MannerScoreReviewsRequest mannerScoreReviewsRequestBuild(final List<Member> members) {
+        final List<MannerScoreReview> mannerScoreReviews = members.stream()
+                .map(member -> MannerScoreReview.builder()
+                        .memberId(member.getId())
+                        .mannerScore(1)
+                        .build())
+                .toList();
+
+        return MannerScoreReviewsRequest.builder()
+                .mannerScoreReviews(mannerScoreReviews)
                 .build();
     }
 }
