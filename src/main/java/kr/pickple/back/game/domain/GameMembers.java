@@ -11,10 +11,12 @@ import jakarta.persistence.OneToMany;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.member.domain.Member;
+import lombok.Getter;
 
 @Embeddable
 public class GameMembers {
 
+    @Getter
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GameMember> gameMembers = new ArrayList<>();
 
