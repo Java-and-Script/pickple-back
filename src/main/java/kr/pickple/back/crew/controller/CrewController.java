@@ -86,12 +86,12 @@ public class CrewController {
     }
 
     @DeleteMapping("/{crewId}/members/{memberId}")
-    public ResponseEntity<Void> deleteCrewMemberShip(
+    public ResponseEntity<Void> deleteCrewMember(
             @Login final Long loggedInMemberId,
             @PathVariable final Long crewId,
             @PathVariable final Long memberId
     ) {
-        crewMemberService.deleteMemberShip(loggedInMemberId, crewId, memberId);
+        crewMemberService.deleteCrewMember(loggedInMemberId, crewId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
