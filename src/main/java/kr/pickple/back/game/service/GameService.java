@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
@@ -55,6 +56,19 @@ public class GameService {
     }
 
     @Transactional
+    public GameResponse findGameDetailsById(final Long gameId) {
+        final Game game = findGameById(gameId);
+        final List<MemberResponse> memberResponses = game.getMembersByStatus(CONFIRMED)
+                .stream()
+                .map(MemberResponse::from)
+                .toList();
+
+        game.increaseViewCount();
+
+        return GameResponse.of(game, memberResponses);
+    }
+
+    @Transactional
     public void registerGameMember(final Long gameId, final Long loggedInMemberId) {
         final Game game = findGameById(gameId);
         final Member member = findMemberById(loggedInMemberId);
@@ -62,18 +76,30 @@ public class GameService {
         game.addGameMember(member);
     }
 
-    private Member findMemberById(final Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    private Game findGameById(final Long gameId) {
+        return gameRepository.findById(gameId)
+                .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
     }
 
-    public GameResponse findAllGameMembers(final Long gameId, final RegistrationStatus status) {
-        final Game game = findGameById(gameId);
+    public GameResponse findAllGameMembers(
+            final Long loggedInMemberId,
+            final Long gameId,
+            final RegistrationStatus status
+    ) {
+        final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, loggedInMemberId);
+        final Game game = gameMember.getGame();
+        final Member loggedInMember = gameMember.getMember();
+
+        if (!game.isHost(loggedInMember) && status == WAITING) {
+            throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
+        }
 
         return GameResponse.of(game, getMemberResponses(game, status));
     }
 
-    public List<GameResponse> findGamesByCategory(final Category category, final String value,
+    public List<GameResponse> findGamesByCategory(
+            final Category category,
+            final String value,
             final Pageable pageable
     ) {
         return switch (category) {
@@ -106,31 +132,84 @@ public class GameService {
 
     @Transactional
     public void updateGameMemberRegistrationStatus(
+            final Long loggedInMemberId,
             final Long gameId,
             final Long memberId,
             final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
     ) {
         final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, memberId);
+        final Game game = gameMember.getGame();
+        final Member loggedInMember = findMemberById(loggedInMemberId);
+
+        if (!game.isHost(loggedInMember)) {
+            throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
+        }
+
         final RegistrationStatus newStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
 
         gameMember.updateStatus(newStatus);
     }
 
     @Transactional
-    public void deleteGameMember(final Long gameId, final Long memberId) {
+    public void deleteGameMember(final Long loggedInMemberId, final Long gameId, final Long memberId) {
         final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, memberId);
+        final Game game = gameMember.getGame();
+        final Member member = gameMember.getMember();
+        final Member loggedInMember = findMemberById(loggedInMemberId);
 
+        if (game.isHost(loggedInMember)) {
+            validateIsHostSelfDeleted(loggedInMember, member);
+            deleteGameMember(gameMember);
+
+            return;
+        }
+
+        if (loggedInMember.equals(member)) {
+            cancelGameMember(gameMember);
+
+            return;
+        }
+
+        throw new GameException(GAME_NOT_ALLOWED_TO_DELETE_GAME_MEMBER, loggedInMemberId);
+    }
+
+    private Member findMemberById(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    private void validateIsHostSelfDeleted(final Member loggedInMember, final Member member) {
+        if (loggedInMember.equals(member)) {
+            throw new GameException(GAME_HOST_CANNOT_BE_DELETED, loggedInMember.getId());
+        }
+    }
+
+    private void cancelGameMember(final GameMember gameMember) {
+        RegistrationStatus status = gameMember.getStatus();
+
+        if (status != WAITING) {
+            throw new GameException(GAME_MEMBER_STATUS_IS_NOT_WAITING, status);
+        }
+
+        deleteGameMember(gameMember);
+    }
+
+    private void deleteGameMember(final GameMember gameMember) {
         gameMemberRepository.delete(gameMember);
     }
 
-    private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
-        return gameMemberRepository.findByMemberIdAndGameId(memberId, gameId)
-                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
-    }
-
     @Transactional
-    public void reviewMannerScores(final Long gameId, final List<MannerScoreReview> mannerScoreReviews) {
-        Game game = findGameById(gameId);
+    public void reviewMannerScores(
+            final Long loggedInMemberId,
+            final Long gameId,
+            final List<MannerScoreReview> mannerScoreReviews
+    ) {
+        final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, loggedInMemberId);
+        final Game game = gameMember.getGame();
+
+        if (isGameNotOver(game)) {
+            throw new GameException(GAME_MEMBERS_CAN_REVIEW_AFTER_PLAYING, game.getPlayDate(), game.getPlayEndTime());
+        }
 
         mannerScoreReviews.forEach(review -> {
             final Member reviewedMember = getReviewedMember(game, review.getMemberId());
@@ -138,9 +217,13 @@ public class GameService {
         });
     }
 
-    private Game findGameById(final Long gameId) {
-        return gameRepository.findById(gameId)
-                .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
+    private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
+        return gameMemberRepository.findByMemberIdAndGameId(memberId, gameId)
+                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
+    }
+
+    private boolean isGameNotOver(final Game game) {
+        return !DateTimeUtil.isAfterThan(game.getPlayDate(), game.getPlayEndTime());
     }
 
     private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
@@ -149,18 +232,5 @@ public class GameService {
                 .filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
                 .findFirst()
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
-    }
-
-    @Transactional
-    public GameResponse findGameDetailsById(final Long gameId) {
-        final Game game = findGameById(gameId);
-        final List<MemberResponse> memberResponses = game.getMembersByStatus(CONFIRMED)
-                .stream()
-                .map(MemberResponse::from)
-                .toList();
-
-        game.increaseViewCount();
-
-        return GameResponse.of(game, memberResponses);
     }
 }

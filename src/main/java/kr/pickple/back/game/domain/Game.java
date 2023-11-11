@@ -155,11 +155,11 @@ public class Game extends BaseEntity {
         gameMembers.addGameMember(this, member);
     }
 
-    public Boolean isHost(final Member member) {
-        return member.equals(host);
-    }
-
     public void increaseViewCount() {
         viewCount++;
+    }
+
+    public Boolean isHost(final Member member) {
+        return member.equals(host);
     }
 }

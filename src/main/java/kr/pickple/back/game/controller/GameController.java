@@ -81,7 +81,7 @@ public class GameController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(gameService.findAllGameMembers(gameId, status));
+                .body(gameService.findAllGameMembers(loggedInMemberId, gameId, status));
     }
 
     @PatchMapping("/{gameId}/members/{memberId}")
@@ -91,7 +91,12 @@ public class GameController {
             @PathVariable final Long memberId,
             @Valid @RequestBody final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
     ) {
-        gameService.updateGameMemberRegistrationStatus(gameId, memberId, gameMemberRegistrationStatusUpdateRequest);
+        gameService.updateGameMemberRegistrationStatus(
+                loggedInMemberId,
+                gameId,
+                memberId,
+                gameMemberRegistrationStatusUpdateRequest
+        );
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -103,7 +108,7 @@ public class GameController {
             @PathVariable final Long gameId,
             @PathVariable final Long memberId
     ) {
-        gameService.deleteGameMember(gameId, memberId);
+        gameService.deleteGameMember(loggedInMemberId, gameId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -116,7 +121,7 @@ public class GameController {
             @Valid @RequestBody final MannerScoreReviewsRequest mannerScoreReviewsRequest
     ) {
         final List<MannerScoreReview> mannerScoreReviews = mannerScoreReviewsRequest.getMannerScoreReviews();
-        gameService.reviewMannerScores(gameId, mannerScoreReviews);
+        gameService.reviewMannerScores(loggedInMemberId, gameId, mannerScoreReviews);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
