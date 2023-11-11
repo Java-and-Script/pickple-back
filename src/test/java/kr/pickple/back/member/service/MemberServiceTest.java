@@ -1,5 +1,6 @@
 package kr.pickple.back.member.service;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.*;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -23,7 +23,6 @@ import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.domain.token.RefreshToken;
 import kr.pickple.back.auth.repository.RefreshTokenRepository;
-import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
@@ -103,12 +102,13 @@ class MemberServiceTest {
     void findAllCrewsByMemberId_ReturnCrewProfileResponses() {
         // given
         final Long memberId = 1L;
+        final Long loggedInMemberId = 1L;
         final Member member = buildMember();
         given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
 
         // when
         final List<CrewProfileResponse> crewProfileResponses = memberService.findAllCrewsByMemberId(memberId,
-                RegistrationStatus.CONFIRMED);
+                loggedInMemberId, CONFIRMED);
 
         // then
         assertThat(crewProfileResponses).isNotNull();
@@ -123,7 +123,6 @@ class MemberServiceTest {
         final Member member = buildMember();
 
         given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
-        ReflectionTestUtils.setField(member, "id", memberId);
 
         // when
         final List<CrewProfileResponse> crewProfileResponses = memberService.findCreatedCrewsByMemberId(
@@ -142,9 +141,6 @@ class MemberServiceTest {
         final Long memberId = 1L;
         final Long loggedInMemberId = 2L;
         final Member member = buildMember();
-
-        given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
-        ReflectionTestUtils.setField(member, "id", memberId);
 
         // when && then
         assertThatThrownBy(() -> memberService.findCreatedCrewsByMemberId(
