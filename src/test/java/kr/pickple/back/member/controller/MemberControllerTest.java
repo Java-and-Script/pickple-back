@@ -2,7 +2,6 @@ package kr.pickple.back.member.controller;
 
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -80,8 +79,7 @@ class MemberControllerTest {
                 .andExpect(jsonPath("oauthId").value(memberCreateRequest.getOauthId()))
                 .andExpect(jsonPath("oauthProvider").value(memberCreateRequest.getOauthProvider().name()))
                 .andExpect(jsonPath("addressDepth1").value(memberCreateRequest.getAddressDepth1()))
-                .andExpect(jsonPath("addressDepth2").value(memberCreateRequest.getAddressDepth2()))
-                .andDo(print());
+                .andExpect(jsonPath("addressDepth2").value(memberCreateRequest.getAddressDepth2()));
     }
 
     @Test
@@ -89,6 +87,7 @@ class MemberControllerTest {
     void findMemberById_ReturnMemberProfileResponse() throws Exception {
         // given
         final Member savedMember = memberSetup.save();
+        final Crew savedCrew = crewSetup.save(savedMember);
 
         // when
         final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{members}", savedMember.getId()));
@@ -107,7 +106,31 @@ class MemberControllerTest {
                 .andExpect(jsonPath("addressDepth2").value(savedMember.getAddressDepth2().getName()))
                 .andExpect(jsonPath("positions[0]").value(savedMember.getPositions().get(0).getAcronym()))
                 .andExpect(jsonPath("positions[1]").value(savedMember.getPositions().get(1).getAcronym()))
-                .andDo(print());
+                .andExpect(jsonPath("crews[0].id").value(savedCrew.getId()))
+                .andExpect(jsonPath("crews[0].name").value(savedCrew.getName()))
+                .andExpect(jsonPath("crews[0].content").value(savedCrew.getContent()))
+                .andExpect(jsonPath("crews[0].memberCount").value(savedCrew.getMemberCount()))
+                .andExpect(jsonPath("crews[0].maxMemberCount").value(savedCrew.getMaxMemberCount()))
+                .andExpect(jsonPath("crews[0].profileImageUrl").value(savedCrew.getProfileImageUrl()))
+                .andExpect(jsonPath("crews[0].backgroundImageUrl").value(savedCrew.getBackgroundImageUrl()))
+                .andExpect(jsonPath("crews[0].status").value(savedCrew.getStatus().getDescription()))
+                .andExpect(jsonPath("crews[0].likeCount").value(savedCrew.getLikeCount()))
+                .andExpect(jsonPath("crews[0].competitionPoint").value(savedCrew.getCompetitionPoint()))
+                .andExpect(jsonPath("crews[0].leader.id").value(savedMember.getId()))
+                .andExpect(jsonPath("crews[0].leader.nickname").value(savedMember.getNickname()))
+                .andExpect(jsonPath("crews[0].leader.email").value(savedMember.getEmail()))
+                .andExpect(jsonPath("crews[0].leader.introduction").value(savedMember.getIntroduction()))
+                .andExpect(jsonPath("crews[0].leader.profileImageUrl").value(savedMember.getProfileImageUrl()))
+                .andExpect(jsonPath("crews[0].leader.mannerScore").value(savedMember.getMannerScore()))
+                .andExpect(jsonPath("crews[0].leader.mannerScoreCount").value(savedMember.getMannerScoreCount()))
+                .andExpect(jsonPath("crews[0].leader.addressDepth1").value(savedMember.getAddressDepth1().getName()))
+                .andExpect(jsonPath("crews[0].leader.addressDepth2").value(savedMember.getAddressDepth2().getName()))
+                .andExpect(
+                        jsonPath("crews[0].leader.positions[0]").value(savedMember.getPositions().get(0).getAcronym()))
+                .andExpect(
+                        jsonPath("crews[0].leader.positions[1]").value(savedMember.getPositions().get(1).getAcronym()))
+                .andExpect(jsonPath("crews[0].addressDepth1").value(savedCrew.getAddressDepth1().getName()))
+                .andExpect(jsonPath("crews[0].addressDepth2").value(savedCrew.getAddressDepth2().getName()));
     }
 
     @Test
@@ -159,8 +182,7 @@ class MemberControllerTest {
                 .andExpect(jsonPath("[0].members[0].mannerScore").value(member.getMannerScore()))
                 .andExpect(jsonPath("[0].members[0].mannerScoreCount").value(member.getMannerScoreCount()))
                 .andExpect(jsonPath("[0].members[0].addressDepth1").value(member.getAddressDepth1().getName()))
-                .andExpect(jsonPath("[0].members[0].addressDepth2").value(member.getAddressDepth2().getName()))
-                .andDo(print());
+                .andExpect(jsonPath("[0].members[0].addressDepth2").value(member.getAddressDepth2().getName()));
     }
 
     @Test
@@ -211,7 +233,6 @@ class MemberControllerTest {
                 .andExpect(jsonPath("[0].members[0].mannerScore").value(member.getMannerScore()))
                 .andExpect(jsonPath("[0].members[0].mannerScoreCount").value(member.getMannerScoreCount()))
                 .andExpect(jsonPath("[0].members[0].addressDepth1").value(member.getAddressDepth1().getName()))
-                .andExpect(jsonPath("[0].members[0].addressDepth2").value(member.getAddressDepth2().getName()))
-                .andDo(print());
+                .andExpect(jsonPath("[0].members[0].addressDepth2").value(member.getAddressDepth2().getName()));
     }
 }
