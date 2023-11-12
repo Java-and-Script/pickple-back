@@ -27,19 +27,18 @@ jobs:
         with:
           arguments: build
 
-      - name: Container Registry Login
+      - name: Docker Hub Login
         uses: docker/login-action@v2
         with:
-          registry: ghcr.io
-          username: ${{ secrets.CONTAINER_REGISTRY_USERNAME }}
-          password: ${{ secrets.ACCESS_TOKEN }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_PASSWORD }}
 
       - name: Docker Image Build and Push
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ${{ secrets.CONTAINER_REGISTRY_IMAGE_TAG }}
+          tags: ${{ secrets.DOCKER_HUB_REPOSITORY }}
 
       - name: Copy Deployment Files to EC2
         uses: appleboy/scp-action@master
@@ -58,7 +57,7 @@ jobs:
           username: ${{ secrets.EC2_INSTANCE_USERNAME }}
           key: ${{ secrets.EC2_INSTANCE_PRIVATE_KEY }}
           script: |
-            docker pull ${{ secrets.CONTAINER_REGISTRY_IMAGE_TAG }}
+            docker pull ${{ secrets.DOCKER_HUB_REPOSITORY }}
             cd ~/pickple/deploy/dev
             docker-compose -p pickple-dev down
             docker-compose -p pickple-dev up -d
