@@ -40,7 +40,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id")
 public class Member extends BaseEntity {
 
-    private static final List<Integer> MANNER_SCORE_POINT_RANGE = List.of(-1, 0, 1);
+    public static final List<Integer> MANNER_SCORE_POINT_RANGE = List.of(-1, 0, 1);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

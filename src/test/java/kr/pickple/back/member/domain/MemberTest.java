@@ -1,9 +1,11 @@
 package kr.pickple.back.member.domain;
 
+import static kr.pickple.back.member.domain.Member.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -15,21 +17,20 @@ import kr.pickple.back.member.exception.MemberException;
 
 class MemberTest {
 
-    @ParameterizedTest
-    @ValueSource(ints = {-1, 0, 1})
+    @Test
     @DisplayName("회원의 매너스코어를 업데이트 시킬 수 있다.")
-    void updateMannerScore(int mannerScorePoint) {
+    void updateMannerScore() {
         // given
         final AddressDepth1 addressDepth1 = AddressFixtures.addressDepth1Build();
         final AddressDepth2 addressDepth2 = AddressFixtures.addressDepth2Build();
 
-        final Member member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
+        // when & then
+        MANNER_SCORE_POINT_RANGE.forEach((mannerScorePoint) -> {
+            final Member member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
+            member.updateMannerScore(mannerScorePoint);
 
-        // when
-        member.updateMannerScore(mannerScorePoint);
-
-        // then
-        assertThat(member.getMannerScore()).isEqualTo(mannerScorePoint);
+            assertThat(member.getMannerScore()).isEqualTo(mannerScorePoint);
+        });
     }
 
     @ParameterizedTest
