@@ -7,7 +7,6 @@ import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.junit.jupiter.api.DisplayName;
@@ -133,6 +132,7 @@ class MemberDocumentTest {
     void findMemberById_ReturnMemberProfileResponse() throws Exception {
         // given
         final Member member = memberSetup.save();
+        crewSetup.save(member);
 
         // when
         final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}", member.getId()))
@@ -164,8 +164,51 @@ class MemberDocumentTest {
                                                 fieldWithPath("addressDepth1").type(JsonFieldType.STRING)
                                                         .description("주소1(도,시)"),
                                                 fieldWithPath("addressDepth2").type(JsonFieldType.STRING).description("주소2(구)"),
-                                                fieldWithPath("positions").type(JsonFieldType.ARRAY).description("주 포지션 목록"),
-                                                fieldWithPath("crews").type(JsonFieldType.ARRAY).description("사용자가 소속된 크루 목록")
+                                                fieldWithPath("positions[]").type(JsonFieldType.ARRAY).description("주 포지션 목록"),
+                                                fieldWithPath("crews[]").type(JsonFieldType.ARRAY)
+                                                        .description("회원이 소속된 크루 목록"),
+                                                fieldWithPath("crews[].id").type(JsonFieldType.NUMBER).description("크루 ID"),
+                                                fieldWithPath("crews[].name").type(JsonFieldType.STRING).description("크루 명"),
+                                                fieldWithPath("crews[].content").type(JsonFieldType.STRING)
+                                                        .description("크루 소개글"),
+                                                fieldWithPath("crews[].memberCount").type(JsonFieldType.NUMBER)
+                                                        .description("멤버 수"),
+                                                fieldWithPath("crews[].maxMemberCount").type(JsonFieldType.NUMBER)
+                                                        .description("최대 인원 수"),
+                                                fieldWithPath("crews[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루 프로필 이미지"),
+                                                fieldWithPath("crews[].backgroundImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루 배경 이미지"),
+                                                fieldWithPath("crews[].status").type(JsonFieldType.STRING)
+                                                        .description("크루 모집 상태(모집 중, 모집 마감"),
+                                                fieldWithPath("crews[].likeCount").type(JsonFieldType.NUMBER)
+                                                        .description("좋아요 수"),
+                                                fieldWithPath("crews[].competitionPoint").type(JsonFieldType.NUMBER)
+                                                        .description("경쟁 점수"),
+                                                fieldWithPath("crews[].leader.id").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 ID"),
+                                                fieldWithPath("crews[].leader.nickname").type(JsonFieldType.STRING)
+                                                        .description("크루장 닉네임"),
+                                                fieldWithPath("crews[].leader.email").type(JsonFieldType.STRING)
+                                                        .description("크루장 이메일"),
+                                                fieldWithPath("crews[].leader.introduction").type(JsonFieldType.VARIES)
+                                                        .description("크루장 소개"),
+                                                fieldWithPath("crews[].leader.profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("크루장 프로필 이미지"),
+                                                fieldWithPath("crews[].leader.mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 매너 점수"),
+                                                fieldWithPath("crews[].leader.mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("크루장 매너 스코어 반영 횟수"),
+                                                fieldWithPath("crews[].leader.addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루장 주 활동지역 주소1"),
+                                                fieldWithPath("crews[].leader.addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루장 주 활동지역 주소2"),
+                                                subsectionWithPath("crews[].leader.positions").type(JsonFieldType.ARRAY)
+                                                        .description("크루장 주 포지션 목록"),
+                                                fieldWithPath("crews[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("크루 주 활동지역 주소1"),
+                                                fieldWithPath("crews[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("크루 주 활동지역 주소2")
                                         )
                                         .build()
                         )
@@ -241,12 +284,14 @@ class MemberDocumentTest {
                                                         .description("크루장 주 활동지역 주소1"),
                                                 fieldWithPath("[].leader.addressDepth2").type(JsonFieldType.STRING)
                                                         .description("크루장 주 활동지역 주소2"),
-                                                subsectionWithPath("[].leader.positions").type(JsonFieldType.ARRAY)
+                                                subsectionWithPath("[].leader.positions[]").type(JsonFieldType.ARRAY)
                                                         .description("크루장 주 포지션 목록"),
                                                 fieldWithPath("[].addressDepth1").type(JsonFieldType.STRING)
                                                         .description("크루 주 활동지역 주소1"),
                                                 fieldWithPath("[].addressDepth2").type(JsonFieldType.STRING)
                                                         .description("크루 주 활동지역 주소2"),
+                                                fieldWithPath("[].members[]").type(JsonFieldType.ARRAY)
+                                                        .description("크루원 목록"),
                                                 fieldWithPath("[].members[].id").type(JsonFieldType.NUMBER)
                                                         .description("크루원 ID"),
                                                 fieldWithPath("[].members[].nickname").type(JsonFieldType.STRING)
@@ -265,13 +310,13 @@ class MemberDocumentTest {
                                                         .description("크루원 주 활동지역 주소1"),
                                                 fieldWithPath("[].members[].addressDepth2").type(JsonFieldType.STRING)
                                                         .description("크루원 주 활동지역 주소2"),
-                                                subsectionWithPath("[].members[].positions").type(JsonFieldType.ARRAY)
+                                                subsectionWithPath("[].members[].positions[]").type(JsonFieldType.ARRAY)
                                                         .description("크루원 주 포지션 목록")
                                         )
                                         .build()
                         )
                 )
-        ).andDo(print());
+        );
     }
 
     @Test
@@ -338,12 +383,14 @@ class MemberDocumentTest {
                                                         .description("크루장 주 활동지역 주소1"),
                                                 fieldWithPath("[].leader.addressDepth2").type(JsonFieldType.STRING)
                                                         .description("크루장 주 활동지역 주소2"),
-                                                subsectionWithPath("[].leader.positions").type(JsonFieldType.ARRAY)
+                                                subsectionWithPath("[].leader.positions[]").type(JsonFieldType.ARRAY)
                                                         .description("크루장 주 포지션 목록"),
                                                 fieldWithPath("[].addressDepth1").type(JsonFieldType.STRING)
                                                         .description("크루 주 활동지역 주소1"),
                                                 fieldWithPath("[].addressDepth2").type(JsonFieldType.STRING)
                                                         .description("크루 주 활동지역 주소2"),
+                                                fieldWithPath("[].members[]").type(JsonFieldType.ARRAY)
+                                                        .description("크루원 목록"),
                                                 fieldWithPath("[].members[].id").type(JsonFieldType.NUMBER)
                                                         .description("크루원 ID"),
                                                 fieldWithPath("[].members[].nickname").type(JsonFieldType.STRING)
@@ -362,12 +409,12 @@ class MemberDocumentTest {
                                                         .description("크루원 주 활동지역 주소1"),
                                                 fieldWithPath("[].members[].addressDepth2").type(JsonFieldType.STRING)
                                                         .description("크루원 주 활동지역 주소2"),
-                                                subsectionWithPath("[].members[].positions").type(JsonFieldType.ARRAY)
+                                                subsectionWithPath("[].members[].positions[]").type(JsonFieldType.ARRAY)
                                                         .description("크루원 주 포지션 목록")
                                         )
                                         .build()
                         )
                 )
-        ).andDo(print());
+        );
     }
 }
