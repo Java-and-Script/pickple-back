@@ -4,6 +4,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static com.epages.restdocs.apispec.Schema.*;
 import static org.mockito.BDDMockito.*;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -213,7 +214,7 @@ public class AuthDocumentTest {
         // when
         final ResultActions resultActions = mockMvc.perform(
                         post("/auth/refresh")
-                                .header("Authorization", "Bearer " + accessTokenRequest)
+                                .header(AUTHORIZATION, "Bearer " + accessTokenRequest)
                                 .cookie(new Cookie("refresh-token", "refreshToken")))
                 .andExpect(status().isCreated());
 
