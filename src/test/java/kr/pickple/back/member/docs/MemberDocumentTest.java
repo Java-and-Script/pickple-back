@@ -3,6 +3,7 @@ package kr.pickple.back.member.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static com.epages.restdocs.apispec.Schema.*;
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
@@ -68,7 +69,7 @@ class MemberDocumentTest {
         final ResultActions resultActions = mockMvc.perform(post("/members")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
-                        .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                        .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                 )
                 .andExpect(status().isCreated());
 
@@ -183,7 +184,7 @@ class MemberDocumentTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/crews", member.getId())
-                        .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                        .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                         .queryParam("status", "확정")
                 )
                 .andExpect(status().isOk());
@@ -284,7 +285,7 @@ class MemberDocumentTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/created-crews", member.getId())
-                        .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                        .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                 )
                 .andExpect(status().isOk());
 

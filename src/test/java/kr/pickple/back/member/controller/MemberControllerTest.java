@@ -1,5 +1,6 @@
 package kr.pickple.back.member.controller;
 
+import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -61,7 +62,7 @@ class MemberControllerTest {
         final ResultActions resultActions = mockMvc.perform(post(BASE_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody)
-                .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
         );
 
         // then
@@ -120,7 +121,7 @@ class MemberControllerTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/crews", member.getId())
-                .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                 .queryParam("status", "확정")
         );
 
@@ -173,7 +174,7 @@ class MemberControllerTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/created-crews", member.getId())
-                .header("Authorization", "Bearer " + authTokens.getAccessToken())
+                .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
         );
 
         // then
