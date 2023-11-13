@@ -231,7 +231,7 @@ public class GameService {
     }
 
     private boolean isGameNotOver(final Game game) {
-        return !DateTimeUtil.isAfterThan(game.getPlayDate(), game.getPlayEndTime());
+        return DateTimeUtil.isAfterThanNow(game.getPlayDate(), game.getPlayEndTime());
     }
 
     private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
