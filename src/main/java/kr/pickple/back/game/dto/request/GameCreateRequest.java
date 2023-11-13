@@ -13,6 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import kr.pickple.back.address.dto.kakao.Coordinate;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
@@ -65,7 +66,11 @@ public class GameCreateRequest {
     @NotNull(message = "포지션 목록은 null일 수 없음")
     private List<Position> positions;
 
-    public Game toEntity(final Member host, final MainAddressResponse mainAddressResponse) {
+    public Game toEntity(
+            final Member host,
+            final MainAddressResponse mainAddressResponse,
+            final Coordinate coordinate
+    ) {
         return Game.builder()
                 .content(content)
                 .playDate(playDate)
@@ -77,6 +82,8 @@ public class GameCreateRequest {
                 .cost(cost)
                 .maxMemberCount(maxMemberCount)
                 .host(host)
+                .latitude(coordinate.getY())
+                .longitude(coordinate.getX())
                 .addressDepth1(mainAddressResponse.getAddressDepth1())
                 .addressDepth2(mainAddressResponse.getAddressDepth2())
                 .positions(positions)

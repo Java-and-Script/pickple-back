@@ -11,8 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.dto.kakao.Coordinate;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.game.domain.Category;
@@ -41,14 +43,17 @@ public class GameService {
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
     private final MemberRepository memberRepository;
+    private final KakaoAddressSearchClient kakaoAddressSearchClient;
 
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
         final Member host = findMemberById(loggedInMemberId);
+        final Coordinate coordinate = kakaoAddressSearchClient.fetchAddress(
+                gameCreateRequest.getMainAddress());
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
-        final Game game = gameCreateRequest.toEntity(host, mainAddressResponse);
+        final Game game = gameCreateRequest.toEntity(host, mainAddressResponse, coordinate);
         final Game savedGame = gameRepository.save(game);
         savedGame.addGameMember(host);
 
