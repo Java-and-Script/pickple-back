@@ -227,6 +227,7 @@ public class AuthDocumentTest {
                                         .tag("Auth")
                                         .summary("accessToken 갱신")
                                         .description("accessToken이 만료되었을 때 새로 갱신할 수 있다.")
+                                        .responseSchema(schema("AccessTokenResponse"))
                                         .requestHeaders(
                                                 headerWithName("Authorization")
                                                         .type(SimpleType.STRING)

@@ -340,6 +340,7 @@ class GameDocumentTest {
                                         .tag("Game")
                                         .summary("게스트 모집 참여 신청 수락")
                                         .description("호스트가 게스트 모집 참여 신청을 수락 한다.")
+                                        .requestSchema(schema("GameMemberRegistrationStatusUpdateRequest"))
                                         .pathParameters(
                                                 parameterWithName("gameId").description("게스트 모집글 ID"),
                                                 parameterWithName("memberId").description("참여 신청한 사용자 ID")
@@ -438,6 +439,7 @@ class GameDocumentTest {
                                         .tag("Game")
                                         .summary("다른 사용자 매너 스코어 리뷰")
                                         .description("경기 종료 후, 다른 사용자의 매너 스코어를 리뷰한다.")
+                                        .requestSchema(schema("MannerScoreReviewsRequest"))
                                         .pathParameters(
                                                 parameterWithName("gameId").description("게스트 모집글 ID")
                                         )
