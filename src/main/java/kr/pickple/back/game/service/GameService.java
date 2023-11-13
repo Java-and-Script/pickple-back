@@ -206,6 +206,7 @@ public class GameService {
     ) {
         final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, loggedInMemberId);
         final Game game = gameMember.getGame();
+        final Member loggedInMember = gameMember.getMember();
 
         if (isGameNotOver(game)) {
             throw new GameException(GAME_MEMBERS_CAN_REVIEW_AFTER_PLAYING, game.getPlayDate(), game.getPlayEndTime());
@@ -213,8 +214,15 @@ public class GameService {
 
         mannerScoreReviews.forEach(review -> {
             final Member reviewedMember = getReviewedMember(game, review.getMemberId());
+            validateIsSelfReview(loggedInMember, reviewedMember);
             reviewedMember.updateMannerScore(review.getMannerScore());
         });
+    }
+
+    private void validateIsSelfReview(final Member loggedInMember, final Member reviewedMember) {
+        if (loggedInMember.equals(reviewedMember)) {
+            throw new GameException(GAME_MEMBER_CANNOT_REVIEW_SELF, loggedInMember.getId(), reviewedMember.getId());
+        }
     }
 
     private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
