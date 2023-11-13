@@ -1,14 +1,19 @@
-== Auth
+== 1. 인증(Auth)
 
-=== REDIRECT OAUTH PAGE
+=== 1.1. OAuth 로그인 페이지 리다이렉트
 operation::redirect-oauth-login-page[snippets='http-request,http-response']
 
-=== OAUTH LOGIN AUTHENTICATED
+---
+
+=== 1.2. OAuth 로그인 (Access Token, Refresh Token 발급)
 operation::oauth-login-authenticated[snippets='http-request,http-response']
 
-=== OAUTH LOGIN REGISTRATION
+---
+
+=== 1.3. Register Token 발급
 operation::oauth-login-registration[snippets='http-request,http-response']
 
-=== OAUTH ACCESS TOKEN REFRESH
-operation::oauth-access-token-refresh[snippets='http-request,http-response']
+---
 
+=== 1.4. Access Token 갱신
+operation::oauth-access-token-refresh[snippets='http-request,http-response']

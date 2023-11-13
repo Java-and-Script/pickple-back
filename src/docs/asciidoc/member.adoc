@@ -1,10 +1,9 @@
-== Member
+== 2. 사용자(Member)
 
-=== CREATE MEMBER
+=== 2.1. 사용자 회원가입
 operation::create-member[snippets='http-request,http-response']
 
-=== FIND MEMBER
+---
+
+=== 2.2. 사용자 프로필 조회
 operation::find-member[snippets='http-request,http-response']
-
-
-
