@@ -16,5 +16,6 @@ public class KakaoOauthProperties {
     private final String authUrl;
     private final String redirectUrl;
     private final String memberUrl;
+    private final String addressUrl;
     private final String providerUrl;
 }
