@@ -116,6 +116,8 @@ public class Game extends BaseEntity {
             final Integer cost,
             final Integer maxMemberCount,
             final Member host,
+            final Double latitude,
+            final Double longitude,
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
             final List<Position> positions
@@ -130,6 +132,8 @@ public class Game extends BaseEntity {
         this.cost = cost;
         this.maxMemberCount = maxMemberCount;
         this.host = host;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
         updateGamePositions(positions);
