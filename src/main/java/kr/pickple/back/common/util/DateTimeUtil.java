@@ -10,10 +10,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DateTimeUtil {
 
-    public static boolean isAfterThan(final LocalDate date, final LocalTime time) {
+    public static boolean isAfterThanNow(final LocalDate date, final LocalTime time) {
         final LocalDateTime datetime = LocalDateTime.of(date, time);
         final LocalDateTime now = LocalDateTime.now();
 
-        return now.isAfter(datetime);
+        return datetime.isAfter(now);
     }
 }
