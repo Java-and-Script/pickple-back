@@ -149,6 +149,7 @@ public class Member extends BaseEntity {
     public void updateMannerScore(final Integer mannerScorePoint) {
         if (MANNER_SCORE_POINT_RANGE.contains(mannerScorePoint)) {
             this.mannerScore += mannerScorePoint;
+            this.mannerScoreCount += 1;
 
             return;
         }
