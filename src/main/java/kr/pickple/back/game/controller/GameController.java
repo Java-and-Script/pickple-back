@@ -126,4 +126,14 @@ public class GameController {
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
+
+    @GetMapping("/locations")
+    public ResponseEntity<List<GameResponse>> findGamesWithInDistance(
+            @RequestParam final Double latitude,
+            @RequestParam final Double longitude,
+            @RequestParam final Double distance
+    ) {
+        return ResponseEntity.status(OK)
+                .body(gameService.findGamesWithInDistance(latitude, longitude, distance));
+    }
 }

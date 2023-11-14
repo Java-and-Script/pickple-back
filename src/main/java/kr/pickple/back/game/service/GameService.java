@@ -246,4 +246,16 @@ public class GameService {
                 .findFirst()
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
     }
+
+    public List<GameResponse> findGamesWithInDistance(
+            final Double latitude,
+            final Double longitude,
+            final Double distance
+    ) {
+        final List<Game> games = gameRepository.findGamesWithInDistance(latitude, longitude, distance);
+
+        return games.stream()
+                .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
+                .toList();
+    }
 }
