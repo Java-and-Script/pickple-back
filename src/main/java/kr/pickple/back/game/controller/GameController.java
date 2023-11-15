@@ -127,7 +127,7 @@ public class GameController {
                 .build();
     }
 
-    @GetMapping("/locations")
+    @GetMapping("/by-location")
     public ResponseEntity<List<GameResponse>> findGamesWithInDistance(
             @RequestParam final Double latitude,
             @RequestParam final Double longitude,
