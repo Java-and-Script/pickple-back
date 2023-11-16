@@ -4,6 +4,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.game.domain.Game;
@@ -17,6 +22,9 @@ public class GameFixtures {
             final AddressDepth2 addressDepth2,
             final Member host
     ) {
+        final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        final Point point = geometryFactory.createPoint(new Coordinate(37.125, 126.75));
+
         return Game.builder()
                 .content("하이하이 즐겜 한 판해요")
                 .playDate(LocalDate.of(2023, 11, 10))
@@ -27,6 +35,7 @@ public class GameFixtures {
                 .detailAddress("영등포 다목적 체육관 2층 201호")
                 .cost(100)
                 .maxMemberCount(5)
+                .point(point)
                 .host(host)
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
