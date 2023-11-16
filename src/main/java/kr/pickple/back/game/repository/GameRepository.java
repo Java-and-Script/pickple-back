@@ -13,13 +13,14 @@ import kr.pickple.back.game.domain.Game;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
 
-    String HAVERSINE_FORMULA = "(6371 * acos(cos(radians(:latitude)) * cos(radians(g.latitude)) *" +
-            " cos(radians(g.longitude) - radians(:longitude)) + sin(radians(:latitude)) * sin(radians(g.latitude))))";
-
     Page<Game> findByAddressDepth1AndAddressDepth2(final AddressDepth1 addressDepth1, final AddressDepth2 addressDepth2,
             final Pageable pageable);
 
-    @Query("SELECT g FROM Game g WHERE " + HAVERSINE_FORMULA + " < :distance ORDER BY " + HAVERSINE_FORMULA)
+    @Query("SELECT g "
+            + "FROM Game g  "
+            + "WHERE ST_Contains(ST_Buffer(ST_GeomFromText(CONCAT('POINT(', :latitude, ' ', :longitude, ')'), 4326), :distance), g.point)"
+            + "ORDER BY ST_Distance_Sphere(g.point, ST_GeomFromText(CONCAT('POINT(', :latitude, ' ', :longitude, ')'), 4326))"
+    )
     List<Game> findGamesWithInDistance(
             final Double latitude,
             final Double longitude,
