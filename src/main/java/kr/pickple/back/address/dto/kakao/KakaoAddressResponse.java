@@ -2,6 +2,11 @@ package kr.pickple.back.address.dto.kakao;
 
 import java.util.List;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.PrecisionModel;
+
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,10 +26,9 @@ public class KakaoAddressResponse {
         private Double y;
     }
 
-    public Coordinate toCoordinate() {
-        return Coordinate.builder()
-                .x(documents.get(0).x)
-                .y(documents.get(0).y)
-                .build();
+    public Point toPoint() {
+        final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+        
+        return geometryFactory.createPoint(new Coordinate(documents.get(0).x, documents.get(0).y));
     }
 }

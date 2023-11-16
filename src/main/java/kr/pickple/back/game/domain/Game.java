@@ -6,6 +6,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -62,8 +64,8 @@ public class Game extends BaseEntity {
     @Column(length = 50)
     private String detailAddress;
 
-    private Double latitude;
-    private Double longitude;
+    @NotNull
+    private Point point;
 
     @NotNull
     @Convert(converter = GameStatusConverter.class)
@@ -116,8 +118,7 @@ public class Game extends BaseEntity {
             final Integer cost,
             final Integer maxMemberCount,
             final Member host,
-            final Double latitude,
-            final Double longitude,
+            final Point point,
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
             final List<Position> positions
@@ -132,8 +133,7 @@ public class Game extends BaseEntity {
         this.cost = cost;
         this.maxMemberCount = maxMemberCount;
         this.host = host;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.point = point;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
         updateGamePositions(positions);

@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.Max;
@@ -13,7 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import kr.pickple.back.address.dto.kakao.Coordinate;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
@@ -69,7 +70,7 @@ public class GameCreateRequest {
     public Game toEntity(
             final Member host,
             final MainAddressResponse mainAddressResponse,
-            final Coordinate coordinate
+            final Point point
     ) {
         return Game.builder()
                 .content(content)
@@ -82,8 +83,7 @@ public class GameCreateRequest {
                 .cost(cost)
                 .maxMemberCount(maxMemberCount)
                 .host(host)
-                .latitude(coordinate.getY())
-                .longitude(coordinate.getX())
+                .point(point)
                 .addressDepth1(mainAddressResponse.getAddressDepth1())
                 .addressDepth2(mainAddressResponse.getAddressDepth2())
                 .positions(positions)

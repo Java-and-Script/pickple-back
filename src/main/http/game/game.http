@@ -69,4 +69,4 @@ Authorization:
 GET http://localhost:8080/games?category=location&value=서울시+영등포구&page=0&size=3
 
 ### 위도, 경도, 거리를 통해 해당하는 게스트 모집글 조회
-GET http://localhost:8080/games/locations?latitude=37.5066680941127&longitude=126.897412723839&distance=10
+GET http://localhost:8080/games/by-location?latitude=37.5066680941127&longitude=126.897412723839&distance=1000

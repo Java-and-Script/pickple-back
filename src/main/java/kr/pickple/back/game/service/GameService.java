@@ -6,12 +6,12 @@ import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
 
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.kakao.Coordinate;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
@@ -48,12 +48,12 @@ public class GameService {
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
         final Member host = findMemberById(loggedInMemberId);
-        final Coordinate coordinate = kakaoAddressSearchClient.fetchAddress(
+        final Point point = kakaoAddressSearchClient.fetchAddress(
                 gameCreateRequest.getMainAddress());
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
-        final Game game = gameCreateRequest.toEntity(host, mainAddressResponse, coordinate);
+        final Game game = gameCreateRequest.toEntity(host, mainAddressResponse, point);
         final Game savedGame = gameRepository.save(game);
         savedGame.addGameMember(host);
 
