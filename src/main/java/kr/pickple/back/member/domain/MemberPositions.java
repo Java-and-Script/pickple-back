@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
@@ -15,6 +17,7 @@ import kr.pickple.back.position.domain.Position;
 @Embeddable
 public class MemberPositions {
 
+    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<MemberPosition> memberPositions = new ArrayList<>();
 
