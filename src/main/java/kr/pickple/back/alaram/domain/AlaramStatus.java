@@ -18,14 +18,14 @@ import static kr.pickple.back.alaram.exception.AlaramExceptionCode.ALARM_STATUS_
 @RequiredArgsConstructor
 public enum AlaramStatus {
 
-    TRUE("true"),
-    FALSE("false");
+    TRUE("읽음", true),
+    FALSE("읽지 않음", false);
 
     private static final Map<String, AlaramStatus> alaramStatusMap = Collections.unmodifiableMap(Stream.of(values())
             .collect(Collectors.toMap(AlaramStatus::getDescription, Function.identity())));
 
-    @JsonValue
     private final String description;
+    private final Boolean booleanValue;
 
     @JsonCreator
     public static AlaramStatus from(final String description) {
@@ -33,5 +33,10 @@ public enum AlaramStatus {
             return alaramStatusMap.get(description);
         }
         throw new CrewException(ALARM_STATUS_NOT_FOUND, description);
+    }
+
+    @JsonValue
+    public Boolean getBooleanValue() {
+        return booleanValue;
     }
 }

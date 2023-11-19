@@ -2,6 +2,7 @@ package kr.pickple.back.alaram.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import kr.pickple.back.alaram.util.AlaramStatusConverter;
 import kr.pickple.back.alaram.util.AlaramTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.crew.domain.Crew;
@@ -27,7 +28,7 @@ public class CrewAlaram extends BaseEntity {
 
     @NotNull
     @Column(length = 10)
-    @Convert(converter = AlaramStatus.class)
+    @Convert(converter = AlaramStatusConverter.class)
     private AlaramStatus isRead = FALSE;
 
     @NotNull
