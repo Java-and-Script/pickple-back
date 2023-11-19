@@ -1,14 +1,8 @@
 package kr.pickple.back.crew.service;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import kr.pickple.back.alaram.event.crew.CrewJoinRequestNotificationEvent;
+import kr.pickple.back.alaram.event.crew.CrewMemberJoinedEvent;
+import kr.pickple.back.alaram.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
@@ -23,6 +17,16 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +37,7 @@ public class CrewMemberService {
     private final MemberRepository memberRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final ChatMessageService chatMessageService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void applyForCrewMemberShip(final Long crewId, final Long loggedInMemberId) {
@@ -40,6 +45,8 @@ public class CrewMemberService {
         final Member member = findMemberById(loggedInMemberId);
 
         crew.addCrewMember(member);
+        //TODO:크루 알람 - 크루장에게 가입 신청이 왔어요! (크루장에게 전송)
+        eventPublisher.publishEvent(new CrewJoinRequestNotificationEvent(crewId));
     }
 
     public CrewProfileResponse findAllCrewMembers(
@@ -85,6 +92,9 @@ public class CrewMemberService {
         enterCrewChatRoom(updateStatus, crewMember);
 
         crewMember.updateStatus(updateStatus);
+        crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
+        //TODO:크루 알람 - 크루원(대기)상태이자 해당 크루 지원 멤버에게 전송 - 가입 신청이 허락되었어요!
+        eventPublisher.publishEvent(new CrewMemberJoinedEvent(crewId, memberId));
     }
 
     private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
@@ -110,6 +120,8 @@ public class CrewMemberService {
             validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
 
             deleteCrewMember(crewMember);
+            //TODO:크루 알람 - 크루장이 크루원(대기)상태에서 해당 크루원을 삭제 함(해당 크루 지원 회원에게 전송) - 가입 신청이 거절되었어요!
+            eventPublisher.publishEvent(new CrewMemberRejectedEvent(crewId, memberId));
             return;
         }
 
