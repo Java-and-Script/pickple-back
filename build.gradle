@@ -81,22 +81,45 @@ tasks.named('compileJava') {
 task copySubmodule(type: Copy) {
     copy {
         from './secret'
-        include "application*.yml"
-        exclude "application-test.yml"
+        include "application.yml"
         into 'src/main/resources'
     }
 
     copy {
-        from './secret'
+        from './secret/local'
+        include "application-local.yml"
+        into 'src/main/resources'
+    }
+
+    copy {
+        from './secret/dev'
+        include "application-dev.yml"
+        into 'src/main/resources'
+    }
+
+    copy {
+        from './secret/prod'
+        include "application-prod.yml"
+        into 'src/main/resources'
+    }
+
+    copy {
+        from './secret/test'
         include "application-test.yml"
         into 'src/test/resources'
         rename("application-test.yml", "application.yml")
     }
 
     copy {
-        from './secret'
+        from './secret/dev'
         include "docker-compose.yml"
         into 'deploy/dev'
+    }
+
+    copy {
+        from './secret/prod'
+        include "docker-compose.yml"
+        into 'deploy/prod'
     }
 }
 
@@ -125,12 +148,12 @@ tasks.register('copyDocs') {
     doFirst {
         def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.json")
 
-        def securitySchemesContent = "  securitySchemes:\n" +              \
-                                                  "    APIKey:\n" +              \
-                                                  "      type: apiKey\n" +              \
-                                                  "      name: Authorization\n" +              \
-                                                  "      in: header\n" +             \
-                                                  "security:\n" +
+        def securitySchemesContent = "  securitySchemes:\n" +                       \
+                                                           "    APIKey:\n" +                       \
+                                                           "      type: apiKey\n" +                       \
+                                                           "      name: Authorization\n" +                       \
+                                                           "      in: header\n" +                      \
+                                                           "security:\n" +
                 "  - APIKey: []  # Apply the security scheme here"
 
         swaggerUIFile.append securitySchemesContent
