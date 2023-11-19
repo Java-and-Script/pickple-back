@@ -5,7 +5,7 @@ import jakarta.persistence.Convert;
 import kr.pickple.back.alaram.domain.AlaramStatus;
 
 @Convert
-public class AlaramStatusConverter implements AttributeConverter<AlaramStatus,String> {
+public class AlaramStatusConverter implements AttributeConverter<AlaramStatus, String> {
 
     @Override
     public String convertToDatabaseColumn(final AlaramStatus status) {

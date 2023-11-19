@@ -2,6 +2,8 @@ package kr.pickple.back.alaram.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import kr.pickple.back.alaram.util.AlaramStatusConverter;
+import kr.pickple.back.alaram.util.AlaramTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
@@ -26,21 +28,21 @@ public class GameAlaram extends BaseEntity {
 
     @NotNull
     @Column(length = 10)
-    @Convert(converter = AlaramStatus.class)
+    @Convert(converter = AlaramStatusConverter.class)
     private AlaramStatus isRead = FALSE;
 
     @NotNull
     @Column(length = 20)
-    @Convert(converter = AlaramType.class)
+    @Convert(converter = AlaramTypeConverter.class)
     private AlaramType alaramType;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_id")
-    private Game game;
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id")
+    private Game game;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
