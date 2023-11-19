@@ -86,6 +86,6 @@ jobs:
           script: |
             docker pull ${{ secrets.PROD_DOCKER_HUB_REPOSITORY_TAGNAME }}
             cd ~/pickple/deploy
-            docker-compose -p pickple-dev down
-            docker-compose -p pickple-dev up -d
+            docker-compose -p pickple-prod down
+            docker-compose -p pickple-prod up -d
             docker image prune -f
