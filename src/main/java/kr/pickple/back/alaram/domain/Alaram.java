@@ -2,14 +2,15 @@ package kr.pickple.back.alaram.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.alaram.util.AlaramStatusConverter;
+import kr.pickple.back.alaram.util.AlaramExistsStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static kr.pickple.back.alaram.domain.AlaramStatus.FALSE;
+import static kr.pickple.back.alaram.domain.AlaramExistsStatus.NOT_EXISTS;
+
 
 @Entity
 @Getter
@@ -22,8 +23,8 @@ public class Alaram {
 
     @NotNull
     @Column(length = 10)
-    @Convert(converter = AlaramStatusConverter.class)
-    private AlaramStatus status = FALSE;
+    @Convert(converter = AlaramExistsStatusConverter.class)
+    private AlaramExistsStatus alaramExistsStatus = NOT_EXISTS;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -44,18 +45,7 @@ public class Alaram {
             final GameAlaram gameAlaram
     ) {
         this.member = member;
-        this.status = findAlaramUnRead(status);
         this.crewAlaram = crewAlaram;
         this.gameAlaram = gameAlaram;
-    }
-
-    private AlaramStatus findAlaramUnRead(AlaramStatus status) {
-        //1. 크루 알람 조회 - 상태가 unread가 있는지 체크
-
-        //2. 게임 알람 조회 - 상태가 unread가 있는지 체크
-
-        //3.status 상태 변화
-
-        return this.status;
     }
 }
