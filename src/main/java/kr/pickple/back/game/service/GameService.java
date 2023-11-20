@@ -31,9 +31,12 @@ import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateReques
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
+import kr.pickple.back.game.dto.response.GamesAndLocationResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
+import kr.pickple.back.map.domain.MapPolygon;
+import kr.pickple.back.map.repository.MapPolygonRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
@@ -52,6 +55,7 @@ public class GameService {
     private final AddressService addressService;
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
+    private final MapPolygonRepository mapPolygonRepository;
 
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
@@ -292,18 +296,27 @@ public class GameService {
                 .toList();
     }
 
-    public List<GameResponse> findGamesWithInAddress(
+    public GamesAndLocationResponse findGamesWithInAddress(
             final String addressDepth1,
             final String addressDepth2
     ) {
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1,
                 addressDepth2);
 
-        final List<Game> games = gameRepository.findGamesWithInAddress(mainAddressResponse.getAddressDepth1(),
-                mainAddressResponse.getAddressDepth2());
+        final List<Game> games = gameRepository.findGamesWithInAddress(
+                mainAddressResponse.getAddressDepth1(),
+                mainAddressResponse.getAddressDepth2()
+        );
 
-        return games.stream()
+        final MapPolygon polygon = mapPolygonRepository.findByAddressDepth1AndAddressDepth2(
+                mainAddressResponse.getAddressDepth1(),
+                mainAddressResponse.getAddressDepth2()
+        );
+
+        final List<GameResponse> gameResponses = games.stream()
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
+
+        return GamesAndLocationResponse.of(gameResponses, polygon);
     }
 }

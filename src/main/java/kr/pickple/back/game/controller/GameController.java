@@ -26,6 +26,7 @@ import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
+import kr.pickple.back.game.dto.response.GamesAndLocationResponse;
 import kr.pickple.back.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 
@@ -138,7 +139,7 @@ public class GameController {
     }
 
     @GetMapping("/by-address")
-    public ResponseEntity<List<GameResponse>> findGamesWithInAddress(
+    public ResponseEntity<GamesAndLocationResponse> findGamesWithInAddress(
             @RequestParam final String addressDepth1,
             @RequestParam final String addressDepth2
     ) {
