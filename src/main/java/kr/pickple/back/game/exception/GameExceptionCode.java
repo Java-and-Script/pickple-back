@@ -22,6 +22,8 @@ public enum GameExceptionCode implements ExceptionCode {
     GAME_NOT_ALLOWED_TO_DELETE_GAME_MEMBER(HttpStatus.FORBIDDEN, "GAM-010", "해당 사용자의 게스트 모집글 참여 신청을 거절 혹은 취소할 권한이 필요함"),
     GAME_MEMBERS_CAN_REVIEW_AFTER_PLAYING(HttpStatus.BAD_REQUEST, "GAM-011", "경기 종료 이전에는 리뷰를 남길 수 없음"),
     GAME_MEMBER_CANNOT_REVIEW_SELF(HttpStatus.BAD_REQUEST, "GAM-012", "자기 자신에게 리뷰를 남길 수 없음"),
+    GAME_CAPACITY_LIMIT_REACHED(HttpStatus.BAD_REQUEST, "GAM-013", "해당 게스트 모집글의 정원을 초과할 수 없음"),
+    GAME_STATUS_IS_CLOSED(HttpStatus.BAD_REQUEST, "GAM-014", "해당 게스트 모집글은 모집중이 아님"),
     ;
 
     private final HttpStatus status;
