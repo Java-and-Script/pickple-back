@@ -111,12 +111,6 @@ task copySubmodule(type: Copy) {
         include "docker-compose.yml"
         into 'deploy/dev'
     }
-
-    copy {
-        from './secret/prod'
-        include "docker-compose.yml"
-        into 'deploy/prod'
-    }
 }
 
 jar {
