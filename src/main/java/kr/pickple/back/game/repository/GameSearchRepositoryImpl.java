@@ -91,9 +91,11 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
     }
 
     private OrderSpecifier<Double> getOrderByAddress() {
-        return Expressions.numberTemplate(Double.class,
+        return Expressions.numberTemplate(
+                        Double.class,
                         "ST_Distance_Sphere({0}, ST_GeomFromText('POINT(' || {1} || ' ' || {2} || ')', 4326))",
-                        game.point, mapPolygon.latitude, mapPolygon.longitude)
+                        game.point, mapPolygon.latitude, mapPolygon.longitude
+                )
                 .asc();
     }
 }
