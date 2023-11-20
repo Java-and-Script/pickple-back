@@ -14,6 +14,7 @@ import kr.pickple.back.auth.config.OauthProviderConverter;
 import kr.pickple.back.auth.config.property.CorsProperties;
 import kr.pickple.back.auth.config.resolver.LoginTokenArgumentResolver;
 import kr.pickple.back.auth.config.resolver.RegisterTokenArgumentResolver;
+import kr.pickple.back.chat.util.RoomTypeConverter;
 import kr.pickple.back.common.util.RegistrationStatusConverter;
 import kr.pickple.back.game.util.CategoryConverter;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,7 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addConverter(new OauthProviderConverter());
         registry.addConverter(new RegistrationStatusConverter());
         registry.addConverter(new CategoryConverter());
+        registry.addConverter(new RoomTypeConverter());
     }
 
     @Override
