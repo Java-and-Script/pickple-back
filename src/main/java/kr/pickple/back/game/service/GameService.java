@@ -1,9 +1,12 @@
 package kr.pickple.back.game.service;
 
+import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
+import java.text.MessageFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.locationtech.jts.geom.Point;
@@ -15,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
+import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.service.ChatMessageService;
+import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.game.domain.Category;
@@ -39,11 +45,13 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class GameService {
 
-    private final AddressService addressService;
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
     private final MemberRepository memberRepository;
     private final KakaoAddressSearchClient kakaoAddressSearchClient;
+    private final AddressService addressService;
+    private final ChatRoomService chatRoomService;
+    private final ChatMessageService chatMessageService;
 
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
@@ -54,10 +62,21 @@ public class GameService {
                 gameCreateRequest.getMainAddress());
 
         final Game game = gameCreateRequest.toEntity(host, mainAddressResponse, point);
-        final Game savedGame = gameRepository.save(game);
-        savedGame.addGameMember(host);
+        game.addGameMember(host);
 
-        return GameIdResponse.from(savedGame.getId());
+        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(host, makeGameRoomName(game), GAME);
+        game.makeNewCrewChatRoom(chatRoom);
+
+        final Long savedGameId = gameRepository.save(game).getId();
+
+        return GameIdResponse.from(savedGameId);
+    }
+
+    private String makeGameRoomName(final Game game) {
+        final String playDateFormat = game.getPlayDate().format(DateTimeFormatter.ofPattern("MM.dd"));
+        final String addressDepth2Name = game.getAddressDepth2().getName();
+
+        return MessageFormat.format("{0} {1}", playDateFormat, addressDepth2Name);
     }
 
     @Transactional
@@ -144,15 +163,29 @@ public class GameService {
     ) {
         final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, memberId);
         final Game game = gameMember.getGame();
+
+        validateIsHost(loggedInMemberId, game);
+
+        final RegistrationStatus updateStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
+        enterGameChatRoom(updateStatus, gameMember);
+
+        gameMember.updateStatus(updateStatus);
+    }
+
+    private void validateIsHost(final Long loggedInMemberId, final Game game) {
         final Member loggedInMember = findMemberById(loggedInMemberId);
 
         if (!game.isHost(loggedInMember)) {
             throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
         }
+    }
 
-        final RegistrationStatus newStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
+    private void enterGameChatRoom(final RegistrationStatus updateStatus, final GameMember gameMember) {
+        final RegistrationStatus nowStatus = gameMember.getStatus();
 
-        gameMember.updateStatus(newStatus);
+        if (nowStatus == WAITING && updateStatus == CONFIRMED) {
+            chatMessageService.enterRoomAndSaveEnteringMessages(gameMember.getCrewChatRoom(), gameMember.getMember());
+        }
     }
 
     @Transactional
