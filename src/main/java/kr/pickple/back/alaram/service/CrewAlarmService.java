@@ -2,12 +2,14 @@ package kr.pickple.back.alaram.service;
 
 import kr.pickple.back.alaram.domain.AlarmStatus;
 import kr.pickple.back.alaram.domain.CrewAlarm;
-import kr.pickple.back.alaram.dto.response.CrewAlaramResponse;
+import kr.pickple.back.alaram.dto.response.CrewAlarmResponse;
 import kr.pickple.back.alaram.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alaram.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alaram.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.alaram.exception.AlarmException;
 import kr.pickple.back.alaram.repository.CrewAlarmRepository;
+import kr.pickple.back.alaram.util.SseEmitters;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewRepository;
@@ -15,16 +17,23 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.List;
 
 import static kr.pickple.back.alaram.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alaram.domain.AlarmType.*;
 import static kr.pickple.back.alaram.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADER;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 //SSE 연결 로직에서는 @Transcational금지
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CrewAlarmService {
@@ -32,10 +41,11 @@ public class CrewAlarmService {
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewAlarmRepository crewAlarmRepository;
+    private final AlarmService alarmService;
+    private final SseEmitters sseEmitters;
 
     //크루 알림 생성
-
-    public CrewAlarm createCrewJoinAlaram(CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
+    public CrewAlarmResponse createCrewJoinAlaram(final CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
         //1.크루 리포지토리에서 해당 크루의 리더인지 확인
         validateIsLeader(crewJoinRequestNotificationEvent);
 
@@ -54,15 +64,13 @@ public class CrewAlarmService {
         //4. DB에다가 알람 저장
         crewAlarmRepository.save(crewAlarm);
 
-        //?.SSE로 발생된 알람 발송 - 미완성
-        //emitMessage(crewAlaramResponse.getCrewAlarm());
+        final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
+        alarmService.notify(leader.getId(), response);
 
-        //?. 발생된 알림을 해당 크루장에게 발송 - notify()메소드 - 미완성
-
-        return CrewAlaramResponse.of(crewAlarm).getCrewAlarm();
+        return response;
     }
 
-    public CrewAlarm createCrewMemberApproveAlaram(CrewMemberJoinedEvent crewMemberJoinedEvent) {
+    public CrewAlarmResponse createCrewMemberApproveAlarm(final CrewMemberJoinedEvent crewMemberJoinedEvent) {
 
         //1.이벤트로부터 크루 정보, 회원 정보 가져오기
         final Long crewId = crewMemberJoinedEvent.getCrewId();
@@ -80,16 +88,13 @@ public class CrewAlarmService {
         //4. 알람 DB에다가 저장
         crewAlarmRepository.save(crewAlarm);
 
-        //?.SSE로 발생된 알람 저장 - DB 저장
-        //emitMessage(crewAlaramResponse.getCrewAlarm());
+        final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
+        alarmService.notify(member.getId(), response);
 
-
-        //?.발생된 알림을 해당 Member에게 발송 - notifiy() 메소드
-
-        return CrewAlaramResponse.of(crewAlarm).getCrewAlarm();
+        return response;
     }
 
-    public CrewAlarm createCrewMemberDeniedAlaram(CrewMemberRejectedEvent crewMemberRejectedEvent) {
+    public CrewAlarmResponse createCrewMemberDeniedAlarm(final CrewMemberRejectedEvent crewMemberRejectedEvent) {
 
         //1.이벤트로 부터 크루 정보,회원 정보 가져오기
         final Long crewId = crewMemberRejectedEvent.getCrewId();
@@ -108,27 +113,35 @@ public class CrewAlarmService {
         //4. 알람 DB에다가 저장
         crewAlarmRepository.save(crewAlarm);
 
+        final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
+        alarmService.notify(member.getId(), response);
 
-        //?. SSE로 발생된 알람 저장 - DB 저장
-        //emitMessage(crewAlaramResponse.getCrewAlarm());
-
-        //?. 발생된 알림을 해당 Member에게 발송 - notify()메소드
-
-        return CrewAlaramResponse.of(crewAlarm).getCrewAlarm();
+        return response;
     }
 
-    private Crew getCrewInfo(Long crewId) {
+    private Crew getCrewInfo(final Long crewId) {
         final Crew crew = crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
         return crew;
     }
 
-    private Member getMemberInfo(Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    private Member getCrewLeaderOfCrew(final Long crewId) {
+        final Crew crew = getCrewInfo(crewId);
+        return crew.getLeader();
     }
 
-    private void validateIsLeader(CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
+    private List<Member> getCrewMembers(final Long crewId, final RegistrationStatus status) {
+        final Crew crew = getCrewInfo(crewId);
+        return crew.getCrewMembers(status);
+    }
+
+    private Member getMemberInfo(final Long memberId) {
+        final Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+        return member;
+    }
+
+    private void validateIsLeader(final CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
         final Long crewId = crewJoinRequestNotificationEvent.getCrewId();
         final Crew crew = crewRepository.findById(crewId).orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
@@ -140,13 +153,40 @@ public class CrewAlarmService {
 
 
     //SSE알람을 발송하는 부분
-    //1. 크루장에게 발송 (멤버(회원)이 크루에 지원 클릭 시)
-    //2. 회원에게 발송(멤버(회훤) - 대기 상태 WAITING을 CONFIREMED로 변경 시)
-    //3. 회원에게 발송(멤버(회원) - 해당 크루가 거절되었어요!)
-    public void emitMessage(CrewAlarm alaram) {
-        //1. SSE로 알람 생성 - 각 케이스 별 알람 생성
+    public void emitMessage(final CrewAlarmResponse crewAlarm) {
 
-        //2. SSE로 발생된 알람 저장
+        final Long crewId = crewAlarm.getCrewId();
+        final Member crewLeader = getCrewLeaderOfCrew(crewId);
+        final List<Member> crewApplyMembers = getCrewMembers(crewId, WAITING);
+
+        //1. SSE로 알람 생성 - 각 케이스 별 알람 생성(크루장과 지원자에게 메시지 전송)
+        sendAlarmToCrewLeader(crewLeader, crewAlarm);
+        sendAlarmToCrewApplyMembers(crewApplyMembers, crewAlarm);
+    }
+
+    private void sendAlarmToMember(final Member member, final CrewAlarmResponse crewAlarm) {
+        final SseEmitter crewLeaderEmitter = sseEmitters.get(member.getId());
+        if (crewLeaderEmitter != null) {
+            try {
+                crewLeaderEmitter.send(crewAlarm);
+            } catch (IOException e) {
+                sseEmitters.remove(member.getId());
+                log.error("해당 회원에게 알람 전송 중 오류가 발생했습니다. : " + member.getId(), e);
+            }
+        }
+    }
+
+    //크루장에게 가입 신청이 올 시 받는 알람
+    private void sendAlarmToCrewLeader(final Member leader, final CrewAlarmResponse crewAlarm) {
+        sendAlarmToMember(leader, crewAlarm);
+    }
+
+    //회원(크루원 - 대기)에게 크루장이 승락 시, 상태가 Confired로 변하며 승락되었다는 알람
+    //회원(크루원 - 대기)에게 크루장이 거절 시, 크루원 테이블에서 삭제되며, 거절되었다는 알람
+    private void sendAlarmToCrewApplyMembers(final List<Member> members, final CrewAlarmResponse crewAlarm) {
+        for (final Member member : members) {
+            sendAlarmToMember(member, crewAlarm);
+        }
     }
 
     //크루 알람 모두 찾기 - 미정
