@@ -1,10 +1,12 @@
 package kr.pickple.back.alaram.service;
 
 import kr.pickple.back.alaram.domain.CrewAlarm;
+import kr.pickple.back.alaram.dto.request.CrewAlarmStatusUpdateRequest;
 import kr.pickple.back.alaram.dto.response.CrewAlaramResponse;
 import kr.pickple.back.alaram.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alaram.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alaram.event.crew.CrewMemberRejectedEvent;
+import kr.pickple.back.alaram.exception.AlarmException;
 import kr.pickple.back.alaram.repository.CrewAlarmRepository;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
@@ -15,7 +17,9 @@ import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import static kr.pickple.back.alaram.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alaram.domain.AlarmType.*;
+import static kr.pickple.back.alaram.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADER;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
@@ -145,23 +149,53 @@ public class CrewAlarmService {
         //2. SSE로 발생된 알람 저장
     }
 
-    //크루 알림 찾기 By ID
-    public void findCrewAlramById() {
-        //id로 알람을 찾기
-    }
-
-    //크루 알람 모두 찾기 - 상태
+    //크루 알람 모두 찾기 - 미정
     public void findCrewAlaramAll() {
 
     }
 
-    //크루 알람 상태 변경
-    public void updateCrewAlaramStatus() {
+    //크루 알림에서 isRead가 False가 있는지 체크하는 메소드
+    public boolean checkUnreadCrewAlarm(final Long memberId){
+        //1.해당 회원의 읽지 않은 알람이 있는지 체크함
+        final boolean existsUnreadCrewAlarm = crewAlarmRepository.existsByMemberIdAndIsRead(memberId, FALSE);
 
+        //2.반환
+        return existsUnreadCrewAlarm;
+    }
+
+
+
+    //크루 알림 찾기 By ID
+    public CrewAlarm findCrewAlramById(final Long crewAlarmId) {
+        //1. 알람 ID로 해당 알림 찾기
+        final CrewAlarm crewAlarm = checkExistCrewAlarm(crewAlarmId);
+
+        //2.찾는 알람 반환
+        return crewAlarm;
+    }
+
+    //크루 알람 상태 변경
+    public void updateCrewAlaramStatus(final Long crewAlarmId, final CrewAlarmStatusUpdateRequest crewAlarmStatusUpdateRequest) {
+        //1.알람 ID로 해당 알림 찾기
+        final CrewAlarm crewAlarm = checkExistCrewAlarm(crewAlarmId);
+
+        //2.상태 업데이트
+        crewAlarm.updateStatus(crewAlarmStatusUpdateRequest.getIsRead());
+
+        //3.저장
+        crewAlarmRepository.save(crewAlarm);
+    }
+
+    private CrewAlarm checkExistCrewAlarm(final Long crewAlarmId) {
+        final CrewAlarm crewAlarm = crewAlarmRepository.findById(crewAlarmId)
+                .orElseThrow(() -> new AlarmException(ALARM_NOT_FOUND, crewAlarmId));
+
+        return crewAlarm;
     }
 
     //크루 알림 삭제
-    public void deleteCrewAlaram() {
-
+    public void deleteAllCrewAlaram() {
+        //1.DB에서 생성된 모든 크루 알람을 삭제함
+        crewAlarmRepository.deleteAll();
     }
 }
