@@ -1,7 +1,7 @@
 package kr.pickple.back.alaram.service;
 
+import kr.pickple.back.alaram.domain.AlarmStatus;
 import kr.pickple.back.alaram.domain.GameAlarm;
-import kr.pickple.back.alaram.dto.request.GameAlarmStatusUpdateRequest;
 import kr.pickple.back.alaram.dto.response.GameAlaramResponse;
 import kr.pickple.back.alaram.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alaram.event.game.GameMemberJoinedEvent;
@@ -150,12 +150,13 @@ public class GameAlarmService {
     }
 
     //게임 알림 변경 By ID
-    public void updateGameAlarmStatus(final Long gameAlarmId, final GameAlarmStatusUpdateRequest gameAlarmStatusUpdateRequest) {
+    public void updateGameAlarmStatus(final Long gameAlarmId, final String isRead) {
         //1. 알람 ID로 해당 알림 찾기
         final GameAlarm gameAlarm = checkExistGameAlarm(gameAlarmId);
+        final AlarmStatus alarmStatus = AlarmStatus.from(isRead);
 
         //2. 상태 업데이트
-        gameAlarm.updateStatus(gameAlarmStatusUpdateRequest.getIsRead());
+        gameAlarm.updateStatus(alarmStatus);
 
         //3. 저장
         gameAlarmRepository.save(gameAlarm);
