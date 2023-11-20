@@ -59,4 +59,8 @@ public class CrewAlarm extends BaseEntity {
         this.crew = crew;
         this.member = member;
     }
+
+    public void updateStatus(AlarmStatus status) {
+        this.isRead = status;
+    }
 }

@@ -59,4 +59,8 @@ public class GameAlarm extends BaseEntity {
         this.game = game;
         this.member = member;
     }
+
+    public void updateStatus(AlarmStatus status) {
+        this.isRead = status;
+    }
 }
