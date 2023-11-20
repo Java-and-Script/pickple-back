@@ -9,6 +9,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -31,6 +32,7 @@ public class CrewMemberService {
     private final CrewRepository crewRepository;
     private final MemberRepository memberRepository;
     private final CrewMemberRepository crewMemberRepository;
+    private final ChatMessageService chatMessageService;
 
     @Transactional
     public void applyForCrewMemberShip(final Long crewId, final Long loggedInMemberId) {
@@ -49,7 +51,7 @@ public class CrewMemberService {
 
         validateIsLeader(loggedInMemberId, crew);
 
-        final List<Member> members = crew.getCrewMembers(status);
+        final List<Member> members = crew.getMembersByStatus(status);
         final List<MemberResponse> crewMemberResponses = members.stream()
                 .map(MemberResponse::from)
                 .toList();
@@ -79,12 +81,23 @@ public class CrewMemberService {
 
         validateIsLeader(loggedInMemberId, crew);
 
-        crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
+        final RegistrationStatus updateStatus = crewMemberUpdateStatusRequest.getStatus();
+        enterCrewChatRoom(updateStatus, crewMember);
+
+        crewMember.updateStatus(updateStatus);
     }
 
     private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
         if (!crew.isLeader(loggedInMemberId)) {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
+        }
+    }
+
+    private void enterCrewChatRoom(final RegistrationStatus updateStatus, final CrewMember crewMember) {
+        final RegistrationStatus nowStatus = crewMember.getStatus();
+
+        if (nowStatus == WAITING && updateStatus == CONFIRMED) {
+            chatMessageService.enterRoomAndSaveEnteringMessages(crewMember.getCrewChatRoom(), crewMember.getMember());
         }
     }
 

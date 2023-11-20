@@ -1,5 +1,6 @@
 package kr.pickple.back.crew.service;
 
+import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
@@ -13,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
@@ -34,8 +37,9 @@ public class CrewService {
 
     private final S3Properties s3Properties;
     private final CrewRepository crewRepository;
-    private final AddressService addressService;
     private final MemberRepository memberRepository;
+    private final AddressService addressService;
+    private final ChatRoomService chatRoomService;
 
     @Transactional
     public CrewIdResponse createCrew(final CrewCreateRequest crewCreateRequest, final Long loggedInMemberId) {
@@ -57,6 +61,9 @@ public class CrewService {
         );
         crew.addCrewMember(leader);
 
+        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, crew.getName(), CREW);
+        crew.makeNewCrewChatRoom(chatRoom);
+
         final Long crewId = crewRepository.save(crew).getId();
 
         return CrewIdResponse.from(crewId);
@@ -66,7 +73,7 @@ public class CrewService {
         final Crew crew = crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CrewExceptionCode.CREW_NOT_FOUND));
 
-        final List<Member> confirmedCrewMembers = crew.getCrewMembers(CONFIRMED);
+        final List<Member> confirmedCrewMembers = crew.getMembersByStatus(CONFIRMED);
         final List<MemberResponse> crewMembers = confirmedCrewMembers.stream()
                 .map(MemberResponse::from)
                 .toList();
@@ -89,7 +96,7 @@ public class CrewService {
         );
 
         return crews.stream()
-                .map(crew -> CrewProfileResponse.of(crew, crew.getCrewMembers(CONFIRMED).stream()
+                .map(crew -> CrewProfileResponse.of(crew, crew.getMembersByStatus(CONFIRMED).stream()
                         .map(MemberResponse::from)
                         .toList()))
                 .toList();
