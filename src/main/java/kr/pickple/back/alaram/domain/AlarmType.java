@@ -12,11 +12,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static kr.pickple.back.alaram.exception.AlaramExceptionCode.ALARM_TYPE_NOT_FOUND;
+import static kr.pickple.back.alaram.exception.AlarmExceptionCode.ALARM_TYPE_NOT_FOUND;
 
 @Getter
 @RequiredArgsConstructor
-public enum AlaramType {
+public enum AlarmType {
 
     CREW_LEADER_WAITING("가입 수락을 기다리고 있어요"),
     CREW_ACCEPT("크루 가입이 수락되었어요"),
@@ -26,15 +26,15 @@ public enum AlaramType {
     GUEST_DENIED("게스트 참여가 거절되었어요"),
     ;
 
-    private static final Map<String, AlaramType> alaramTypeMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(AlaramType::name, Function.identity())));
+    private static final Map<String, AlarmType> alarmTypeMap = Collections.unmodifiableMap(Stream.of(values())
+            .collect(Collectors.toMap(AlarmType::name, Function.identity())));
 
     private final String description;
 
     @JsonCreator
-    public static AlaramType from(final String name) {
-        if (alaramTypeMap.containsKey(name)) {
-            return alaramTypeMap.get(name);
+    public static AlarmType from(final String name) {
+        if (alarmTypeMap.containsKey(name)) {
+            return alarmTypeMap.get(name);
         }
         throw new CrewException(ALARM_TYPE_NOT_FOUND, name);
     }

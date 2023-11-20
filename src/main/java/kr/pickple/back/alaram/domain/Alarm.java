@@ -2,20 +2,20 @@ package kr.pickple.back.alaram.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.alaram.util.AlaramExistsStatusConverter;
+import kr.pickple.back.alaram.util.AlarmExistsStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import static kr.pickple.back.alaram.domain.AlaramExistsStatus.NOT_EXISTS;
+import static kr.pickple.back.alaram.domain.AlarmExistsStatus.NOT_EXISTS;
 
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Alaram {
+public class Alarm {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,8 +23,8 @@ public class Alaram {
 
     @NotNull
     @Column(length = 10)
-    @Convert(converter = AlaramExistsStatusConverter.class)
-    private AlaramExistsStatus alaramExistsStatus = NOT_EXISTS;
+    @Convert(converter = AlarmExistsStatusConverter.class)
+    private AlarmExistsStatus alarmExistsStatus = NOT_EXISTS;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -32,20 +32,20 @@ public class Alaram {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crew_alaram_id")
-    private CrewAlaram crewAlaram;
+    private CrewAlarm crewAlarm;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_alaram_id")
-    private GameAlaram gameAlaram;
+    private GameAlarm gameAlarm;
 
     @Builder
-    private Alaram(
+    private Alarm(
             final Member member,
-            final CrewAlaram crewAlaram,
-            final GameAlaram gameAlaram
+            final CrewAlarm crewAlarm,
+            final GameAlarm gameAlarm
     ) {
         this.member = member;
-        this.crewAlaram = crewAlaram;
-        this.gameAlaram = gameAlaram;
+        this.crewAlarm = crewAlarm;
+        this.gameAlarm = gameAlarm;
     }
 }
