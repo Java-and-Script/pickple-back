@@ -6,6 +6,7 @@ import jakarta.persistence.OneToMany;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.member.domain.Member;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREA
 @Embeddable
 public class CrewMembers {
 
+    @Getter
     @OneToMany(mappedBy = "crew", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<CrewMember> crewMembers = new ArrayList<>();
 
@@ -31,7 +33,6 @@ public class CrewMembers {
         final CrewMember crewMember = buildCrewMember(crew, member);
         if (member.equals(crew.getLeader())) {
             crewMember.confirmRegistration();
-            member.addCrewMember(crewMember);
         }
 
         crewMembers.add(crewMember);

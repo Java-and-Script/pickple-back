@@ -15,9 +15,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.exception.CrewException;
@@ -27,6 +29,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Getter
 @Entity
@@ -87,16 +90,17 @@ public class Crew extends BaseEntity {
     @Embedded
     private CrewMembers crewMembers = new CrewMembers();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
     @Builder
     private Crew(
             final String name,
             final String content,
-            final Integer memberCount,
             final String profileImageUrl,
             final String backgroundImageUrl,
-            final Integer likeCount,
             final Integer maxMemberCount,
-            final Integer competitionPoint,
             final Member leader,
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2
@@ -105,23 +109,19 @@ public class Crew extends BaseEntity {
         this.content = content;
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
-        this.status = updateStatusWhenMaxMembers(maxMemberCount);
         this.maxMemberCount = maxMemberCount;
         this.leader = leader;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+        updateStatusIfCrewMemberFull();
     }
 
-    public CrewStatus updateStatusWhenMaxMembers(final Integer maxMemberCount) {
-        if (memberCount == maxMemberCount) {
-            status = CLOSED;
-        }
-
-        return this.status;
-    }
-
-    public List<Member> getCrewMembers(final RegistrationStatus status) {
+    public List<Member> getMembersByStatus(final RegistrationStatus status) {
         return crewMembers.getCrewMembers(status);
+    }
+
+    public List<CrewMember> getCrewMembers() {
+        return crewMembers.getCrewMembers();
     }
 
     public void addCrewMember(final Member member) {
@@ -137,7 +137,7 @@ public class Crew extends BaseEntity {
     }
 
     private void updateStatusIfCrewMemberFull() {
-        if (memberCount == maxMemberCount) {
+        if (isFullCrew()) {
             this.status = CLOSED;
         }
     }
@@ -148,15 +148,23 @@ public class Crew extends BaseEntity {
     }
 
     private void validateCrewClosed() {
-        if (status == CLOSED) {
+        if (isClosedCrew()) {
             throw new CrewException(CREW_STATUS_IS_CLOSED, status);
         }
     }
 
+    private Boolean isClosedCrew() {
+        return status == CLOSED;
+    }
+
     private void validateCrewFull() {
-        if (memberCount == maxMemberCount) {
+        if (isFullCrew()) {
             throw new CrewException(CREW_CAPACITY_LIMIT_REACHED, memberCount);
         }
+    }
+
+    private Boolean isFullCrew() {
+        return memberCount.equals(maxMemberCount);
     }
 
     public Boolean isLeader(final Member member) {
@@ -165,5 +173,10 @@ public class Crew extends BaseEntity {
 
     public Boolean isLeader(final Long memberId) {
         return memberId.equals(leader.getId());
+    }
+
+    public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
+        chatRoom.updateMaxMemberCount(maxMemberCount);
+        this.chatRoom = chatRoom;
     }
 }
