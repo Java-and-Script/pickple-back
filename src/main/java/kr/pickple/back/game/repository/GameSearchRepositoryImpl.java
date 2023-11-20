@@ -1,6 +1,7 @@
 package kr.pickple.back.game.repository;
 
 import static kr.pickple.back.game.domain.QGame.*;
+import static kr.pickple.back.map.domain.QMapPolygon.*;
 
 import java.util.List;
 
@@ -9,6 +10,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
+import kr.pickple.back.address.domain.AddressDepth1;
+import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.game.domain.Game;
 import lombok.RequiredArgsConstructor;
 
@@ -17,6 +20,7 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    @Override
     public List<Game> findGamesWithInDistance(
             final Double latitude,
             final Double longitude,
@@ -50,5 +54,38 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
                         pointWKT
                 )
                 .asc();
+    }
+
+    @Override
+    public List<Game> findGamesWithInAddress(
+            final AddressDepth1 addressDepth1,
+            final AddressDepth2 addressDepth2
+    ) {
+        return jpaQueryFactory
+                .select(game)
+                .from(game)
+                .join(mapPolygon).on(isWithInAddress())
+                .where(isAddress(addressDepth1, addressDepth2))
+                .fetch();
+    }
+
+    private BooleanExpression isWithInAddress() {
+        return Expressions.booleanTemplate(
+                "ST_Contains({0}, {1})",
+                mapPolygon.polygon,
+                game.point
+        );
+    }
+
+    private BooleanExpression isAddress(final AddressDepth1 addressDepth1, final AddressDepth2 addressDepth2) {
+        return isAddressDepth1(addressDepth1).and(isAddressDepth2(addressDepth2));
+    }
+
+    private BooleanExpression isAddressDepth1(final AddressDepth1 addressDepth1) {
+        return mapPolygon.addressDepth1.eq(addressDepth1);
+    }
+
+    private BooleanExpression isAddressDepth2(final AddressDepth2 addressDepth2) {
+        return mapPolygon.addressDepth2.eq(addressDepth2);
     }
 }

@@ -136,4 +136,13 @@ public class GameController {
         return ResponseEntity.status(OK)
                 .body(gameService.findGamesWithInDistance(latitude, longitude, distance));
     }
+
+    @GetMapping("/by-address")
+    public ResponseEntity<List<GameResponse>> findGamesWithInAddress(
+            @RequestParam final String addressDepth1,
+            @RequestParam final String addressDepth2
+    ) {
+        return ResponseEntity.status(OK)
+                .body(gameService.findGamesWithInAddress(addressDepth1, addressDepth2));
+    }
 }
