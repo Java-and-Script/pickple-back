@@ -2,8 +2,8 @@ package kr.pickple.back.alaram.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.alaram.util.AlaramStatusConverter;
-import kr.pickple.back.alaram.util.AlaramTypeConverter;
+import kr.pickple.back.alaram.util.AlarmStatusConverter;
+import kr.pickple.back.alaram.util.AlarmTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
@@ -15,12 +15,12 @@ import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
 
-import static kr.pickple.back.alaram.domain.AlaramStatus.FALSE;
+import static kr.pickple.back.alaram.domain.AlarmStatus.FALSE;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameAlaram extends BaseEntity {
+public class GameAlarm extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,13 +28,13 @@ public class GameAlaram extends BaseEntity {
 
     @NotNull
     @Column(length = 10)
-    @Convert(converter = AlaramStatusConverter.class)
-    private AlaramStatus isRead = FALSE;
+    @Convert(converter = AlarmStatusConverter.class)
+    private AlarmStatus isRead = FALSE;
 
     @NotNull
     @Column(length = 20)
-    @Convert(converter = AlaramTypeConverter.class)
-    private AlaramType alaramType;
+    @Convert(converter = AlarmTypeConverter.class)
+    private AlarmType alarmType;
 
     @CreatedDate
     @Column(updatable = false)
@@ -49,12 +49,12 @@ public class GameAlaram extends BaseEntity {
     private Member member;
 
     @Builder
-    private GameAlaram(
-            final AlaramType alaramType,
+    private GameAlarm(
+            final AlarmType alarmType,
             final Game game,
             final Member member
     ) {
-        this.alaramType = alaramType;
+        this.alarmType = alarmType;
         this.createdAt = super.getCreatedAt();
         this.game = game;
         this.member = member;

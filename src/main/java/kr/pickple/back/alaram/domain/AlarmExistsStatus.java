@@ -12,25 +12,25 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static kr.pickple.back.alaram.exception.AlaramExceptionCode.ALARM_EXISTS_STATUS_NOT_FOUND;
+import static kr.pickple.back.alaram.exception.AlarmExceptionCode.ALARM_EXISTS_STATUS_NOT_FOUND;
 
 @Getter
 @RequiredArgsConstructor
-public enum AlaramExistsStatus {
+public enum AlarmExistsStatus {
 
     EXISTS("읽지 않은 알람이 있음", true),
     NOT_EXISTS("읽지 않은 알람이 없음", false);
 
-    private static final Map<String, AlaramExistsStatus> alaramExistsStatusMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(AlaramExistsStatus::getDescription, Function.identity())));
+    private static final Map<String, AlarmExistsStatus> alarmExistsStatusMap = Collections.unmodifiableMap(Stream.of(values())
+            .collect(Collectors.toMap(AlarmExistsStatus::getDescription, Function.identity())));
 
     private final String description;
     private final Boolean booleanValue;
 
     @JsonCreator
-    public static AlaramExistsStatus from(final String description) {
-        if (alaramExistsStatusMap.containsKey(description)) {
-            return alaramExistsStatusMap.get(description);
+    public static AlarmExistsStatus from(final String description) {
+        if (alarmExistsStatusMap.containsKey(description)) {
+            return alarmExistsStatusMap.get(description);
         }
         throw new CrewException(ALARM_EXISTS_STATUS_NOT_FOUND, description);
     }
