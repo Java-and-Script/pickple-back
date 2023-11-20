@@ -30,7 +30,7 @@ public class MemberCrews {
                 .toList();
     }
 
-    public void addCrewMember(final CrewMember crewMember) {
-        memberCrews.add(crewMember);
+    public void addMemberCrew(final CrewMember memberCrew) {
+        memberCrews.add(memberCrew);
     }
 }

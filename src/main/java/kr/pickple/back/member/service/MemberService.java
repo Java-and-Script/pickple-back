@@ -115,7 +115,7 @@ public class MemberService {
     }
 
     private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
-        return crew.getCrewMembers(memberStatus)
+        return crew.getMembersByStatus(memberStatus)
                 .stream()
                 .map(MemberResponse::from)
                 .toList();
