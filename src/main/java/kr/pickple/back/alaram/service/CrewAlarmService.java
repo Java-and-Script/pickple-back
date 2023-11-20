@@ -194,7 +194,7 @@ public class CrewAlarmService {
     }
 
     //크루 알림 삭제
-    public void deleteAllCrewAlaram() {
+    public void deleteAllCrewAlarms() {
         //1.DB에서 생성된 모든 크루 알람을 삭제함
         crewAlarmRepository.deleteAll();
     }
