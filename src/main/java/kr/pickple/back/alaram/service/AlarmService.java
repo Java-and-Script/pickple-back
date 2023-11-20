@@ -32,8 +32,7 @@ public class AlarmService {
     //1.SSE 연결 - 이벤트가 발생 된 후, 30초동안 지속 연결
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
         final Member member = findMemberById(loggedInMemberId);
-        final SseEmitter emitter = new SseEmitter(30 * 1000L); //30초안 sse 연결 지속
-        sseEmitters.add(loggedInMemberId, emitter);
+        final SseEmitter emitter = new SseEmitter();
 
         try {
             emitter.send(SseEmitter.event()
@@ -43,7 +42,6 @@ public class AlarmService {
             sseEmitters.remove(loggedInMemberId);
             emitter.completeWithError(e);
         }
-
 
         return emitter;
     }
@@ -96,11 +94,11 @@ public class AlarmService {
 
         //3.해당 알람이 어떤 알람인지 확인하고, 상태 수정
         if (gameAlarm != null) {
-            gameAlarmService.updateGameAlarmStatus(alarmId,isRead);
+            gameAlarmService.updateGameAlarmStatus(alarmId, isRead);
         }
 
         if (crewAlarm != null) {
-            crewAlarmService.updateCrewAlaramStatus(alarmId,isRead);
+            crewAlarmService.updateCrewAlaramStatus(alarmId, isRead);
         }
         //아니면
         throw new AlarmException(AlarmExceptionCode.ALARM_NOT_FOUND, alarmId);

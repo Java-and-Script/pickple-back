@@ -23,7 +23,7 @@ public class SseEmitters {
 
         emitter.onCompletion(() -> {
             log.info("onCompletion callback");
-            this.emitters.remove(id);    // 만료되면 리스트에서 삭제
+            this.emitters.remove(id);
         });
 
         emitter.onTimeout(() -> {
