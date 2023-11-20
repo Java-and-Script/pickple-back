@@ -33,7 +33,7 @@ public class GameAlarmEventHandler {
     @Async
     @EventListener
     public void sendAlarmToGameMemberOnRejection(final GameMemberRejectedEvent gameMemberRejectedEvent) {
-        final GameAlarm gameAlarm = gameAlarmService.createGuestDeniedAlaram(gameMemberRejectedEvent); //알람 생성
+        final GameAlarm gameAlarm = gameAlarmService.createGuestDeniedAlarm(gameMemberRejectedEvent); //알람 생성
         gameAlarmService.emitMessage(gameAlarm); //SSE로 알람 메시지 전송
     }
 }
