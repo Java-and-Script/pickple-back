@@ -157,7 +157,7 @@ public class Member extends BaseEntity {
         throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
     }
 
-    public void addCrewMember(final CrewMember crewMember) {
-        memberCrews.addCrewMember(crewMember);
+    public void addMemberCrew(final CrewMember memberCrew) {
+        memberCrews.addMemberCrew(memberCrew);
     }
 }
