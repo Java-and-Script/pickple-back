@@ -66,6 +66,7 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
                 .from(game)
                 .join(mapPolygon).on(isWithInAddress())
                 .where(isAddress(addressDepth1, addressDepth2))
+                .orderBy(getOrderByAddress())
                 .fetch();
     }
 
@@ -87,5 +88,12 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
 
     private BooleanExpression isAddressDepth2(final AddressDepth2 addressDepth2) {
         return mapPolygon.addressDepth2.eq(addressDepth2);
+    }
+
+    private OrderSpecifier<Double> getOrderByAddress() {
+        return Expressions.numberTemplate(Double.class,
+                        "ST_Distance_Sphere({0}, ST_GeomFromText('POINT(' || {1} || ' ' || {2} || ')', 4326))",
+                        game.point, mapPolygon.latitude, mapPolygon.longitude)
+                .asc();
     }
 }
