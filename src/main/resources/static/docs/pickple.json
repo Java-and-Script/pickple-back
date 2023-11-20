@@ -157,7 +157,7 @@
                 },
                 "examples" : {
                   "find-game" : {
-                    "value" : "{\n  \"id\" : 5,\n  \"content\" : \"하이하이 즐겜 한 판해요\",\n  \"playDate\" : \"2023-11-10\",\n  \"playStartTime\" : \"11:30:00\",\n  \"playEndTime\" : \"13:00:00\",\n  \"playTimeMinutes\" : 90,\n  \"mainAddress\" : \"서울 영등포구 도림동 254\",\n  \"detailAddress\" : \"영등포 다목적 체육관 2층 201호\",\n  \"latitude\" : null,\n  \"longitude\" : null,\n  \"status\" : \"모집 중\",\n  \"viewCount\" : 1,\n  \"cost\" : 100,\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 5,\n  \"host\" : {\n    \"id\" : 10,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"members\" : [ {\n    \"id\" : 10,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 11,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 12,\n    \"email\" : \"pickple2@pickple.kr\",\n    \"nickname\" : \"pickple2\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n}"
+                    "value" : "{\n  \"id\" : 5,\n  \"content\" : \"하이하이 즐겜 한 판해요\",\n  \"playDate\" : \"2023-11-10\",\n  \"playStartTime\" : \"11:30:00\",\n  \"playEndTime\" : \"13:00:00\",\n  \"playTimeMinutes\" : 90,\n  \"mainAddress\" : \"서울 영등포구 도림동 254\",\n  \"detailAddress\" : \"영등포 다목적 체육관 2층 201호\",\n  \"latitude\" : null,\n  \"longitude\" : null,\n  \"status\" : \"모집 중\",\n  \"viewCount\" : 1,\n  \"cost\" : 100,\n  \"memberCount\" : 3,\n  \"maxMemberCount\" : 5,\n  \"host\" : {\n    \"id\" : 10,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"members\" : [ {\n    \"id\" : 10,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 11,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 12,\n    \"email\" : \"pickple2@pickple.kr\",\n    \"nickname\" : \"pickple2\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n}"
                   }
                 }
               }
@@ -196,7 +196,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNjk5ODYwOTQzLCJleHAiOjE2OTk4NjIxNzN9.68YmGrfA4qzNlYWdXDYNFDr6wDnjfSixaCDm1PgPPZdgF7Dtt8ghdPQO7J4Vefrh6tIDFLYWFpV4XnHymVU4Sg"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzkzMTQyLCJleHAiOjE3MDAzOTQzNzJ9.TlkXaKo6vD0JF24PCPuuhaocQkx9T1UTtMSjKvyGX_8u8dM0ZcFEtRcVo5xtFvdQcJkYr-wuekpeklIjZRnkGA"
         } ],
         "responses" : {
           "200" : {
@@ -243,7 +243,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3IiwiaWF0IjoxNjk5ODYwOTQ0LCJleHAiOjE2OTk4NjIxNzR9._8bOgd_Dpi-TBwCNUEil-DP_4qVswvs5M_EBJ5_Joczw5MXcaRXHMUM5LmIqS8miL64hze0xrW62sCODM4WXsw"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3IiwiaWF0IjoxNzAwMzkzMTQzLCJleHAiOjE3MDAzOTQzNzN9.sk1tLRiCMvCJ8n0hN7IhePU_BIsPRn4T8VSm0ijBqsOVnBA_Qjgrca5GbfcgC2mr2YWgwEK1XxMqG9nDBJT9RQ"
         } ],
         "responses" : {
           "204" : {
@@ -277,7 +277,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMyIsImlhdCI6MTY5OTg2MDk0NCwiZXhwIjoxNjk5ODYyMTc0fQ.py5tYha1O2LPcDI4pWdx2xQwYTIcD21iY9EHf5kMf1HK0SFHVYwkR7noxgv15lVJbdWSk8190qwIAikgLREFKg"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMyIsImlhdCI6MTcwMDM5MzE0MywiZXhwIjoxNzAwMzk0MzczfQ.RRjpqzZZMI9whNZcpq7crpf64-f_G37eYiGeo415DvpfIWqskjkmHOc5krlHel9PGVzEnnsb34-z_XElJrJCQg"
         } ],
         "requestBody" : {
           "content" : {
@@ -333,7 +333,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4IiwiaWF0IjoxNjk5ODYwOTQ0LCJleHAiOjE2OTk4NjIxNzR9.pxzzffmlCqPfABr_qxTv4Dh4u_CAPhmuBdUmxxlj1YaoBUs1xagquzhDa6tGJKIlqlN8T2NwYE1LlNJmPi0JaQ"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4IiwiaWF0IjoxNzAwMzkzMTQzLCJleHAiOjE3MDAzOTQzNzN9.I1vBNKCdKxh8bHpRAbzLmHSLLDGzAwOpf8TpG96ONAZcq3HMwbs_TBCjBQj_VrLk2-Tcy0KSGoALjP6kER_w2A"
         } ],
         "responses" : {
           "204" : {
@@ -373,7 +373,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNjk5ODYwOTQ0LCJleHAiOjE2OTk4NjIxNzR9.UcZB15VcnaAplTMi71GJG8WSJQDjIwixxom8mzgyl3TzcI_29aD8gkjGaIuLsCKIw3glRjT0fXcfBLz7_OIWvg"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzAwMzkzMTQzLCJleHAiOjE3MDAzOTQzNzN9.uJeT2bL2KxoczkTwJIGdZ1Qi09nrOSo2IEPI7p3VRf0db67br2uE8isgX0IMkCFAegOmKHB0-JBQ2cM11xanWQ"
         } ],
         "requestBody" : {
           "content" : {
@@ -413,7 +413,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJLQUtBTzk5OTk5OSIsImlhdCI6MTY5OTg2MDk0NCwiZXhwIjoxNjk5ODYxMjQ0fQ.qir-DUFkhIAuvU3qLhPaOpAQskwDpa_5pKRO7EvS7817yfe35sPjFFLpvoxNZ0xFLgvSahTrBLzQQUgjmuHt5g"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJLQUtBTzk5OTk5OSIsImlhdCI6MTcwMDM5MzE0NCwiZXhwIjoxNzAwMzkzNDQ0fQ.LJDU6TequEII_NBpcyt_VSFLE7qvAVaNYHNjluckyo5UvBrkvs6sybqewnopVVuqf0zkC3CSs0LypN5ADs9lsQ"
         } ],
         "requestBody" : {
           "content" : {
@@ -447,7 +447,7 @@
                 },
                 "examples" : {
                   "create-member" : {
-                    "value" : "{\n  \"accessToken\" : \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMyIsImlhdCI6MTY5OTg2MDk0NCwiZXhwIjoxNjk5ODYyMTc0fQ.FCf9P1UfkXMCgXdm49jCk8ZjQH1EGMY5wUgMXJkI1C8TlZ5BZia0OKMiz4-KHFb7OTpfipo0KK83RHivqC-JHQ\",\n  \"refreshToken\" : \"eyJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE2OTk4NjA5NDQsImV4cCI6MTY5OTg2MjM3NH0.6cWix5OjDirVH7JktWFHSVEYxI5tcryEWs95x7wz8gb5tpkdsmujJiDz58I-ptB9dW7xy6v0lvXySybLodSEHw\",\n  \"id\" : 23,\n  \"nickname\" : \"백둥\",\n  \"profileImageUrl\" : \"https://amazon.image/1\",\n  \"email\" : \"pickple@pickple.kr\",\n  \"oauthId\" : 999999,\n  \"oauthProvider\" : \"KAKAO\",\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\"\n}"
+                    "value" : "{\n  \"accessToken\" : \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4IiwiaWF0IjoxNzAwMzkzMTQ0LCJleHAiOjE3MDAzOTQzNzR9.ZzviN-LJjQGtEHQpkG7tXOmhotytxYaYxnLU4Jv4qpRa-AuNi4ggHLMvRMpsKKvYuw4kebAR__I-ukxnm0_KYQ\",\n  \"refreshToken\" : \"eyJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MDAzOTMxNDQsImV4cCI6MTcwMDM5NDU3NH0.3KCs4iO8qIao8kmsdi5fZz9t0yBHHBG6TOpM3HUOJGATmEc0_SlhKi0w8kebcVVLFtQZ3U09wX2yblstegAc6Q\",\n  \"id\" : 8,\n  \"nickname\" : \"백둥\",\n  \"profileImageUrl\" : \"https://amazon.image/1\",\n  \"email\" : \"pickple@pickple.kr\",\n  \"oauthId\" : 999999,\n  \"oauthProvider\" : \"KAKAO\",\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\"\n}"
                   }
                 }
               }
@@ -484,7 +484,7 @@
                 },
                 "examples" : {
                   "find-member" : {
-                    "value" : "{\n  \"id\" : 21,\n  \"email\" : \"pickple1@pickple.kr\",\n  \"nickname\" : \"pickple1\",\n  \"introduction\" : null,\n  \"profileImageUrl\" : \"https://amazon.image\",\n  \"mannerScore\" : 0,\n  \"mannerScoreCount\" : 0,\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"crews\" : [ {\n    \"id\" : 5,\n    \"name\" : \"백둥크루1\",\n    \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n    \"memberCount\" : 1,\n    \"maxMemberCount\" : 15,\n    \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n    \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n    \"status\" : \"모집 중\",\n    \"likeCount\" : 0,\n    \"competitionPoint\" : 0,\n    \"leader\" : {\n      \"id\" : 21,\n      \"email\" : \"pickple1@pickple.kr\",\n      \"nickname\" : \"pickple1\",\n      \"introduction\" : null,\n      \"profileImageUrl\" : \"https://amazon.image\",\n      \"mannerScore\" : 0,\n      \"mannerScoreCount\" : 0,\n      \"addressDepth1\" : \"서울시\",\n      \"addressDepth2\" : \"영등포구\",\n      \"positions\" : [ \"C\", \"PG\" ]\n    },\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\"\n  } ]\n}"
+                    "value" : "{\n  \"id\" : 6,\n  \"email\" : \"pickple1@pickple.kr\",\n  \"nickname\" : \"pickple1\",\n  \"introduction\" : null,\n  \"profileImageUrl\" : \"https://amazon.image\",\n  \"mannerScore\" : 0,\n  \"mannerScoreCount\" : 0,\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"crews\" : [ {\n    \"id\" : 5,\n    \"name\" : \"백둥크루1\",\n    \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n    \"memberCount\" : 1,\n    \"maxMemberCount\" : 15,\n    \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n    \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n    \"status\" : \"모집 중\",\n    \"likeCount\" : 0,\n    \"competitionPoint\" : 0,\n    \"leader\" : {\n      \"id\" : 6,\n      \"email\" : \"pickple1@pickple.kr\",\n      \"nickname\" : \"pickple1\",\n      \"introduction\" : null,\n      \"profileImageUrl\" : \"https://amazon.image\",\n      \"mannerScore\" : 0,\n      \"mannerScoreCount\" : 0,\n      \"addressDepth1\" : \"서울시\",\n      \"addressDepth2\" : \"영등포구\",\n      \"positions\" : [ \"C\", \"PG\" ]\n    },\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\"\n  } ]\n}"
                   }
                 }
               }
@@ -515,7 +515,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMCIsImlhdCI6MTY5OTg2MDk0NCwiZXhwIjoxNjk5ODYyMTc0fQ.SRba2qeqpMQ4bKU5ttnDxu-dPGKfDlk3PCai1OiJRpfxJ99ysojXy1ftLk0s4DIDh2qSfuQsMXk5YK7POYcTpA"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzAwMzkzMTQ0LCJleHAiOjE3MDAzOTQzNzR9.0BvR1RQOhp7UoSF9cbLbv9xsTjtkfelwajX_aiirrrlZM6TskaJe7rxdSD7WD_tZkZgESn6HKjecxSKv5lW0ug"
         } ],
         "responses" : {
           "200" : {
@@ -527,7 +527,7 @@
                 },
                 "examples" : {
                   "find-created-crews-by-member-id" : {
-                    "value" : "[ {\n  \"id\" : 4,\n  \"name\" : \"백둥크루1\",\n  \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 15,\n  \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n  \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n  \"status\" : \"모집 중\",\n  \"likeCount\" : 0,\n  \"competitionPoint\" : 0,\n  \"leader\" : {\n    \"id\" : 20,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"members\" : [ {\n    \"id\" : 20,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n} ]"
+                    "value" : "[ {\n  \"id\" : 4,\n  \"name\" : \"백둥크루1\",\n  \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 15,\n  \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n  \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n  \"status\" : \"모집 중\",\n  \"likeCount\" : 0,\n  \"competitionPoint\" : 0,\n  \"leader\" : {\n    \"id\" : 5,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"members\" : [ {\n    \"id\" : 5,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n} ]"
                   }
                 }
               }
@@ -569,7 +569,7 @@
           "schema" : {
             "type" : "string"
           },
-          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyMiIsImlhdCI6MTY5OTg2MDk0NCwiZXhwIjoxNjk5ODYyMTc0fQ.jH43jLnlynzXTjEoJMsgnDzOnbDOMD8hR49doIcHLr5_HUzdDwBot8f340cWUG31PYVWQ1bse-98BfLiMyPLZg"
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3IiwiaWF0IjoxNzAwMzkzMTQ0LCJleHAiOjE3MDAzOTQzNzR9.Y82MSz_82f81ntYIrHFKdKFzUTcG3c-RScSxgJQ2Q7B34FcVkcTix4X0mD6P5pEza1gc3vpRjmLt_8Ai_c8PuQ"
         } ],
         "responses" : {
           "200" : {
@@ -581,7 +581,7 @@
                 },
                 "examples" : {
                   "find-all-crews-by-member-id" : {
-                    "value" : "[ {\n  \"id\" : 6,\n  \"name\" : \"백둥크루1\",\n  \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 15,\n  \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n  \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n  \"status\" : \"모집 중\",\n  \"likeCount\" : 0,\n  \"competitionPoint\" : 0,\n  \"leader\" : {\n    \"id\" : 22,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"members\" : [ {\n    \"id\" : 22,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n} ]"
+                    "value" : "[ {\n  \"id\" : 6,\n  \"name\" : \"백둥크루1\",\n  \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 15,\n  \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n  \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n  \"status\" : \"모집 중\",\n  \"likeCount\" : 0,\n  \"competitionPoint\" : 0,\n  \"leader\" : {\n    \"id\" : 7,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"members\" : [ {\n    \"id\" : 7,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n} ]"
                   }
                 }
               }
@@ -596,6 +596,60 @@
   },
   "components" : {
     "schemas" : {
+      "Authenticated" : {
+        "title" : "Authenticated",
+        "type" : "object",
+        "properties" : {
+          "oauthId" : {
+            "type" : "number",
+            "description" : "oauthId"
+          },
+          "addressDepth2" : {
+            "description" : "주소2(도,시)",
+            "oneOf" : [ null, {
+              "type" : "string"
+            } ]
+          },
+          "addressDepth1" : {
+            "description" : "주소1(도,시)",
+            "oneOf" : [ null, {
+              "type" : "string"
+            } ]
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "id" : {
+            "description" : "회원 ID",
+            "oneOf" : [ null, {
+              "type" : "number"
+            } ]
+          },
+          "accessToken" : {
+            "type" : "string",
+            "description" : "AccessToken"
+          },
+          "profileImageUrl" : {
+            "type" : "string",
+            "description" : "프로필 이미지 경로"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "이메일"
+          },
+          "oauthProvider" : {
+            "type" : "string",
+            "description" : "oauth 제공자"
+          },
+          "refreshToken" : {
+            "description" : "RefreshToken",
+            "oneOf" : [ null, {
+              "type" : "string"
+            } ]
+          }
+        }
+      },
       "CrewProfile" : {
         "title" : "CrewProfile",
         "type" : "array",
@@ -766,60 +820,6 @@
               "type" : "string",
               "description" : "크루 배경 이미지"
             }
-          }
-        }
-      },
-      "Authenticated" : {
-        "title" : "Authenticated",
-        "type" : "object",
-        "properties" : {
-          "oauthId" : {
-            "type" : "number",
-            "description" : "oauthId"
-          },
-          "addressDepth2" : {
-            "description" : "주소2(도,시)",
-            "oneOf" : [ null, {
-              "type" : "string"
-            } ]
-          },
-          "addressDepth1" : {
-            "description" : "주소1(도,시)",
-            "oneOf" : [ null, {
-              "type" : "string"
-            } ]
-          },
-          "nickname" : {
-            "type" : "string",
-            "description" : "닉네임"
-          },
-          "id" : {
-            "description" : "회원 ID",
-            "oneOf" : [ null, {
-              "type" : "number"
-            } ]
-          },
-          "accessToken" : {
-            "type" : "string",
-            "description" : "AccessToken"
-          },
-          "profileImageUrl" : {
-            "type" : "string",
-            "description" : "프로필 이미지 경로"
-          },
-          "email" : {
-            "type" : "string",
-            "description" : "이메일"
-          },
-          "oauthProvider" : {
-            "type" : "string",
-            "description" : "oauth 제공자"
-          },
-          "refreshToken" : {
-            "description" : "RefreshToken",
-            "oneOf" : [ null, {
-              "type" : "string"
-            } ]
           }
         }
       },

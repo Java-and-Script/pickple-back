@@ -1,11 +1,14 @@
 package kr.pickple.back.fixture.domain;
 
+import static kr.pickple.back.chat.domain.RoomType.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.domain.Member;
 
@@ -14,7 +17,7 @@ public class CrewFixtures {
     public static Crew crewBuild(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
-            final Member leaader
+            final Member leader
     ) {
         return Crew.builder()
                 .name("백둥크루1")
@@ -22,9 +25,16 @@ public class CrewFixtures {
                 .profileImageUrl("https://amazon.profileimage/1")
                 .backgroundImageUrl("https://amazon.backgroundimage/1")
                 .maxMemberCount(15)
-                .leader(leaader)
+                .leader(leader)
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
+                .build();
+    }
+
+    public static ChatRoom crewChatRoomBuild() {
+        return ChatRoom.builder()
+                .name("백둥크루1")
+                .type(CREW)
                 .build();
     }
 

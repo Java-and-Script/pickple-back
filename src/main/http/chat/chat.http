@@ -1,6 +1,6 @@
 ### 새 1:1 채팅방 생성
 POST http://localhost:8080/rooms/personal
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
 Content-Type: application/json
 
 {
@@ -9,24 +9,24 @@ Content-Type: application/json
 
 ### 특정 사용자와의 1:1 채팅방 존재 여부 조회
 GET http://localhost:8080/rooms/personal/existed?receiver=2
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
 
 ### 참여중인 모든 채팅방 목록 조회(개인)
 GET http://localhost:8080/rooms?type=개인
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
 
 ### 참여중인 모든 채팅방 목록 조회(게스트 모집)
 GET http://localhost:8080/rooms?type=게스트
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
 
 ### 참여중인 모든 채팅방 목록 조회(크루)
 GET http://localhost:8080/rooms?type=크루
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
 
 ### 단일 채팅방 정보 상세 조회
 GET http://localhost:8080/rooms/1
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
 
 ### 특정 채팅방의 모든 메시지 목록 조회
 GET http://localhost:8080/messages/rooms/1
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzc2NjI5LCJleHAiOjE3MDAzOTgyMjl9.yTWnb2CdGzaPgP6sHxgLaagR6yrK97wEMYbB9ELRZrBtVDFHtA9giF6spKyg0IPsnt-dAiHK67V-xtizKOrZgg
+Authorization:
