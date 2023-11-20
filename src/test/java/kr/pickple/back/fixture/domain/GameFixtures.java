@@ -1,5 +1,7 @@
 package kr.pickple.back.fixture.domain;
 
+import static kr.pickple.back.chat.domain.RoomType.*;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -11,6 +13,8 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
@@ -40,6 +44,13 @@ public class GameFixtures {
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
                 .positions(List.of(Position.CENTER, Position.POINT_GUARD))
+                .build();
+    }
+
+    public static ChatRoom gameChatRoomBuild() {
+        return ChatRoom.builder()
+                .name("11.10 영등포구")
+                .type(GAME)
                 .build();
     }
 }
