@@ -16,7 +16,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class GamesAndLocationResponse {
 
     private List<GameResponse> games;
