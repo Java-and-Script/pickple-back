@@ -1,15 +1,14 @@
 package kr.pickple.back.alaram.controller;
 
-import kr.pickple.back.alaram.dto.response.AlaramUnReadCountResponse;
-import kr.pickple.back.alaram.service.AlaramService;
+import jakarta.validation.Valid;
+import kr.pickple.back.alaram.domain.AlarmExistsStatus;
+import kr.pickple.back.alaram.service.AlarmService;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.awt.*;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -19,8 +18,9 @@ import static org.springframework.http.HttpStatus.OK;
 @RequestMapping("/alarms")
 public class AlarmController {
 
-    private final AlaramService alarmService;
+    private final AlarmService alarmService;
 
+    //해당 사용자의 sse연결
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribeToSse(
             @Login final Long loggedInMemberId
@@ -31,14 +31,16 @@ public class AlarmController {
                 .body(emitter);
     }
 
+    //해당 사용자에게 미 알람이 있는지 체크
     @GetMapping("/unread")
-    public ResponseEntity<AlaramUnReadCountResponse> findUnreadAlarmResponse(
-            @PathVariable final Login loggedInMemberId
+    public ResponseEntity<AlarmExistsStatus> findUnreadAlarm(
+            @Login final Long loggedInMemberId
     ) {
-        //알람 서비스 중, 읽지 않은 알람 계산
+        AlarmExistsStatus alarmExistsStatus = alarmService.checkUnReadAlarms(loggedInMemberId);
+        return ResponseEntity
+                .status(OK)
+                .body(alarmExistsStatus);
 
-        return ResponseEntity.status(OK)
-                .body(AlaramService.countUnreadAlaram());
     }
 
 //    @GetMapping
@@ -48,25 +50,28 @@ public class AlarmController {
 //            ){
 //        //커시 기반 조회 서비스 구현 후, 채움
 //        return  ResponseEntity.status(OK)
-//                .body(AlaramService.findAllAlarms());
+//                .body(AlarmService.findAllAlarms());
 //    }
 
-    @PatchMapping("/{alaramId}")
-    public ResponseEntity<Void> updateAlaramStatus(
+
+    //알람 수정
+    @PatchMapping("/{alarmId}")
+    public ResponseEntity<Void> updateAlarmStatus(
             @Login final Long loggedInMemberId,
-            @PathVariable final Long alaramId
+            @PathVariable final Long alarmId,
+            @Valid @RequestBody final String isRead
     ) {
-        //알람 서비스 중, 수정 기반
+        alarmService.updateAlarmById(loggedInMemberId, alarmId, isRead);
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
 
+    //모든 알람 삭제
     @DeleteMapping
-    public ResponseEntity<Void> deleteAlarams(
-            @Login final Long loggedInMemberId,
-            final Cursor cursor
+    public ResponseEntity<Void> deleteAllAlarms(
+            @Login final Long loggedInMemberId
     ) {
-        //알람 삭제 서비스, 커서 기반
+        alarmService.deleteAllAlarms(loggedInMemberId);
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
