@@ -60,7 +60,7 @@ jobs:
           strip_components: 2
 
   deploy-to-ec2:
-    needs: [ docker-build-push, send-files-to-ec2 ]
+    needs: [ docker-build-push, send-docker-compose-file-to-ec2 ]
     environment: prod
     runs-on: ubuntu-latest
     steps:
