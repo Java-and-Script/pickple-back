@@ -1,6 +1,7 @@
 package kr.pickple.back.game.domain;
 
 import static kr.pickple.back.game.domain.GameStatus.*;
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -18,11 +19,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
@@ -83,7 +87,7 @@ public class Game extends BaseEntity {
     private Integer memberCount = 1;
 
     @NotNull
-    private Integer maxMemberCount = 1;
+    private Integer maxMemberCount = 2;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
@@ -105,6 +109,10 @@ public class Game extends BaseEntity {
 
     @Embedded
     private GameMembers gameMembers = new GameMembers();
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
 
     @Builder
     private Game(
@@ -159,11 +167,40 @@ public class Game extends BaseEntity {
         gameMembers.addGameMember(this, member);
     }
 
+    public void increaseMemberCount() {
+        if (isClosedGame()) {
+            throw new GameException(GAME_STATUS_IS_CLOSED, status);
+        }
+
+        if (isFullGame()) {
+            throw new GameException(GAME_CAPACITY_LIMIT_REACHED, memberCount);
+        }
+
+        memberCount += 1;
+
+        if (isFullGame()) {
+            status = CLOSED;
+        }
+    }
+
+    private Boolean isClosedGame() {
+        return status == CLOSED;
+    }
+
+    private Boolean isFullGame() {
+        return memberCount.equals(maxMemberCount);
+    }
+
     public void increaseViewCount() {
         viewCount++;
     }
 
     public Boolean isHost(final Member member) {
         return member.equals(host);
+    }
+
+    public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
+        chatRoom.updateMaxMemberCount(maxMemberCount);
+        this.chatRoom = chatRoom;
     }
 }
