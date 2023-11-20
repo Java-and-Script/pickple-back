@@ -1,7 +1,7 @@
 package kr.pickple.back.alaram.service;
 
+import kr.pickple.back.alaram.domain.AlarmStatus;
 import kr.pickple.back.alaram.domain.CrewAlarm;
-import kr.pickple.back.alaram.dto.request.CrewAlarmStatusUpdateRequest;
 import kr.pickple.back.alaram.dto.response.CrewAlaramResponse;
 import kr.pickple.back.alaram.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alaram.event.crew.CrewMemberJoinedEvent;
@@ -155,15 +155,13 @@ public class CrewAlarmService {
     }
 
     //크루 알림에서 isRead가 False가 있는지 체크하는 메소드
-    public boolean checkUnreadCrewAlarm(final Long memberId){
+    public boolean checkUnreadCrewAlarm(final Long memberId) {
         //1.해당 회원의 읽지 않은 알람이 있는지 체크함
         final boolean existsUnreadCrewAlarm = crewAlarmRepository.existsByMemberIdAndIsRead(memberId, FALSE);
 
         //2.반환
         return existsUnreadCrewAlarm;
     }
-
-
 
     //크루 알림 찾기 By ID
     public CrewAlarm findCrewAlramById(final Long crewAlarmId) {
@@ -175,12 +173,13 @@ public class CrewAlarmService {
     }
 
     //크루 알람 상태 변경
-    public void updateCrewAlaramStatus(final Long crewAlarmId, final CrewAlarmStatusUpdateRequest crewAlarmStatusUpdateRequest) {
+    public void updateCrewAlaramStatus(final Long crewAlarmId, final String isRead) {
         //1.알람 ID로 해당 알림 찾기
         final CrewAlarm crewAlarm = checkExistCrewAlarm(crewAlarmId);
+        final AlarmStatus alarmStatus = AlarmStatus.from(isRead);
 
         //2.상태 업데이트
-        crewAlarm.updateStatus(crewAlarmStatusUpdateRequest.getIsRead());
+        crewAlarm.updateStatus(alarmStatus);
 
         //3.저장
         crewAlarmRepository.save(crewAlarm);
