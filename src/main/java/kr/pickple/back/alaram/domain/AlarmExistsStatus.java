@@ -39,5 +39,4 @@ public enum AlarmExistsStatus {
     public Boolean getBooleanValue() {
         return booleanValue;
     }
-
 }
