@@ -10,5 +10,6 @@ public interface GameSearchRepository {
 
     List<Game> findGamesWithInDistance(final Double latitude, final Double longitude, final Double distance);
 
-    List<Game> findGamesWithInAddress(final AddressDepth1 addressDepth1, final AddressDepth2 addressDepth2);
+    List<Game> findGamesWithInAddress(final AddressDepth1 addressDepth1,
+            final AddressDepth2 addressDepth2);
 }
