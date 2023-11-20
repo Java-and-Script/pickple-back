@@ -258,4 +258,19 @@ public class GameService {
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
     }
+
+    public List<GameResponse> findGamesWithInAddress(
+            final String addressDepth1,
+            final String addressDepth2
+    ) {
+        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1,
+                addressDepth2);
+
+        final List<Game> games = gameRepository.findGamesWithInAddress(mainAddressResponse.getAddressDepth1(),
+                mainAddressResponse.getAddressDepth2());
+
+        return games.stream()
+                .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
+                .toList();
+    }
 }

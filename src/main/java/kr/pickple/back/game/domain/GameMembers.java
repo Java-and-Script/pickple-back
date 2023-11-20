@@ -5,6 +5,8 @@ import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.BatchSize;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.OneToMany;
@@ -17,6 +19,7 @@ import lombok.Getter;
 public class GameMembers {
 
     @Getter
+    @BatchSize(size = 1000)
     @OneToMany(mappedBy = "game", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GameMember> gameMembers = new ArrayList<>();
 
