@@ -1,8 +1,10 @@
 package kr.pickple.back.alaram.dto.response;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import kr.pickple.back.alaram.domain.AlarmStatus;
 import kr.pickple.back.alaram.domain.AlarmType;
 import kr.pickple.back.alaram.domain.CrewAlarm;
+import kr.pickple.back.crew.domain.Crew;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -11,19 +13,23 @@ import java.time.LocalDateTime;
 
 @Getter
 @Builder
+@JsonSerialize
 @RequiredArgsConstructor
-public class CrewAlaramResponse {
+public class CrewAlarmResponse {
 
-    private final CrewAlarm crewAlarm;
     private final Long id;
+    private final Long crewId;
     private final String crewName;
     private final LocalDateTime createdAt;
     private final AlarmStatus isRead;
     private final AlarmType alarmType;
 
-    public static CrewAlaramResponse of(final CrewAlarm crewAlarm) {
-        return CrewAlaramResponse.builder()
+    public static CrewAlarmResponse of(final CrewAlarm crewAlarm) {
+        final Crew crew = crewAlarm.getCrew();
+
+        return CrewAlarmResponse.builder()
                 .id(crewAlarm.getId())
+                .crewId(crew.getId())
                 .crewName(crewAlarm.getCrew().getName())
                 .createdAt(crewAlarm.getCreatedAt())
                 .isRead(crewAlarm.getIsRead())
