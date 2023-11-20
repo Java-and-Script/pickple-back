@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
@@ -59,15 +60,15 @@ public class CrewMember extends BaseEntity {
         this.status = CONFIRMED;
     }
 
-    public void updateStatus(final RegistrationStatus registrationStatus) {
-        this.status = registrationStatus;
+    public void updateStatus(final RegistrationStatus status) {
+        if (this.status == WAITING && status == CONFIRMED) {
+            crew.increaseMemberCount();
+        }
 
-        updateCrewMemberCount(registrationStatus);
+        this.status = status;
     }
 
-    private void updateCrewMemberCount(final RegistrationStatus registrationStatus) {
-        if (registrationStatus == CONFIRMED) {
-            this.crew.increaseMemberCount();
-        }
+    public ChatRoom getCrewChatRoom() {
+        return crew.getChatRoom();
     }
 }
