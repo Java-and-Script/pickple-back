@@ -198,6 +198,10 @@ public class Game extends BaseEntity {
         return member.equals(host);
     }
 
+    public Boolean isHost(final Long hostId) {
+        return hostId.equals(host.getId());
+    }
+
     public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
         chatRoom.updateMaxMemberCount(maxMemberCount);
         this.chatRoom = chatRoom;
