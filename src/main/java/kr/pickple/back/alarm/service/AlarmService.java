@@ -50,17 +50,17 @@ public class AlarmService {
     //SseEmitters에서 해당 사용자의 SseEmitter를 가져오고, 이를 통해 이벤트를 클라이언트에게 전송
     //특정 이벤트가 발생했을 때 해당 이벤트를 클라이언트에게 실시간으로 전달하는데 사용됨
     //새로운 알림이 도착했을 때 이를 클라이언트에게 실시간으로 알려주는 등의 기능을 구현하고자 할 때 notify 메서드를 사용
-    public void notify(final Long loggedInMemberId, final Object event) {
-        final SseEmitter emitter = sseEmitters.get(loggedInMemberId);
-        if (emitter != null) {
-            try {
-                emitter.send(event);
-            } catch (IOException e) {
-                sseEmitters.remove(loggedInMemberId);
-                emitter.completeWithError(e);
-            }
-        }
-    }
+//    public void notify(final Long loggedInMemberId, final Object event) {
+//        final SseEmitter emitter = sseEmitters.get(loggedInMemberId);
+//        if (emitter != null) {
+//            try {
+//                emitter.send(event);
+//            } catch (IOException e) {
+//                sseEmitters.remove(loggedInMemberId);
+//                emitter.completeWithError(e);
+//            }
+//        }
+//    }
 
     //모든 알람 찾기 모두 - 각 알림에서 생성일 순으로 조회
 
