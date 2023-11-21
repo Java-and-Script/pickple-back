@@ -1,8 +1,8 @@
 package kr.pickple.back.crew.service;
 
-import kr.pickple.back.alaram.event.crew.CrewJoinRequestNotificationEvent;
-import kr.pickple.back.alaram.event.crew.CrewMemberJoinedEvent;
-import kr.pickple.back.alaram.event.crew.CrewMemberRejectedEvent;
+import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
+import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
+import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
