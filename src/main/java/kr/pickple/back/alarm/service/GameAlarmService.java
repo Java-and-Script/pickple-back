@@ -41,7 +41,7 @@ public class GameAlarmService {
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
     private final GameAlarmRepository gameAlarmRepository;
-    private final AlarmService alarmService;
+    //private final AlarmService alarmService;
     private final SseEmitters sseEmitters;
 
     public GameAlarmResponse createGameJoinAlarm(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
@@ -64,7 +64,9 @@ public class GameAlarmService {
         gameAlarmRepository.save(gameAlarm);
 
         final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
-        alarmService.notify(host.getId(), response);
+        //alarmService.notify(host.getId(), response);
+        sseEmitters.notify(host.getId(), response);
+
 
         return response;
     }
@@ -88,7 +90,9 @@ public class GameAlarmService {
         gameAlarmRepository.save(gameAlarm);
 
         final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
-        alarmService.notify(member.getId(), response);
+//        alarmService.notify(member.getId(), response);
+        sseEmitters.notify(member.getId(), response);
+
 
         return response;
     }
@@ -112,7 +116,8 @@ public class GameAlarmService {
         gameAlarmRepository.save(gameAlarm);
 
         final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
-        alarmService.notify(member.getId(), response);
+//        alarmService.notify(member.getId(), response);
+        sseEmitters.notify(member.getId(), response);
 
         return response;
     }

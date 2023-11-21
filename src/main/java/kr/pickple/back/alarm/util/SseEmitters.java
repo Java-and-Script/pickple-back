@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -12,6 +13,8 @@ import java.util.concurrent.ConcurrentMap;
 @Component
 @RequiredArgsConstructor
 public class SseEmitters {
+
+    //private final SseEmitters sseEmitters;
 
     private final ConcurrentMap<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
@@ -40,5 +43,17 @@ public class SseEmitters {
 
     public void remove(final Long id) {
         this.emitters.remove(id);
+    }
+
+    public void notify(final Long loggedInMemberId, final Object event) {
+        final SseEmitter emitter = this.get(loggedInMemberId);
+        if (emitter != null) {
+            try {
+                emitter.send(event);
+            } catch (IOException e) {
+                this.remove(loggedInMemberId);
+                emitter.completeWithError(e);
+            }
+        }
     }
 }

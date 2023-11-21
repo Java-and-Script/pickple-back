@@ -41,7 +41,7 @@ public class CrewAlarmService {
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewAlarmRepository crewAlarmRepository;
-    private final AlarmService alarmService;
+    //private final AlarmService alarmService;
     private final SseEmitters sseEmitters;
 
     //크루 알림 생성
@@ -65,7 +65,8 @@ public class CrewAlarmService {
         crewAlarmRepository.save(crewAlarm);
 
         final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
-        alarmService.notify(leader.getId(), response);
+        //alarmService.notify(leader.getId(), response);
+        sseEmitters.notify(leader.getId(), response);
 
         return response;
     }
@@ -89,7 +90,8 @@ public class CrewAlarmService {
         crewAlarmRepository.save(crewAlarm);
 
         final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
-        alarmService.notify(member.getId(), response);
+        //alarmService.notify(member.getId(), response);
+        sseEmitters.notify(member.getId(), response);
 
         return response;
     }
@@ -114,7 +116,8 @@ public class CrewAlarmService {
         crewAlarmRepository.save(crewAlarm);
 
         final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
-        alarmService.notify(member.getId(), response);
+        //alarmService.notify(member.getId(), response);
+        sseEmitters.notify(member.getId(), response);
 
         return response;
     }
