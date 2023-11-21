@@ -1,5 +1,6 @@
 package kr.pickple.back.alarm.service;
 
+import kr.pickple.back.alarm.domain.Alarm;
 import kr.pickple.back.alarm.domain.AlarmStatus;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
@@ -7,6 +8,7 @@ import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.alarm.exception.AlarmException;
+import kr.pickple.back.alarm.repository.AlarmRepository;
 import kr.pickple.back.alarm.repository.CrewAlarmRepository;
 import kr.pickple.back.alarm.util.SseEmitters;
 import kr.pickple.back.common.domain.RegistrationStatus;
@@ -18,6 +20,7 @@ import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -42,8 +45,8 @@ public class CrewAlarmService {
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewAlarmRepository crewAlarmRepository;
-    //private final AlarmService alarmService;
     private final SseEmitters sseEmitters;
+    private final AlarmRepository alarmRepository;
 
     //크루 알림 생성
     public CrewAlarmResponse createCrewJoinAlarm(final CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
@@ -64,6 +67,13 @@ public class CrewAlarmService {
 
         //4. DB에다가 알람 저장
         crewAlarmRepository.save(crewAlarm);
+
+        //5.통합 알람 엔티티 생성 및 저장
+        final Alarm alarm = Alarm.builder()
+                .member(leader)
+                .crewAlarm(crewAlarm)
+                .build();
+        alarmRepository.save(alarm);
 
         final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
         //alarmService.notify(leader.getId(), response);
@@ -89,6 +99,13 @@ public class CrewAlarmService {
 
         //4. 알람 DB에다가 저장
         crewAlarmRepository.save(crewAlarm);
+
+        //5.통합 알람 엔티티 생성 및 저장
+        final Alarm alarm = Alarm.builder()
+                .member(member)
+                .crewAlarm(crewAlarm)
+                .build();
+        alarmRepository.save(alarm);
 
         final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
         //alarmService.notify(member.getId(), response);
@@ -249,5 +266,22 @@ public class CrewAlarmService {
     public void deleteAllCrewAlarms() {
         //1.DB에서 생성된 모든 크루 알람을 삭제함
         crewAlarmRepository.deleteAll();
+    }
+
+    //1. memberId와 cursorid를 이용하여 CrewAlarm이 있는지 확인하고 반환
+    public boolean existsCrewAlarmByMemberIdAndIdLessThan(final Long memberId, final Long id) {
+        return crewAlarmRepository.existsByMemberIdAndIdLessThan(memberId, id);
+    }
+
+    //2.memberId와 cursorid를 이용하여 CrewAlarm을 가져오며, 그 결과를 CrewAlarmResponse로 변환하여 반환
+    public List<CrewAlarmResponse> findCrewAlarmByMemberIdOrderByIdDesc(final Long memberId, final Pageable page) {
+        List<CrewAlarm> crewAlarms = crewAlarmRepository.findByMemberIdOrderByIdDesc(memberId, page);
+        return crewAlarms.stream().map(CrewAlarmResponse::of).collect(Collectors.toList());
+    }
+
+    //3.memberId와 id를 이용하여 CrewAlarm을 가져오고, 그 결과를 CrewAlarmResponse로 변환하여 반환
+    public List<CrewAlarmResponse> findCrewAlarmByMemberIdAndIdLessThanOrderByIdDesc(final Long memberId, final Long cursorId, final Pageable page) {
+        List<CrewAlarm> crewAlarms = crewAlarmRepository.findByMemberIdAndIdLessThanOrderByIdDesc(memberId, cursorId, page);
+        return crewAlarms.stream().map(CrewAlarmResponse::of).collect(Collectors.toList());
     }
 }

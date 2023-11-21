@@ -18,6 +18,7 @@ import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -252,5 +253,22 @@ public class GameAlarmService {
     public void deleteAllGameAlarms() {
         //1.DB에서 생성된 모든 게임 알람을 삭제함
         gameAlarmRepository.deleteAll();
+    }
+
+    //1. memberId와 cursorid를 이용하여 GameAlarm이 있는지 확인하고 반환
+    public boolean existsGameAlarmByMemberIdAndIdLessThan(final Long memberId, final Long id) {
+        return gameAlarmRepository.existsByMemberIdAndIdLessThan(memberId, id);
+    }
+
+    //2.memberId와 cursorid를 이용하여 GameAlarm을 가져오며, 그 결과를 GameAlarmResponse로 변환하여 반환
+    public List<GameAlarmResponse> findGameAlarmByMemberIdOrderByIdDesc(final Long memberId, final Pageable page) {
+        List<GameAlarm> gameAlarms = gameAlarmRepository.findByMemberIdOrderByIdDesc(memberId, page);
+        return gameAlarms.stream().map(GameAlarmResponse::of).collect(Collectors.toList());
+    }
+
+    //3.memberId와 id를 이용하여 GameAlarm을 가져오고, 그 결과를 GameAlarmResponse로 변환하여 반환
+    public List<GameAlarmResponse> findGameAlarmByMemberIdAndIdLessThanOrderByIdDesc(final Long memberId, final Long cursorId, final Pageable page) {
+        List<GameAlarm> gameAlarms = gameAlarmRepository.findByMemberIdAndIdLessThanOrderByIdDesc(memberId, cursorId, page);
+        return gameAlarms.stream().map(GameAlarmResponse::of).collect(Collectors.toList());
     }
 }
