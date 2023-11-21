@@ -2,12 +2,14 @@ package kr.pickple.back.alaram.service;
 
 import kr.pickple.back.alaram.domain.AlarmStatus;
 import kr.pickple.back.alaram.domain.GameAlarm;
-import kr.pickple.back.alaram.dto.response.GameAlaramResponse;
+import kr.pickple.back.alaram.dto.response.GameAlarmResponse;
 import kr.pickple.back.alaram.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alaram.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alaram.event.game.GameMemberRejectedEvent;
 import kr.pickple.back.alaram.exception.AlarmException;
 import kr.pickple.back.alaram.repository.GameAlarmRepository;
+import kr.pickple.back.alaram.util.SseEmitters;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameRepository;
@@ -15,16 +17,23 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.io.IOException;
+import java.util.List;
 
 import static kr.pickple.back.alaram.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alaram.domain.AlarmType.*;
 import static kr.pickple.back.alaram.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
 import static kr.pickple.back.game.exception.GameExceptionCode.GAME_IS_NOT_HOST;
 import static kr.pickple.back.game.exception.GameExceptionCode.GAME_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 //SSE 연결 로직에서는 @Transcational금지
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameAlarmService {
@@ -32,8 +41,10 @@ public class GameAlarmService {
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
     private final GameAlarmRepository gameAlarmRepository;
+    private final AlarmService alarmService;
+    private final SseEmitters sseEmitters;
 
-    public GameAlarm createGameJoinAlaram(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
+    public GameAlarmResponse createGameJoinAlarm(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
         //1.게임 리포지토리에서 해당 게임의 호스트인지 확인
         validateIsHost(gameJoinRequestNotificationEvent);
 
@@ -51,10 +62,14 @@ public class GameAlarmService {
 
         //4. DB에다가 알림 저장
         gameAlarmRepository.save(gameAlarm);
-        return GameAlaramResponse.of(gameAlarm).getGameAlarm();
+
+        final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
+        alarmService.notify(host.getId(), response);
+
+        return response;
     }
 
-    public GameAlarm createGuestApproveAlaram(final GameMemberJoinedEvent gameMemberJoinedEvent) {
+    public GameAlarmResponse createGuestApproveAlarm(final GameMemberJoinedEvent gameMemberJoinedEvent) {
 
         //1.이벤트로부터 게임 정보, 회원 정보 가져오기
         final Long gameId = gameMemberJoinedEvent.getGameId();
@@ -72,10 +87,13 @@ public class GameAlarmService {
         //3.알람을 DB에다가 저장
         gameAlarmRepository.save(gameAlarm);
 
-        return GameAlaramResponse.of(gameAlarm).getGameAlarm();
+        final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
+        alarmService.notify(member.getId(), response);
+
+        return response;
     }
 
-    public GameAlarm createGuestDeniedAlarm(final GameMemberRejectedEvent gameMemberRejectedEvent) {
+    public GameAlarmResponse createGuestDeniedAlarm(final GameMemberRejectedEvent gameMemberRejectedEvent) {
 
         //1.이벤트로부터 게임 정보, 회원 정보 가져오기
         final Long gameId = gameMemberRejectedEvent.getGameId();
@@ -93,7 +111,10 @@ public class GameAlarmService {
         //3.알람 DB에다가 저장
         gameAlarmRepository.save(gameAlarm);
 
-        return GameAlaramResponse.of(gameAlarm).getGameAlarm();
+        final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
+        alarmService.notify(member.getId(), response);
+
+        return response;
     }
 
 
@@ -119,11 +140,50 @@ public class GameAlarmService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    //3개의 부분에서 SSE알람으로 존재함 - 구분
-    public void emitMessage(GameAlarm gameAlarm) {
-        //1. SSE로 알람 생성 - 각 케이스 별 알람 생성
+    private Member getHostOfGame(final Long gameId) {
+        final Game game = getGameInfo(gameId);
+        return game.getHost();
+    }
 
-        //2. SSE로 발생된 알람 저장
+    private List<Member> getGameMembers(final Long gameId, final RegistrationStatus status) {
+        final Game game = getGameInfo(gameId);
+        return game.getMembersByStatus(status);
+    }
+
+    //SSE 알람을 발송하는 부분
+    public void emitMessage(final GameAlarmResponse gameAlarm) {
+        final Long gameId = gameAlarm.getGameId();
+        final Member gameHost = getHostOfGame(gameId);
+        final List<Member> gameApplyMembers = getGameMembers(gameId, WAITING);
+
+        //1. SSE로 알람 생성 - 각 케이스 별 알람 생성(호스트와 게스트에게 메시지 전송)
+        sendAlarmToGameHost(gameHost, gameAlarm);
+        sendAlarmToGameApplyMembers(gameApplyMembers, gameAlarm);
+    }
+
+    private void sendAlarmToMember(final Member member, final GameAlarmResponse gameAlarm) {
+        final SseEmitter gameHostEmitter = sseEmitters.get(member.getId());
+        if (gameHostEmitter != null) {
+            try {
+                gameHostEmitter.send(gameAlarm);
+            } catch (IOException e) {
+                sseEmitters.remove(member.getId());
+                log.info("해당 회원에게 알람 전송 중 오류가 발생되었습니다. : " + member.getId(), e);
+            }
+        }
+    }
+
+    //게임 호스트에게 가입 신청이 올 시 받는 알람
+    private void sendAlarmToGameHost(final Member gameHost, final GameAlarmResponse gameAlarm) {
+        sendAlarmToMember(gameHost, gameAlarm);
+    }
+
+    //회원(게스트 - 대기)에게 호스트가 승락 시, 상태가 Confirmed로 변하며 승락되었다는 알람
+    //회원(게스트 - 대기)에게 호스트가 거절 시, 게임 참여자(Game Memmber) 테이블에서 삭제되며, 거절되었다는 알람
+    private void sendAlarmToGameApplyMembers(List<Member> members, GameAlarmResponse gameAlarm) {
+        for (final Member member : members) {
+            sendAlarmToMember(member, gameAlarm);
+        }
     }
 
     //게임 알림 찾기 모두 - 미정

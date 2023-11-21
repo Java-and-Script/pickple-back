@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import kr.pickple.back.alaram.domain.AlarmStatus;
 import kr.pickple.back.alaram.domain.AlarmType;
 import kr.pickple.back.alaram.domain.GameAlarm;
+import kr.pickple.back.game.domain.Game;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ import java.time.LocalTime;
 public class GameAlarmResponse {
 
     private final Long id;
+    private final Long gameId;
     private final String mainAddress;
     private final LocalDateTime createdAt;
     private final LocalDate playDate;
@@ -28,8 +30,11 @@ public class GameAlarmResponse {
     private final AlarmType alarmType;
 
     public static GameAlarmResponse of(final GameAlarm gameAlarm) {
+        final Game game = gameAlarm.getGame();
+
         return GameAlarmResponse.builder()
                 .id(gameAlarm.getId())
+                .gameId(game.getId())
                 .mainAddress(gameAlarm.getGame().getMainAddress())
                 .createdAt(gameAlarm.getCreatedAt())
                 .playDate(gameAlarm.getGame().getPlayDate())
