@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
@@ -17,6 +18,7 @@ public class GameAlarmEventHandler {
     private final GameAlarmService gameAlarmService;
 
     @Async
+    @Transactional
     @EventListener
     public void sendAlarmToGameHost(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
         final GameAlarmResponse gameAlarm = gameAlarmService.createGameJoinAlarm(gameJoinRequestNotificationEvent); //알람 생성
@@ -24,6 +26,7 @@ public class GameAlarmEventHandler {
     }
 
     @Async
+    @Transactional
     @EventListener
     public void sendAlarmToGameMemberOnJoin(final GameMemberJoinedEvent gameMemberJoinedEvent) {
         final GameAlarmResponse gameAlarm = gameAlarmService.createGuestApproveAlarm(gameMemberJoinedEvent); //알람 생성
@@ -31,6 +34,7 @@ public class GameAlarmEventHandler {
     }
 
     @Async
+    @Transactional
     @EventListener
     public void sendAlarmToGameMemberOnRejection(final GameMemberRejectedEvent gameMemberRejectedEvent) {
         final GameAlarmResponse gameAlarm = gameAlarmService.createGuestDeniedAlarm(gameMemberRejectedEvent); //알람 생성
