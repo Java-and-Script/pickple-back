@@ -131,4 +131,8 @@ public class ChatRoom extends BaseEntity {
     public ChatMessage getLastChatMessage() {
         return chatMessages.getLastChatMessage();
     }
+
+    public ChatMessage getLastEnteringChatMessageByMember(final Member member) {
+        return chatMessages.getLastEnteringChatMessageByMember(member);
+    }
 }

@@ -18,6 +18,7 @@ import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
+import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
@@ -122,10 +123,20 @@ public class ChatMessageService {
 
         validateIsExistedRoomMember(loggedInMember, chatRoom);
 
+        final ChatMessage lastEnteringMessage = chatRoom.getLastEnteringChatMessageByMember(loggedInMember);
+
         return chatRoom.getChatMessages()
                 .stream()
+                .filter(thisChatMessage -> isEqualOrAfterThanLastEnteringMessage(lastEnteringMessage, thisChatMessage))
                 .map(ChatMessageResponse::from)
                 .toList();
+    }
+
+    private Boolean isEqualOrAfterThanLastEnteringMessage(
+            final ChatMessage lastEnteringMessage,
+            final ChatMessage thisChatMessage
+    ) {
+        return DateTimeUtil.isEqualOrAfter(lastEnteringMessage.getCreatedAt(), thisChatMessage.getCreatedAt());
     }
 
     private ChatRoom findRoomById(final Long roomId) {
