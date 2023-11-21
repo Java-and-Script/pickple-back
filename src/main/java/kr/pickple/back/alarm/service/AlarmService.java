@@ -15,6 +15,8 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -61,32 +63,45 @@ public class AlarmService {
     public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final Integer size) {
         final Member member = findMemberById(loggedInMemberId);
 
+        Pageable page = PageRequest.of(0, size);
+
         //1.각 알림을 조회하고, Response DTO로 변환
-        final List<CrewAlarmResponse> AllCrewAlarmList = crewAlarmService.findCrewAlarmAll();
-        final List<GameAlarmResponse> AllGameAlarmList = gameAlarmService.findGameAlarmAll();
+        List<CrewAlarmResponse> crewAlarmResponses;
+        List<GameAlarmResponse> gameAlarmResponses;
+
+        //1-1.초기 페이징 처리
+        if (cursorId == 0) {
+            crewAlarmResponses = crewAlarmService.findCrewAlarmByMemberIdOrderByIdDesc(member.getId(), page);
+            gameAlarmResponses = gameAlarmService.findGameAlarmByMemberIdOrderByIdDesc(member.getId(), page);
+        } else {
+            crewAlarmResponses = crewAlarmService.findCrewAlarmByMemberIdAndIdLessThanOrderByIdDesc(member.getId(), cursorId, page);
+            gameAlarmResponses = gameAlarmService.findGameAlarmByMemberIdAndIdLessThanOrderByIdDesc(member.getId(), cursorId, page);
+        }
 
         //2.서로 다른 알람을 하나의 리스트에 넣음
-        final List<AlarmResponse> alarmResponses = new ArrayList<>();
-        alarmResponses.addAll(AllCrewAlarmList);
-        alarmResponses.addAll(AllGameAlarmList);
+        List<AlarmResponse> alarmResponses = new ArrayList<>();
+        alarmResponses.addAll(crewAlarmResponses);
+        alarmResponses.addAll(gameAlarmResponses);
 
         //3.서로 다른 알람들을 생성일 순으로 정렬
         alarmResponses.sort(Comparator.comparing(AlarmResponse::getCreatedAt).reversed());
 
-        final Long lastIdOfList = alarmResponses.isEmpty() ? null : alarmResponses.get(alarmResponses.size() - 1).getId();
+        //3-1.초기 알람 사이즈
+        if (alarmResponses.size() > size) {
+            alarmResponses = alarmResponses.subList(0, size);
+        }
 
+        final Long lastIdOfList = alarmResponses.isEmpty() ? null : alarmResponses.get(alarmResponses.size() - 1).getId();
 
         return CursorResult.<AlarmResponse>builder()
                 .alarmResponses(alarmResponses)
-                .hasNext(hasNext(lastIdOfList))
+                .hasNext(hasNext(member.getId(), lastIdOfList))
                 .build();
     }
 
-    //3.커서 기반 페이징 - 다음 페이지가 있는지 조회
-    private Boolean hasNext(Long id) {
-        if (id == null) return false;
-
-        return this.alarmRepository.existsByIdLessThan(id);
+    //크루와 게임에 대한 다음 페이지가 있는지 확인
+    private boolean hasNext(final Long memberId, final Long id) {
+        return crewAlarmService.existsCrewAlarmByMemberIdAndIdLessThan(memberId, id) || gameAlarmService.existsGameAlarmByMemberIdAndIdLessThan(memberId, id);
     }
 
     //특정 알림 읽음, 읽지 않음 상태 확인
