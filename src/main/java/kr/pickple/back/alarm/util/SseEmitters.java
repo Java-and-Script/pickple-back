@@ -8,8 +8,8 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class SseEmitters {
 
