@@ -1,0 +1,42 @@
+### 크루 생성
+POST http://localhost:8080/crews
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+{
+  "name": "땅콩 크루",
+  "content": "안녕하세요, 땅콩 크루입니다. 백둥체육관 201호에서 진행합니다.",
+  "maxMemberCount": 15,
+  "addressDepth1": "서울시",
+  "addressDepth2": "강남구"
+}
+
+### 크루 상세 조회
+GET http://localhost:8080/crews/15
+
+### 크루가입 신청
+POST http://localhost:8080/crews/15/members
+Authorization: Bearer {{token2}}
+Content-Type: application/json
+
+
+### 크루원 가입 신청자 목록
+GET  http://localhost:8080/crews/15/members?status=대기
+Authorization: Bearer {{token1}}
+
+### 크루원 가입 신청 수락
+PATCH http://localhost:8080/crews/15/members/2
+Content-Type: application/json
+Authorization: Bearer {{token1}}
+
+{
+  "status": "확정"
+}
+
+### 크루원 가입 신청 거절/취소
+DELETE http://localhost:8080/crews/15/members/1
+Authorization: Bearer {{token1}}
+Content-Type: application/json
+
+### 사용자 근처 크루 목록 조회
+GET http://localhost:8080/crews?addressDepth1=서울시&addressDepth2=영등포구&page=0&size=10

@@ -1,0 +1,1303 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "PICKPLE API 문서",
+    "description" : "PICKPLE 서비스의 API 문서입니다.",
+    "version" : "0.0.1"
+  },
+  "servers" : [ {
+    "url" : "https://dev.pickple.kr"
+  } ],
+  "tags" : [ ],
+  "paths" : {
+    "/auth/refresh" : {
+      "post" : {
+        "tags" : [ "Auth" ],
+        "summary" : "accessToken 갱신",
+        "description" : "accessToken이 만료되었을 때 새로 갱신할 수 있다.",
+        "operationId" : "oauth-access-token-refresh",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Register Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer accessToken"
+        } ],
+        "responses" : {
+          "201" : {
+            "description" : "201",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/AccessTokenResponse"
+                },
+                "examples" : {
+                  "oauth-access-token-refresh" : {
+                    "value" : "{\n  \"accessToken\" : \"accessToken\"\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/{oauthProvider}" : {
+      "get" : {
+        "tags" : [ "Auth" ],
+        "summary" : "oauth 페이지로 리다이렉트",
+        "description" : "클라이언트에서 로그인 버튼을 클릭하면 oauth 페이지로 리다이렉트 한다.",
+        "operationId" : "redirect-oauth-login-page",
+        "parameters" : [ {
+          "name" : "oauthProvider",
+          "in" : "path",
+          "description" : "oauth 제공자",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "default" : "kakao"
+          }
+        } ],
+        "responses" : {
+          "302" : {
+            "description" : "302",
+            "headers" : {
+              "Location" : {
+                "description" : "리다이렉트 주소",
+                "schema" : {
+                  "type" : "string",
+                  "default" : "https://test.url"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login/{oauthProvider}" : {
+      "get" : {
+        "tags" : [ "Auth" ],
+        "summary" : "oauth 로그인",
+        "description" : "oauth를 이용하여 로그인 할 수 있다.",
+        "operationId" : "oauth-login-",
+        "parameters" : [ {
+          "name" : "oauthProvider",
+          "in" : "path",
+          "description" : "oauth 제공자",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "default" : "kakao"
+          }
+        }, {
+          "name" : "authCode",
+          "in" : "query",
+          "description" : "oauth 로그인 후 받은 authCode",
+          "required" : true,
+          "schema" : {
+            "type" : "string",
+            "default" : "testCode"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "headers" : {
+              "Set-Cookie" : {
+                "description" : "refreshToken",
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/Authenticated"
+                },
+                "examples" : {
+                  "oauth-login-authenticated" : {
+                    "value" : "{\n  \"accessToken\" : \"accessToken\",\n  \"refreshToken\" : \"refreshToken\",\n  \"id\" : 1,\n  \"nickname\" : \"강백둥\",\n  \"profileImageUrl\" : \"https://amazon.image/1\",\n  \"email\" : \"pickple1@pickple.kr\",\n  \"oauthId\" : 1,\n  \"oauthProvider\" : \"KAKAO\",\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\"\n}"
+                  },
+                  "oauth-login-registration" : {
+                    "value" : "{\n  \"accessToken\" : \"accessToken\",\n  \"refreshToken\" : null,\n  \"id\" : null,\n  \"nickname\" : \"강백둥\",\n  \"profileImageUrl\" : \"https://amazon.image/1\",\n  \"email\" : \"pickple1@pickple.kr\",\n  \"oauthId\" : 1,\n  \"oauthProvider\" : \"KAKAO\",\n  \"addressDepth1\" : null,\n  \"addressDepth2\" : null\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/{gameId}" : {
+      "get" : {
+        "tags" : [ "Game" ],
+        "summary" : "게스트 모집글 상세 조회",
+        "description" : "게스트 모집글 정보를 상세 조회한다",
+        "operationId" : "find-game",
+        "parameters" : [ {
+          "name" : "gameId",
+          "in" : "path",
+          "description" : "게스트 모집글 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GameResponse"
+                },
+                "examples" : {
+                  "find-game" : {
+                    "value" : "{\n  \"id\" : 5,\n  \"content\" : \"하이하이 즐겜 한 판해요\",\n  \"playDate\" : \"2023-11-10\",\n  \"playStartTime\" : \"11:30:00\",\n  \"playEndTime\" : \"13:00:00\",\n  \"playTimeMinutes\" : 90,\n  \"mainAddress\" : \"서울 영등포구 도림동 254\",\n  \"detailAddress\" : \"영등포 다목적 체육관 2층 201호\",\n  \"latitude\" : null,\n  \"longitude\" : null,\n  \"status\" : \"모집 중\",\n  \"viewCount\" : 1,\n  \"cost\" : 100,\n  \"memberCount\" : 3,\n  \"maxMemberCount\" : 5,\n  \"host\" : {\n    \"id\" : 10,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"members\" : [ {\n    \"id\" : 10,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 11,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 12,\n    \"email\" : \"pickple2@pickple.kr\",\n    \"nickname\" : \"pickple2\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/games/{gameId}/members" : {
+      "get" : {
+        "tags" : [ "Game" ],
+        "summary" : "게스트 모집에 참여 신청된 혹은 확정된 사용자 정보 목록 조회",
+        "description" : "게스트 모집에 참여 신청된 혹은 확정된 사용자 정보 목록을 조회한다.",
+        "operationId" : "find-all-waiting-",
+        "parameters" : [ {
+          "name" : "gameId",
+          "in" : "path",
+          "description" : "게스트 모집글 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "사용자의 참여 상태 (대기 혹은 확정)",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Access Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwMzkzMTQyLCJleHAiOjE3MDAzOTQzNzJ9.TlkXaKo6vD0JF24PCPuuhaocQkx9T1UTtMSjKvyGX_8u8dM0ZcFEtRcVo5xtFvdQcJkYr-wuekpeklIjZRnkGA"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/GameResponse"
+                },
+                "examples" : {
+                  "find-all-waiting-or-confirmed-gameMembers" : {
+                    "value" : "{\n  \"id\" : 1,\n  \"content\" : \"하이하이 즐겜 한 판해요\",\n  \"playDate\" : \"2023-11-10\",\n  \"playStartTime\" : \"11:30:00\",\n  \"playEndTime\" : \"13:00:00\",\n  \"playTimeMinutes\" : 90,\n  \"mainAddress\" : \"서울 영등포구 도림동 254\",\n  \"detailAddress\" : \"영등포 다목적 체육관 2층 201호\",\n  \"latitude\" : null,\n  \"longitude\" : null,\n  \"status\" : \"모집 중\",\n  \"viewCount\" : 0,\n  \"cost\" : 100,\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 5,\n  \"host\" : {\n    \"id\" : 1,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"members\" : [ {\n    \"id\" : 2,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 3,\n    \"email\" : \"pickple2@pickple.kr\",\n    \"nickname\" : \"pickple2\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n}"
+                  },
+                  "find-all-waiting-gameMembers" : {
+                    "value" : "{\n  \"id\" : 1,\n  \"content\" : \"하이하이 즐겜 한 판해요\",\n  \"playDate\" : \"2023-11-10\",\n  \"playStartTime\" : \"11:30:00\",\n  \"playEndTime\" : \"13:00:00\",\n  \"playTimeMinutes\" : 90,\n  \"mainAddress\" : \"서울 영등포구 도림동 254\",\n  \"detailAddress\" : \"영등포 다목적 체육관 2층 201호\",\n  \"latitude\" : null,\n  \"longitude\" : null,\n  \"status\" : \"모집 중\",\n  \"viewCount\" : 0,\n  \"cost\" : 100,\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 5,\n  \"host\" : {\n    \"id\" : 1,\n    \"email\" : \"pickple0@pickple.kr\",\n    \"nickname\" : \"pickple0\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"members\" : [ {\n    \"id\" : 2,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  }, {\n    \"id\" : 3,\n    \"email\" : \"pickple2@pickple.kr\",\n    \"nickname\" : \"pickple2\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      },
+      "post" : {
+        "tags" : [ "Game" ],
+        "summary" : "게스트 모집 참여 신청",
+        "description" : "게스트 모집에 참여 신청을 한다.",
+        "operationId" : "register-gameMember",
+        "parameters" : [ {
+          "name" : "gameId",
+          "in" : "path",
+          "description" : "게스트 모집글 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Access Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3IiwiaWF0IjoxNzAwMzkzMTQzLCJleHAiOjE3MDAzOTQzNzN9.sk1tLRiCMvCJ8n0hN7IhePU_BIsPRn4T8VSm0ijBqsOVnBA_Qjgrca5GbfcgC2mr2YWgwEK1XxMqG9nDBJT9RQ"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "204"
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/games/{gameId}/members/manner-scores" : {
+      "patch" : {
+        "tags" : [ "Game" ],
+        "summary" : "다른 사용자 매너 스코어 리뷰",
+        "description" : "경기 종료 후, 다른 사용자의 매너 스코어를 리뷰한다.",
+        "operationId" : "review-mannerScores",
+        "parameters" : [ {
+          "name" : "gameId",
+          "in" : "path",
+          "description" : "게스트 모집글 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Access Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxMyIsImlhdCI6MTcwMDM5MzE0MywiZXhwIjoxNzAwMzk0MzczfQ.RRjpqzZZMI9whNZcpq7crpf64-f_G37eYiGeo415DvpfIWqskjkmHOc5krlHel9PGVzEnnsb34-z_XElJrJCQg"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MannerScoreReviewsRequest"
+              },
+              "examples" : {
+                "review-mannerScores" : {
+                  "value" : "{\n  \"mannerScoreReviews\" : [ {\n    \"memberId\" : 14,\n    \"mannerScore\" : 1\n  }, {\n    \"memberId\" : 15,\n    \"mannerScore\" : 1\n  } ]\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "204"
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/games/{gameId}/members/{memberId}" : {
+      "delete" : {
+        "tags" : [ "Game" ],
+        "summary" : "게스트 모집 참여 신청 거절/취소",
+        "description" : "게스트 모집 참여 신청에 대해 거절 혹은 취소한다.",
+        "operationId" : "delete-gameMember",
+        "parameters" : [ {
+          "name" : "gameId",
+          "in" : "path",
+          "description" : "게스트 모집글 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "memberId",
+          "in" : "path",
+          "description" : "참여 신청한 사용자 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Access Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4IiwiaWF0IjoxNzAwMzkzMTQzLCJleHAiOjE3MDAzOTQzNzN9.I1vBNKCdKxh8bHpRAbzLmHSLLDGzAwOpf8TpG96ONAZcq3HMwbs_TBCjBQj_VrLk2-Tcy0KSGoALjP6kER_w2A"
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "204"
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      },
+      "patch" : {
+        "tags" : [ "Game" ],
+        "summary" : "게스트 모집 참여 신청 수락",
+        "description" : "호스트가 게스트 모집 참여 신청을 수락 한다.",
+        "operationId" : "confirm-gameMember",
+        "parameters" : [ {
+          "name" : "gameId",
+          "in" : "path",
+          "description" : "게스트 모집글 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "memberId",
+          "in" : "path",
+          "description" : "참여 신청한 사용자 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Access Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzAwMzkzMTQzLCJleHAiOjE3MDAzOTQzNzN9.uJeT2bL2KxoczkTwJIGdZ1Qi09nrOSo2IEPI7p3VRf0db67br2uE8isgX0IMkCFAegOmKHB0-JBQ2cM11xanWQ"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/GameMemberRegistrationStatusUpdateRequest"
+              },
+              "examples" : {
+                "confirm-gameMember" : {
+                  "value" : "{\n  \"status\" : \"확정\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "204" : {
+            "description" : "204"
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/members" : {
+      "post" : {
+        "tags" : [ "Member" ],
+        "summary" : "회원 생성",
+        "description" : "회원을 생성한다.",
+        "operationId" : "create-member",
+        "parameters" : [ {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "Register Token",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJLQUtBTzk5OTk5OSIsImlhdCI6MTcwMDM5MzE0NCwiZXhwIjoxNzAwMzkzNDQ0fQ.LJDU6TequEII_NBpcyt_VSFLE7qvAVaNYHNjluckyo5UvBrkvs6sybqewnopVVuqf0zkC3CSs0LypN5ADs9lsQ"
+        } ],
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/MemberCreateRequest"
+              },
+              "examples" : {
+                "create-member" : {
+                  "value" : "{\n  \"nickname\" : \"백둥\",\n  \"profileImageUrl\" : \"https://amazon.image/1\",\n  \"email\" : \"pickple@pickple.kr\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"oauthId\" : 999999,\n  \"oauthProvider\" : \"KAKAO\",\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\"\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "201" : {
+            "description" : "201",
+            "headers" : {
+              "Set-Cookie" : {
+                "description" : "refreshToken",
+                "schema" : {
+                  "type" : "string"
+                }
+              }
+            },
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MemberProfileResponse"
+                },
+                "examples" : {
+                  "create-member" : {
+                    "value" : "{\n  \"accessToken\" : \"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI4IiwiaWF0IjoxNzAwMzkzMTQ0LCJleHAiOjE3MDAzOTQzNzR9.ZzviN-LJjQGtEHQpkG7tXOmhotytxYaYxnLU4Jv4qpRa-AuNi4ggHLMvRMpsKKvYuw4kebAR__I-ukxnm0_KYQ\",\n  \"refreshToken\" : \"eyJhbGciOiJIUzUxMiJ9.eyJpYXQiOjE3MDAzOTMxNDQsImV4cCI6MTcwMDM5NDU3NH0.3KCs4iO8qIao8kmsdi5fZz9t0yBHHBG6TOpM3HUOJGATmEc0_SlhKi0w8kebcVVLFtQZ3U09wX2yblstegAc6Q\",\n  \"id\" : 8,\n  \"nickname\" : \"백둥\",\n  \"profileImageUrl\" : \"https://amazon.image/1\",\n  \"email\" : \"pickple@pickple.kr\",\n  \"oauthId\" : 999999,\n  \"oauthProvider\" : \"KAKAO\",\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\"\n}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/members/{memberId}" : {
+      "get" : {
+        "tags" : [ "Member" ],
+        "summary" : "회원 프로필 조회",
+        "description" : "회원 프로필을 조회한다",
+        "operationId" : "find-member",
+        "parameters" : [ {
+          "name" : "memberId",
+          "in" : "path",
+          "description" : "회원 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/MemberProfileResponse"
+                },
+                "examples" : {
+                  "find-member" : {
+                    "value" : "{\n  \"id\" : 6,\n  \"email\" : \"pickple1@pickple.kr\",\n  \"nickname\" : \"pickple1\",\n  \"introduction\" : null,\n  \"profileImageUrl\" : \"https://amazon.image\",\n  \"mannerScore\" : 0,\n  \"mannerScoreCount\" : 0,\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"positions\" : [ \"C\", \"PG\" ],\n  \"crews\" : [ {\n    \"id\" : 5,\n    \"name\" : \"백둥크루1\",\n    \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n    \"memberCount\" : 1,\n    \"maxMemberCount\" : 15,\n    \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n    \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n    \"status\" : \"모집 중\",\n    \"likeCount\" : 0,\n    \"competitionPoint\" : 0,\n    \"leader\" : {\n      \"id\" : 6,\n      \"email\" : \"pickple1@pickple.kr\",\n      \"nickname\" : \"pickple1\",\n      \"introduction\" : null,\n      \"profileImageUrl\" : \"https://amazon.image\",\n      \"mannerScore\" : 0,\n      \"mannerScoreCount\" : 0,\n      \"addressDepth1\" : \"서울시\",\n      \"addressDepth2\" : \"영등포구\",\n      \"positions\" : [ \"C\", \"PG\" ]\n    },\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\"\n  } ]\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{memberId}/created-crews" : {
+      "get" : {
+        "tags" : [ "Member" ],
+        "summary" : "회원이 만든 크루 목록 조회",
+        "description" : "회원이 만든 크루 목록을 조회 할 수 있다.",
+        "operationId" : "find-created-crews-by-member-id",
+        "parameters" : [ {
+          "name" : "memberId",
+          "in" : "path",
+          "description" : "회원 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "AccessToken",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI1IiwiaWF0IjoxNzAwMzkzMTQ0LCJleHAiOjE3MDAzOTQzNzR9.0BvR1RQOhp7UoSF9cbLbv9xsTjtkfelwajX_aiirrrlZM6TskaJe7rxdSD7WD_tZkZgESn6HKjecxSKv5lW0ug"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CrewProfile"
+                },
+                "examples" : {
+                  "find-created-crews-by-member-id" : {
+                    "value" : "[ {\n  \"id\" : 4,\n  \"name\" : \"백둥크루1\",\n  \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 15,\n  \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n  \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n  \"status\" : \"모집 중\",\n  \"likeCount\" : 0,\n  \"competitionPoint\" : 0,\n  \"leader\" : {\n    \"id\" : 5,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"members\" : [ {\n    \"id\" : 5,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n} ]"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    },
+    "/members/{memberId}/crews" : {
+      "get" : {
+        "tags" : [ "Member" ],
+        "summary" : "회원이 가입한 크루 목록 조회",
+        "description" : "회원이 가입한 크루 목록을 조회 할 수 있다.",
+        "operationId" : "find-all-crews-by-member-id",
+        "parameters" : [ {
+          "name" : "memberId",
+          "in" : "path",
+          "description" : "회원 ID",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "status",
+          "in" : "query",
+          "description" : "가입 상태",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        }, {
+          "name" : "Authorization",
+          "in" : "header",
+          "description" : "AccessToken",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          },
+          "example" : "Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI3IiwiaWF0IjoxNzAwMzkzMTQ0LCJleHAiOjE3MDAzOTQzNzR9.Y82MSz_82f81ntYIrHFKdKFzUTcG3c-RScSxgJQ2Q7B34FcVkcTix4X0mD6P5pEza1gc3vpRjmLt_8Ai_c8PuQ"
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/CrewProfile"
+                },
+                "examples" : {
+                  "find-all-crews-by-member-id" : {
+                    "value" : "[ {\n  \"id\" : 6,\n  \"name\" : \"백둥크루1\",\n  \"content\" : \"안녕하세요 백둥크루1 입니다.\",\n  \"memberCount\" : 1,\n  \"maxMemberCount\" : 15,\n  \"profileImageUrl\" : \"https://amazon.profileimage/1\",\n  \"backgroundImageUrl\" : \"https://amazon.backgroundimage/1\",\n  \"status\" : \"모집 중\",\n  \"likeCount\" : 0,\n  \"competitionPoint\" : 0,\n  \"leader\" : {\n    \"id\" : 7,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  },\n  \"addressDepth1\" : \"서울시\",\n  \"addressDepth2\" : \"영등포구\",\n  \"members\" : [ {\n    \"id\" : 7,\n    \"email\" : \"pickple1@pickple.kr\",\n    \"nickname\" : \"pickple1\",\n    \"introduction\" : null,\n    \"profileImageUrl\" : \"https://amazon.image\",\n    \"mannerScore\" : 0,\n    \"mannerScoreCount\" : 0,\n    \"addressDepth1\" : \"서울시\",\n    \"addressDepth2\" : \"영등포구\",\n    \"positions\" : [ \"C\", \"PG\" ]\n  } ]\n} ]"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security" : [ {
+          "bearerAuthJWT" : [ ]
+        } ]
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "Authenticated" : {
+        "title" : "Authenticated",
+        "type" : "object",
+        "properties" : {
+          "oauthId" : {
+            "type" : "number",
+            "description" : "oauthId"
+          },
+          "addressDepth2" : {
+            "description" : "주소2(도,시)",
+            "oneOf" : [ null, {
+              "type" : "string"
+            } ]
+          },
+          "addressDepth1" : {
+            "description" : "주소1(도,시)",
+            "oneOf" : [ null, {
+              "type" : "string"
+            } ]
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "id" : {
+            "description" : "회원 ID",
+            "oneOf" : [ null, {
+              "type" : "number"
+            } ]
+          },
+          "accessToken" : {
+            "type" : "string",
+            "description" : "AccessToken"
+          },
+          "profileImageUrl" : {
+            "type" : "string",
+            "description" : "프로필 이미지 경로"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "이메일"
+          },
+          "oauthProvider" : {
+            "type" : "string",
+            "description" : "oauth 제공자"
+          },
+          "refreshToken" : {
+            "description" : "RefreshToken",
+            "oneOf" : [ null, {
+              "type" : "string"
+            } ]
+          }
+        }
+      },
+      "CrewProfile" : {
+        "title" : "CrewProfile",
+        "type" : "array",
+        "items" : {
+          "type" : "object",
+          "properties" : {
+            "leader" : {
+              "type" : "object",
+              "properties" : {
+                "addressDepth2" : {
+                  "type" : "string",
+                  "description" : "크루장 주 활동지역 주소2"
+                },
+                "addressDepth1" : {
+                  "type" : "string",
+                  "description" : "크루장 주 활동지역 주소1"
+                },
+                "nickname" : {
+                  "type" : "string",
+                  "description" : "크루장 닉네임"
+                },
+                "positions" : {
+                  "type" : "array",
+                  "description" : "크루장 주 포지션 목록",
+                  "items" : {
+                    "oneOf" : [ {
+                      "type" : "object"
+                    }, {
+                      "type" : "boolean"
+                    }, {
+                      "type" : "string"
+                    }, {
+                      "type" : "number"
+                    } ]
+                  }
+                },
+                "mannerScore" : {
+                  "type" : "number",
+                  "description" : "크루장 매너 점수"
+                },
+                "id" : {
+                  "type" : "number",
+                  "description" : "크루장 ID"
+                },
+                "mannerScoreCount" : {
+                  "type" : "number",
+                  "description" : "크루장 매너 스코어 반영 횟수"
+                },
+                "profileImageUrl" : {
+                  "type" : "string",
+                  "description" : "크루장 프로필 이미지"
+                },
+                "introduction" : {
+                  "type" : "object",
+                  "description" : "크루장 소개"
+                },
+                "email" : {
+                  "type" : "string",
+                  "description" : "크루장 이메일"
+                }
+              }
+            },
+            "maxMemberCount" : {
+              "type" : "number",
+              "description" : "최대 인원 수"
+            },
+            "memberCount" : {
+              "type" : "number",
+              "description" : "멤버 수"
+            },
+            "likeCount" : {
+              "type" : "number",
+              "description" : "좋아요 수"
+            },
+            "content" : {
+              "type" : "string",
+              "description" : "크루 소개글"
+            },
+            "addressDepth2" : {
+              "type" : "string",
+              "description" : "크루 주 활동지역 주소2"
+            },
+            "members" : {
+              "type" : "array",
+              "description" : "크루원 목록",
+              "items" : {
+                "type" : "object",
+                "properties" : {
+                  "addressDepth2" : {
+                    "type" : "string",
+                    "description" : "크루원 주 활동지역 주소2"
+                  },
+                  "addressDepth1" : {
+                    "type" : "string",
+                    "description" : "크루원 주 활동지역 주소1"
+                  },
+                  "nickname" : {
+                    "type" : "string",
+                    "description" : "크루원 닉네임"
+                  },
+                  "positions" : {
+                    "type" : "array",
+                    "description" : "크루원 주 포지션 목록",
+                    "items" : {
+                      "oneOf" : [ {
+                        "type" : "object"
+                      }, {
+                        "type" : "boolean"
+                      }, {
+                        "type" : "string"
+                      }, {
+                        "type" : "number"
+                      } ]
+                    }
+                  },
+                  "mannerScore" : {
+                    "type" : "number",
+                    "description" : "크루원 매너 점수"
+                  },
+                  "id" : {
+                    "type" : "number",
+                    "description" : "크루원 ID"
+                  },
+                  "mannerScoreCount" : {
+                    "type" : "number",
+                    "description" : "크루원 매너 스코어 반영 횟수"
+                  },
+                  "profileImageUrl" : {
+                    "type" : "string",
+                    "description" : "크루원 프로필 이미지"
+                  },
+                  "introduction" : {
+                    "type" : "object",
+                    "description" : "크루원 소개"
+                  },
+                  "email" : {
+                    "type" : "string",
+                    "description" : "크루원 이메일"
+                  }
+                }
+              }
+            },
+            "addressDepth1" : {
+              "type" : "string",
+              "description" : "크루 주 활동지역 주소1"
+            },
+            "competitionPoint" : {
+              "type" : "number",
+              "description" : "경쟁 점수"
+            },
+            "name" : {
+              "type" : "string",
+              "description" : "크루 명"
+            },
+            "id" : {
+              "type" : "number",
+              "description" : "크루 ID"
+            },
+            "profileImageUrl" : {
+              "type" : "string",
+              "description" : "크루 프로필 이미지"
+            },
+            "status" : {
+              "type" : "string",
+              "description" : "크루 모집 상태(모집 중, 모집 마감"
+            },
+            "backgroundImageUrl" : {
+              "type" : "string",
+              "description" : "크루 배경 이미지"
+            }
+          }
+        }
+      },
+      "MemberCreateRequest" : {
+        "title" : "MemberCreateRequest",
+        "type" : "object",
+        "properties" : {
+          "oauthId" : {
+            "type" : "number",
+            "description" : "oauthId"
+          },
+          "addressDepth2" : {
+            "type" : "string",
+            "description" : "주소2(구)"
+          },
+          "addressDepth1" : {
+            "type" : "string",
+            "description" : "주소1(도,시)"
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "positions" : {
+            "type" : "array",
+            "description" : "주 포지션 목록",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "profileImageUrl" : {
+            "type" : "string",
+            "description" : "프로필 이미지 경로"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "이메일"
+          },
+          "oauthProvider" : {
+            "type" : "string",
+            "description" : "oauth 제공자"
+          }
+        }
+      },
+      "MemberProfileResponse" : {
+        "title" : "MemberProfileResponse",
+        "type" : "object",
+        "properties" : {
+          "addressDepth2" : {
+            "type" : "string",
+            "description" : "주소2(구)"
+          },
+          "addressDepth1" : {
+            "type" : "string",
+            "description" : "주소1(도,시)"
+          },
+          "nickname" : {
+            "type" : "string",
+            "description" : "닉네임"
+          },
+          "crews" : {
+            "type" : "array",
+            "description" : "회원이 소속된 크루 목록",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "leader" : {
+                  "type" : "object",
+                  "properties" : {
+                    "addressDepth2" : {
+                      "type" : "string",
+                      "description" : "크루장 주 활동지역 주소2"
+                    },
+                    "addressDepth1" : {
+                      "type" : "string",
+                      "description" : "크루장 주 활동지역 주소1"
+                    },
+                    "nickname" : {
+                      "type" : "string",
+                      "description" : "크루장 닉네임"
+                    },
+                    "positions" : {
+                      "type" : "array",
+                      "description" : "크루장 주 포지션 목록",
+                      "items" : {
+                        "oneOf" : [ {
+                          "type" : "object"
+                        }, {
+                          "type" : "boolean"
+                        }, {
+                          "type" : "string"
+                        }, {
+                          "type" : "number"
+                        } ]
+                      }
+                    },
+                    "mannerScore" : {
+                      "type" : "number",
+                      "description" : "크루장 매너 점수"
+                    },
+                    "id" : {
+                      "type" : "number",
+                      "description" : "크루장 ID"
+                    },
+                    "mannerScoreCount" : {
+                      "type" : "number",
+                      "description" : "크루장 매너 스코어 반영 횟수"
+                    },
+                    "profileImageUrl" : {
+                      "type" : "string",
+                      "description" : "크루장 프로필 이미지"
+                    },
+                    "introduction" : {
+                      "type" : "object",
+                      "description" : "크루장 소개"
+                    },
+                    "email" : {
+                      "type" : "string",
+                      "description" : "크루장 이메일"
+                    }
+                  }
+                },
+                "maxMemberCount" : {
+                  "type" : "number",
+                  "description" : "최대 인원 수"
+                },
+                "memberCount" : {
+                  "type" : "number",
+                  "description" : "멤버 수"
+                },
+                "likeCount" : {
+                  "type" : "number",
+                  "description" : "좋아요 수"
+                },
+                "content" : {
+                  "type" : "string",
+                  "description" : "크루 소개글"
+                },
+                "addressDepth2" : {
+                  "type" : "string",
+                  "description" : "크루 주 활동지역 주소2"
+                },
+                "addressDepth1" : {
+                  "type" : "string",
+                  "description" : "크루 주 활동지역 주소1"
+                },
+                "competitionPoint" : {
+                  "type" : "number",
+                  "description" : "경쟁 점수"
+                },
+                "name" : {
+                  "type" : "string",
+                  "description" : "크루 명"
+                },
+                "id" : {
+                  "type" : "number",
+                  "description" : "크루 ID"
+                },
+                "profileImageUrl" : {
+                  "type" : "string",
+                  "description" : "크루 프로필 이미지"
+                },
+                "status" : {
+                  "type" : "string",
+                  "description" : "크루 모집 상태(모집 중, 모집 마감"
+                },
+                "backgroundImageUrl" : {
+                  "type" : "string",
+                  "description" : "크루 배경 이미지"
+                }
+              }
+            }
+          },
+          "positions" : {
+            "type" : "array",
+            "description" : "주 포지션 목록",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "mannerScore" : {
+            "type" : "number",
+            "description" : "매너 스코어"
+          },
+          "id" : {
+            "type" : "number",
+            "description" : "회원 ID"
+          },
+          "mannerScoreCount" : {
+            "type" : "number",
+            "description" : "매너 스코어 반영 개수"
+          },
+          "profileImageUrl" : {
+            "type" : "string",
+            "description" : "프로필 이미지 경로"
+          },
+          "introduction" : {
+            "type" : "object",
+            "description" : "자기 소개"
+          },
+          "email" : {
+            "type" : "string",
+            "description" : "이메일"
+          }
+        }
+      },
+      "GameResponse" : {
+        "title" : "GameResponse",
+        "type" : "object",
+        "properties" : {
+          "cost" : {
+            "type" : "number",
+            "description" : "비용"
+          },
+          "maxMemberCount" : {
+            "type" : "number",
+            "description" : "인원 제한"
+          },
+          "playEndTime" : {
+            "type" : "string",
+            "description" : "경기 종료 시간"
+          },
+          "memberCount" : {
+            "type" : "number",
+            "description" : "인원 수"
+          },
+          "latitude" : {
+            "type" : "object",
+            "description" : "위도"
+          },
+          "positions" : {
+            "type" : "array",
+            "description" : "포지션 목록",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "mainAddress" : {
+            "type" : "string",
+            "description" : "메인 주소(도/시, 구, 동, 번지)"
+          },
+          "content" : {
+            "type" : "string",
+            "description" : "게스트 모집글 내용"
+          },
+          "playStartTime" : {
+            "type" : "string",
+            "description" : "경기 시작 시간"
+          },
+          "addressDepth2" : {
+            "type" : "string",
+            "description" : "주소2(구)"
+          },
+          "playDate" : {
+            "type" : "string",
+            "description" : "경기 날짜"
+          },
+          "members" : {
+            "type" : "array",
+            "description" : "게스트 모집글에 참여 신청한 사용자 목록",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "addressDepth2" : {
+                  "type" : "string",
+                  "description" : "주소2(구)"
+                },
+                "addressDepth1" : {
+                  "type" : "string",
+                  "description" : "주소1(도,시)"
+                },
+                "nickname" : {
+                  "type" : "string",
+                  "description" : "닉네임"
+                },
+                "positions" : {
+                  "type" : "array",
+                  "description" : "주 포지션 목록",
+                  "items" : {
+                    "oneOf" : [ {
+                      "type" : "object"
+                    }, {
+                      "type" : "boolean"
+                    }, {
+                      "type" : "string"
+                    }, {
+                      "type" : "number"
+                    } ]
+                  }
+                },
+                "mannerScore" : {
+                  "type" : "number",
+                  "description" : "매너 스코어"
+                },
+                "id" : {
+                  "type" : "number",
+                  "description" : "회원 ID"
+                },
+                "mannerScoreCount" : {
+                  "type" : "number",
+                  "description" : "매너 스코어 반영 개수"
+                },
+                "profileImageUrl" : {
+                  "type" : "string",
+                  "description" : "프로필 이미지 경로"
+                },
+                "introduction" : {
+                  "type" : "object",
+                  "description" : "자기 소개"
+                },
+                "email" : {
+                  "type" : "string",
+                  "description" : "이메일"
+                }
+              }
+            }
+          },
+          "addressDepth1" : {
+            "type" : "string",
+            "description" : "주소1(도,시)"
+          },
+          "host" : {
+            "type" : "object",
+            "properties" : {
+              "addressDepth2" : {
+                "type" : "string",
+                "description" : "호스트.주소2(구)"
+              },
+              "addressDepth1" : {
+                "type" : "string",
+                "description" : "호스트.주소1(도,시)"
+              },
+              "nickname" : {
+                "type" : "string",
+                "description" : "호스트.닉네임"
+              },
+              "positions" : {
+                "type" : "array",
+                "description" : "호스트.포지션 목록",
+                "items" : {
+                  "oneOf" : [ {
+                    "type" : "object"
+                  }, {
+                    "type" : "boolean"
+                  }, {
+                    "type" : "string"
+                  }, {
+                    "type" : "number"
+                  } ]
+                }
+              },
+              "mannerScore" : {
+                "type" : "number",
+                "description" : "호스트.매너 스코어"
+              },
+              "id" : {
+                "type" : "number",
+                "description" : "호스트.사용자 ID"
+              },
+              "mannerScoreCount" : {
+                "type" : "number",
+                "description" : "호스트.매너 스코어 반영 횟수"
+              },
+              "profileImageUrl" : {
+                "type" : "string",
+                "description" : "호스트.프로필 이미지 경로"
+              },
+              "introduction" : {
+                "type" : "object",
+                "description" : "호스트.자기소개"
+              },
+              "email" : {
+                "type" : "string",
+                "description" : "호스트.이메일"
+              }
+            },
+            "description" : "호스트 정보"
+          },
+          "detailAddress" : {
+            "type" : "string",
+            "description" : "상세 주소(층, 호수)"
+          },
+          "viewCount" : {
+            "type" : "number",
+            "description" : "조회 수"
+          },
+          "id" : {
+            "type" : "number",
+            "description" : "게스트 모집글 ID"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "게스트 모집 상태"
+          },
+          "longitude" : {
+            "type" : "object",
+            "description" : "경도"
+          },
+          "playTimeMinutes" : {
+            "type" : "number",
+            "description" : "경기 진행 분"
+          }
+        }
+      },
+      "MannerScoreReviewsRequest" : {
+        "title" : "MannerScoreReviewsRequest",
+        "type" : "object",
+        "properties" : {
+          "mannerScoreReviews" : {
+            "type" : "array",
+            "description" : "매너 스코어 리뷰 리스트",
+            "items" : {
+              "type" : "object",
+              "properties" : {
+                "mannerScore" : {
+                  "type" : "number",
+                  "description" : "부여한 매너 스코어 (-1, 0, 1)"
+                },
+                "memberId" : {
+                  "type" : "number",
+                  "description" : "경기에 참여한 사용자 ID"
+                }
+              }
+            }
+          }
+        }
+      },
+      "GameMemberRegistrationStatusUpdateRequest" : {
+        "title" : "GameMemberRegistrationStatusUpdateRequest",
+        "type" : "object",
+        "properties" : {
+          "status" : {
+            "type" : "string",
+            "description" : "확정"
+          }
+        }
+      },
+      "AccessTokenResponse" : {
+        "title" : "AccessTokenResponse",
+        "type" : "object",
+        "properties" : {
+          "accessToken" : {
+            "type" : "string",
+            "description" : "AccessToken"
+          }
+        }
+      }
+    },
+    "securitySchemes" : {
+      "bearerAuthJWT" : {
+        "type" : "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

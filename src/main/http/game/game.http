@@ -1,0 +1,72 @@
+### 게스트 모집하기
+POST http://localhost:8080/games
+Content-Type: application/json
+Authorization:
+
+{
+  "content": "재밌는 농구 경기 해요~! 다 초보입니다",
+  "playDate": "2023-02-01",
+  "playStartTime": "11:30",
+  "playTimeMinutes": 90,
+  "mainAddress": "서울 영등포구 도림동 254",
+  "detailAddress": "영등포 다목적 체육관 2층 201호",
+  "cost": 100,
+  "maxMemberCount": "5",
+  "positions": [
+    "C",
+    "PG"
+  ]
+}
+
+### 게스트 모집 상세 조회
+GET http://localhost:8080/games/1
+
+### 게스트 모집 참여 신청
+POST http://localhost:8080/games/38/members
+Content-Type: application/json
+Authorization:
+
+### 게스트 모집 참여 신청 수락
+PATCH http://localhost:8080/games/38/members/2
+Content-Type: application/json
+Authorization:
+
+{
+  "status": "확정"
+}
+
+### 게스트 모집 참여 신청 거절/취소
+DELETE http://localhost:8080/games/2/members/3
+Authorization:
+
+### 게스트 모집에 참여 신청된 사용자 정보 목록 조회
+GET http://localhost:8080/games/2/members?status=대기
+Authorization:
+
+### 게스트 모집에 확정된 사용자 정보 목록 조회
+GET http://localhost:8080/games/2/members?status=확정
+Authorization:
+
+### 다른 사용자(호스트, 게스트) 매너 스코어 리뷰
+PATCH http://localhost:8080/games/1/members/manner-scores
+Content-Type: application/json
+Authorization:
+
+{
+  "mannerScoreReviews": [
+    {
+      "memberId": 1,
+      "mannerScore": 1
+    },
+    {
+      "memberId": 2,
+      "mannerScore": -1
+    }
+  ]
+}
+
+### 조건별 게스트 모집글 조회(장소)
+GET http://localhost:8080/games?category=location&value=서울시+영등포구&page=0&size=3
+
+### 위도, 경도, 거리를 통해 해당하는 게스트 모집글 조회
+GET http://localhost:8080/games/by-location?latitude=37.5066680941127&longitude=126.897412723839&distance=1000

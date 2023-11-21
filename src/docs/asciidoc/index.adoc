@@ -1,0 +1,23 @@
+= Pickple REST API Document
+:doctype: book
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 2
+:sectlinks:
+
+|===
+|환경|url
+
+|로컬(Local)
+|`http://localhost:8080`
+
+|개발(Dev)
+|`https://dev.pickple.kr`
+|===
+
+include::auth.adoc[]
+include::member.adoc[]
+include::crew.adoc[]
+include::game.adoc[]
+include::address.adoc[]
+include::position.adoc[]

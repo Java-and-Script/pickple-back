@@ -1,8 +1,9 @@
 ### Custom ###
 .idea
+deploy
 .env
-src/main/resources/application-dev.yml
-src/main/resources/application-local.yml
+src/main/resources/application*.yml
+src/test/resources/application.yml
 
 ### Intellij ###
 # User-specific stuff
@@ -218,3 +219,6 @@ gradle-app.setting
 ### Gradle Patch ###
 # Java heap dump
 *.hprof
+
+### Http ###
+src/main/http/crew/http-client.env.json
