@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 public enum RoomType {
+
     PERSONAL("개인"),
     GAME("게스트"),
     CREW("크루"),

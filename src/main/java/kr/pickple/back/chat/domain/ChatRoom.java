@@ -104,9 +104,9 @@ public class ChatRoom extends BaseEntity {
         chatMessages.addChatMessage(chatMessage);
     }
 
-    public void enterNewMember(final ChatMessage chatMessage) {
+    public void enterRoom(final ChatMessage chatMessage) {
         final Member newMember = chatMessage.getSender();
-        chatRoomMembers.addChatRoomMember(this, newMember);
+        chatRoomMembers.activateChatRoomMember(this, newMember);
 
         sendMessage(chatMessage);
         increaseMemberCount();
@@ -114,7 +114,7 @@ public class ChatRoom extends BaseEntity {
 
     public void leaveRoom(final ChatMessage chatMessage) {
         final Member member = chatMessage.getSender();
-        chatRoomMembers.removeChatRoomMember(this, member);
+        chatRoomMembers.deactivateChatRoomMember(this, member);
 
         sendMessage(chatMessage);
         decreaseMemberCount();
