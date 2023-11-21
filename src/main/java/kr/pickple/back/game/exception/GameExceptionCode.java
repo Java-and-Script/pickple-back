@@ -1,10 +1,9 @@
 package kr.pickple.back.game.exception;
 
-import org.springframework.http.HttpStatus;
-
 import kr.pickple.back.common.exception.ExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,6 +23,7 @@ public enum GameExceptionCode implements ExceptionCode {
     GAME_MEMBER_CANNOT_REVIEW_SELF(HttpStatus.BAD_REQUEST, "GAM-012", "자기 자신에게 리뷰를 남길 수 없음"),
     GAME_CAPACITY_LIMIT_REACHED(HttpStatus.BAD_REQUEST, "GAM-013", "해당 게스트 모집글의 정원을 초과할 수 없음"),
     GAME_STATUS_IS_CLOSED(HttpStatus.BAD_REQUEST, "GAM-014", "해당 게스트 모집글은 모집중이 아님"),
+    GAME_IS_NOT_HOST(HttpStatus.BAD_REQUEST, "GAM-013", "해당 게임의 호스트가 아님"),
     ;
 
     private final HttpStatus status;
