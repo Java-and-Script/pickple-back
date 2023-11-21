@@ -3,6 +3,9 @@ name: cd-prod
 on:
   push:
     branches: [ "main" ]
+  pull_request:
+    branches: [ "dev" ]
+
 
 jobs:
   docker-build-push:
