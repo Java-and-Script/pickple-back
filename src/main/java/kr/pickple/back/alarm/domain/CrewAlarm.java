@@ -11,9 +11,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 
@@ -36,10 +33,6 @@ public class CrewAlarm extends BaseEntity {
     @Convert(converter = AlarmTypeConverter.class)
     private AlarmType alarmType;
 
-    @CreatedDate
-    @Column(updatable = false)
-    private LocalDateTime createdAt;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crew_id")
     private Crew crew;
@@ -55,7 +48,6 @@ public class CrewAlarm extends BaseEntity {
             final Member member
     ) {
         this.alarmType = alarmType;
-        this.createdAt = super.getCreatedAt();
         this.crew = crew;
         this.member = member;
     }
