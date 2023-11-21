@@ -10,7 +10,7 @@ import kr.pickple.back.member.domain.Member;
 
 public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, Long> {
 
-    Boolean existsByChatRoomAndMember(final ChatRoom chatRoom, final Member member);
+    Boolean existsByActiveTrueAndChatRoomAndMember(final ChatRoom chatRoom, final Member member);
 
     List<ChatRoomMember> findAllByMember(final Member member);
 }

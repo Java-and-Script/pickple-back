@@ -74,21 +74,21 @@ public class ChatRoomFindService {
                     .stream()
                     .filter(roomMember -> !roomMember.equals(sender))
                     .findFirst()
-                    .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
+                    .orElseThrow(() -> new ChatException(CHAT_RECEIVER_NOT_FOUND));
 
             return ChatRoomDetailResponse.of(chatRoom, receiver);
         }
 
         if (chatRoom.isMatchedRoomType(CREW)) {
             final Crew crew = crewRepository.findByChatRoom(chatRoom)
-                    .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
+                    .orElseThrow(() -> new ChatException(CHAT_CREW_NOT_FOUND, chatRoom.getId()));
 
             return ChatRoomDetailResponse.of(chatRoom, crew);
         }
 
         if (chatRoom.isMatchedRoomType(GAME)) {
             final Game game = gameRepository.findByChatRoom(chatRoom)
-                    .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
+                    .orElseThrow(() -> new ChatException(CHAT_GAME_NOT_FOUND, chatRoom.getId()));
 
             return ChatRoomDetailResponse.of(chatRoom, game);
         }

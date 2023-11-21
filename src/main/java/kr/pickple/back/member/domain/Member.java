@@ -37,7 +37,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 public class Member extends BaseEntity {
 
     public static final List<Integer> MANNER_SCORE_POINT_RANGE = List.of(-1, 0, 1);

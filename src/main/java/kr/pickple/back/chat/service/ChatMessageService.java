@@ -34,28 +34,32 @@ public class ChatMessageService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public ChatMessageResponse enterNewMember(
+    public ChatMessageResponse enterChatRoom(
             final Long roomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member newMember = findMemberById(chatMessageCreateRequest.getSenderId());
+        final Member member = findMemberById(chatMessageCreateRequest.getSenderId());
         final ChatRoom chatRoom = findRoomById(roomId);
-        final ChatMessage enteringMessage = enterRoomAndSaveEnteringMessages(chatRoom, newMember);
+        final ChatMessage enteringMessage = enterRoomAndSaveEnteringMessages(chatRoom, member);
 
         return ChatMessageResponse.from(enteringMessage);
     }
 
     @Transactional
     public ChatMessage enterRoomAndSaveEnteringMessages(final ChatRoom chatRoom, final Member member) {
-        if (isExistedRoomMember(chatRoom, member)) {
-            throw new ChatException(CHAT_MEMBER_IS_ALREADY_IN_ROOM, chatRoom.getId(), member.getId());
-        }
+        validateIsNotExistedRoomMember(chatRoom, member);
 
         final String content = MessageType.makeEnterMessage(member.getNickname());
         final ChatMessage chatMessage = buildChatMessage(ENTER, content, chatRoom, member);
-        chatRoom.enterNewMember(chatMessage);
+        chatRoom.enterRoom(chatMessage);
 
         return chatMessageRepository.save(chatMessage);
+    }
+
+    private void validateIsNotExistedRoomMember(final ChatRoom chatRoom, final Member member) {
+        if (isExistedRoomMember(chatRoom, member)) {
+            throw new ChatException(CHAT_MEMBER_IS_ALREADY_IN_ROOM, chatRoom.getId(), member.getId());
+        }
     }
 
     @Transactional
@@ -98,12 +102,6 @@ public class ChatMessageService {
         return ChatMessageResponse.from(leavingMessage);
     }
 
-    private void validateIsExistedRoomMember(final Member member, final ChatRoom chatRoom) {
-        if (!isExistedRoomMember(chatRoom, member)) {
-            throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, member.getId(), chatRoom.getId());
-        }
-    }
-
     private ChatMessage buildChatMessage(
             final MessageType type,
             final String content,
@@ -118,11 +116,11 @@ public class ChatMessageService {
                 .build();
     }
 
-    public List<ChatMessageResponse> findAllMessagesInRoom(final Long memberId, final Long roomId) {
+    public List<ChatMessageResponse> findAllMessagesInRoom(final Long loggedInMemberId, final Long roomId) {
         final ChatRoom chatRoom = findRoomById(roomId);
-        final Member member = findMemberById(memberId);
+        final Member loggedInMember = findMemberById(loggedInMemberId);
 
-        validateIsExistedRoomMember(member, chatRoom);
+        validateIsExistedRoomMember(loggedInMember, chatRoom);
 
         return chatRoom.getChatMessages()
                 .stream()
@@ -140,7 +138,13 @@ public class ChatMessageService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
+    private void validateIsExistedRoomMember(final Member member, final ChatRoom chatRoom) {
+        if (!isExistedRoomMember(chatRoom, member)) {
+            throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, member.getId(), chatRoom.getId());
+        }
+    }
+
     private Boolean isExistedRoomMember(final ChatRoom chatRoom, final Member member) {
-        return chatRoomMemberRepository.existsByChatRoomAndMember(chatRoom, member);
+        return chatRoomMemberRepository.existsByActiveTrueAndChatRoomAndMember(chatRoom, member);
     }
 }

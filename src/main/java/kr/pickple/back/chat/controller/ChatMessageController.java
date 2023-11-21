@@ -27,11 +27,11 @@ public class ChatMessageController {
 
     @MessageMapping("/messages/enter/{roomId}")
     @SendTo("/receive/rooms/{roomId}")
-    public ChatMessageResponse enterNewMember(
+    public ChatMessageResponse enterChatRoom(
             @DestinationVariable final Long roomId,
             @Payload final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        return chatMessageService.enterNewMember(roomId, chatMessageCreateRequest);
+        return chatMessageService.enterChatRoom(roomId, chatMessageCreateRequest);
     }
 
     @MessageMapping("/messages/talk/{roomId}")
@@ -54,10 +54,10 @@ public class ChatMessageController {
 
     @GetMapping("/messages/rooms/{roomId}")
     public ResponseEntity<List<ChatMessageResponse>> findAllMessagesInRoom(
-            @Login final Long memberId,
+            @Login final Long loggedInMemberId,
             @PathVariable final Long roomId
     ) {
         return ResponseEntity.status(OK)
-                .body(chatMessageService.findAllMessagesInRoom(memberId, roomId));
+                .body(chatMessageService.findAllMessagesInRoom(loggedInMemberId, roomId));
     }
 }
