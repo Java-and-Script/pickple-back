@@ -16,4 +16,8 @@ public final class DateTimeUtil {
 
         return datetime.isAfter(now);
     }
+
+    public static boolean isEqualOrAfter(final LocalDateTime baseDateTime, final LocalDateTime targetDateTime) {
+        return targetDateTime.isEqual(baseDateTime) || targetDateTime.isAfter(baseDateTime);
+    }
 }

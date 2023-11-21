@@ -59,4 +59,8 @@ public class ChatMessage extends BaseEntity {
     public void updateContent(final String content) {
         this.content = content;
     }
+
+    public Boolean isMatchedMessageType(final MessageType type) {
+        return this.type == type;
+    }
 }
