@@ -67,12 +67,6 @@ jobs:
     environment: prod
     runs-on: ubuntu-latest
     steps:
-      - name: Docker Hub Login
-        uses: docker/login-action@v2
-        with:
-          username: ${{ secrets.PROD_DOCKER_HUB_USERNAME }}
-          password: ${{ secrets.PROD_DOCKER_HUB_PASSWORD }}
-          
       - name: Docker Container Run
         uses: appleboy/ssh-action@master
         with:
