@@ -1,18 +1,22 @@
 package kr.pickple.back.chat.service;
 
+import static java.lang.Boolean.*;
 import static java.text.MessageFormat.*;
 import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.domain.ChatRoomMember;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
-import kr.pickple.back.chat.dto.response.ChatRoomExistedResponse;
+import kr.pickple.back.chat.dto.response.PersonalChatRoomExistedResponse;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
@@ -62,17 +66,29 @@ public class ChatRoomService {
         return savedChatRoom;
     }
 
-    public ChatRoomExistedResponse existsChatRoomWithReceiver(final Long senderId, final Long receiverId) {
+    public PersonalChatRoomExistedResponse getActivePersonalChatRoomWithReceiver(
+            final Long senderId,
+            final Long receiverId
+    ) {
         final Member sender = findMemberById(senderId);
         final Member receiver = findMemberById(receiverId);
 
         validateIsSelfChat(receiver, sender);
 
-        final Boolean isExisted = chatRoomMemberRepository.findAllByMember(sender)
+        final Optional<ChatRoomMember> optionalChatRoomMember = chatRoomMemberRepository.findAllByMember(sender)
                 .stream()
-                .anyMatch(chatRoomMember -> isPersonalChatRoomWithReceiver(receiver, chatRoomMember.getChatRoom()));
+                .filter(chatRoomMember -> isPersonalChatRoomWithReceiver(chatRoomMember, receiver))
+                .findFirst();
 
-        return ChatRoomExistedResponse.from(isExisted);
+        final Boolean isChatRoomExisted = optionalChatRoomMember.isPresent();
+        Boolean isSenderActive = FALSE;
+
+        if (isChatRoomExisted) {
+            final ChatRoomMember chatRoomMember = optionalChatRoomMember.get();
+            isSenderActive = chatRoomMember.isActive();
+        }
+
+        return PersonalChatRoomExistedResponse.of(isChatRoomExisted, isSenderActive);
     }
 
     private void validateIsSelfChat(Member receiver, Member sender) {
@@ -81,12 +97,14 @@ public class ChatRoomService {
         }
     }
 
-    private boolean isPersonalChatRoomWithReceiver(final Member receiver, final ChatRoom chatRoom) {
-        return chatRoom.isMatchedRoomType(PERSONAL) && chatRoom.isEntered(receiver);
-    }
-
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    private Boolean isPersonalChatRoomWithReceiver(final ChatRoomMember chatRoomMember, final Member receiver) {
+        final ChatRoom chatRoom = chatRoomMember.getChatRoom();
+
+        return chatRoom.isMatchedRoomType(PERSONAL) && chatRoom.isEntered(receiver);
     }
 }
