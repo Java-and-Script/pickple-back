@@ -14,8 +14,6 @@ import java.util.concurrent.ConcurrentMap;
 @RequiredArgsConstructor
 public class SseEmitters {
 
-    //private final SseEmitters sseEmitters;
-
     private final ConcurrentMap<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     public SseEmitter add(final Long id, final SseEmitter emitter) {
