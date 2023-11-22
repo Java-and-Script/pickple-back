@@ -23,20 +23,20 @@ public enum GameAlarmType {
     ;
 
     private static final Map<String, GameAlarmType> gameAlarmTypeMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(GameAlarmType::name, Function.identity())));
+            .collect(Collectors.toMap(GameAlarmType::getDescription, Function.identity())));
 
     private final String description;
 
     @JsonCreator
-    public static GameAlarmType from(final String name) {
-        if (gameAlarmTypeMap.containsKey(name)) {
-            return gameAlarmTypeMap.get(name);
+    public static GameAlarmType from(final String description) {
+        if (gameAlarmTypeMap.containsKey(description)) {
+            return gameAlarmTypeMap.get(description);
         }
-        throw new AlarmException(ALARM_TYPE_NOT_FOUND, name);
+        throw new AlarmException(ALARM_TYPE_NOT_FOUND, description);
     }
 
     @JsonValue
-    public String getName() {
-        return name();
+    public String getDescription() {
+        return description;
     }
 }
