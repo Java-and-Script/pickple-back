@@ -1,5 +1,13 @@
 package kr.pickple.back.address.service;
 
+import static kr.pickple.back.address.exception.AddressExceptionCode.*;
+
+import java.util.List;
+
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.address.dto.response.AllAddressResponse;
@@ -9,13 +17,6 @@ import kr.pickple.back.address.repository.AddressDepth1Repository;
 import kr.pickple.back.address.repository.AddressDepth2Repository;
 import kr.pickple.back.address.util.AddressParser;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static kr.pickple.back.address.exception.AddressExceptionCode.ADDRESS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class AddressService {
     private final AddressDepth1Repository addressDepth1Repository;
     private final AddressDepth2Repository addressDepth2Repository;
 
-    @Cacheable(cacheNames = "address", key = "'all'")
+    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "address", key = "'all'")
     public AllAddressResponse findAllAddress() {
         final AddressDepth1 addressDepth1 = addressDepth1Repository.findAll()
                 .get(0);
