@@ -27,6 +27,7 @@ import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.dto.response.GamesAndLocationResponse;
+import kr.pickple.back.game.service.GameFacadeService;
 import kr.pickple.back.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,7 @@ import lombok.RequiredArgsConstructor;
 public class GameController {
 
     private final GameService gameService;
+    private final GameFacadeService gameFacadeService;
 
     @PostMapping
     public ResponseEntity<GameIdResponse> createGame(
@@ -144,6 +146,6 @@ public class GameController {
             @RequestParam final String addressDepth2
     ) {
         return ResponseEntity.status(OK)
-                .body(gameService.findGamesWithInAddress(addressDepth1, addressDepth2));
+                .body(gameFacadeService.findGamesWithInAddress(addressDepth1, addressDepth2));
     }
 }
