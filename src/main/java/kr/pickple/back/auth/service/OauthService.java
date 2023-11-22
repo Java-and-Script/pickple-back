@@ -2,11 +2,13 @@ package kr.pickple.back.auth.service;
 
 import static kr.pickple.back.auth.exception.AuthExceptionCode.*;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.TokenExtractor;
 import kr.pickple.back.auth.domain.oauth.OauthMember;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
@@ -15,7 +17,7 @@ import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.domain.token.RefreshToken;
 import kr.pickple.back.auth.dto.response.AccessTokenResponse;
 import kr.pickple.back.auth.exception.AuthException;
-import kr.pickple.back.auth.repository.RefreshTokenRepository;
+import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.auth.service.authcode.AuthCodeRequestUrlProviderComposite;
 import kr.pickple.back.auth.service.memberclient.OauthMemberClientComposite;
 import kr.pickple.back.member.domain.Member;
@@ -28,12 +30,15 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class OauthService {
 
+    private static final String REFRESH_TOKEN_KEY = "refresh_token";
+
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthCodeRequestUrlProviderComposite authCodeRequestUrlProviderComposite;
     private final OauthMemberClientComposite oauthMemberClientComposite;
     private final TokenExtractor tokenExtractor;
     private final JwtProvider jwtProvider;
+    private final JwtProperties jwtProperties;
+    private final RedisRepository redisRepository;
 
     public String getAuthCodeRequestUrl(final OauthProvider oauthProvider) {
         return authCodeRequestUrlProviderComposite.provide(oauthProvider);
@@ -55,9 +60,15 @@ public class OauthService {
             final RefreshToken refreshToken = RefreshToken.builder()
                     .token(loginTokens.getRefreshToken())
                     .memberId(loginMember.getId())
+                    .createdAt(LocalDateTime.now())
                     .build();
 
-            refreshTokenRepository.save(refreshToken);
+            redisRepository.saveHash(
+                    REFRESH_TOKEN_KEY,
+                    refreshToken.getToken(),
+                    refreshToken,
+                    jwtProperties.getRefreshTokenExpirationTime()
+            );
 
             return AuthenticatedMemberResponse.of(loginMember, loginTokens);
         }
@@ -73,8 +84,12 @@ public class OauthService {
         final String accessToken = tokenExtractor.extractAccessToken(authorizationHeader);
 
         if (jwtProvider.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
-            final RefreshToken validRefreshToken = refreshTokenRepository.findById(refreshToken)
-                    .orElseThrow(() -> new AuthException(AUTH_INVALID_REFRESH_TOKEN));
+            final RefreshToken validRefreshToken = redisRepository.findHash(REFRESH_TOKEN_KEY,
+                    refreshToken);
+
+            if (validRefreshToken == null) {
+                throw new AuthException(AUTH_INVALID_REFRESH_TOKEN);
+            }
 
             final String regeneratedAccessToken = jwtProvider.regenerateAccessToken(
                     validRefreshToken.getMemberId().toString());
@@ -90,6 +105,6 @@ public class OauthService {
     }
 
     public void deleteRefreshToken(final String refreshToken) {
-        refreshTokenRepository.deleteById(refreshToken);
+        redisRepository.deleteHash(REFRESH_TOKEN_KEY, refreshToken);
     }
 }

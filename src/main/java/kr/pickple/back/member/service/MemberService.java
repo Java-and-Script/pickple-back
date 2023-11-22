@@ -3,6 +3,7 @@ package kr.pickple.back.member.service;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -10,10 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.domain.token.RefreshToken;
-import kr.pickple.back.auth.repository.RefreshTokenRepository;
+import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
@@ -34,10 +36,13 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberService {
 
+    private static final String REFRESH_TOKEN_KEY = "refresh_token";
+
     private final AddressService addressService;
     private final MemberRepository memberRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
+    private final RedisRepository redisRepository;
     private final JwtProvider jwtProvider;
+    private final JwtProperties jwtProperties;
 
     @Transactional
     public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
@@ -56,9 +61,15 @@ public class MemberService {
         final RefreshToken refreshToken = RefreshToken.builder()
                 .token(loginTokens.getRefreshToken())
                 .memberId(savedMember.getId())
+                .createdAt(LocalDateTime.now())
                 .build();
 
-        refreshTokenRepository.save(refreshToken);
+        redisRepository.saveHash(
+                REFRESH_TOKEN_KEY,
+                refreshToken.getToken(),
+                refreshToken,
+                jwtProperties.getRefreshTokenExpirationTime()
+        );
 
         return AuthenticatedMemberResponse.of(savedMember, loginTokens);
     }
