@@ -45,8 +45,7 @@ public class CrewMemberService {
         final Member member = findMemberById(loggedInMemberId);
 
         crew.addCrewMember(member);
-        //TODO:크루 알람 - 크루장에게 가입 신청이 왔어요! (크루장에게 전송)
-        eventPublisher.publishEvent(new CrewJoinRequestNotificationEvent(crewId));
+        eventPublisher.publishEvent(new CrewJoinRequestNotificationEvent(crewId, crew.getLeader()));
     }
 
     public CrewProfileResponse findAllCrewMembers(
@@ -93,7 +92,6 @@ public class CrewMemberService {
 
         crewMember.updateStatus(updateStatus);
         crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
-        //TODO:크루 알람 - 크루원(대기)상태이자 해당 크루 지원 멤버에게 전송 - 가입 신청이 허락되었어요!
         eventPublisher.publishEvent(new CrewMemberJoinedEvent(crewId, memberId));
     }
 
@@ -120,7 +118,6 @@ public class CrewMemberService {
             validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
 
             deleteCrewMember(crewMember);
-            //TODO:크루 알람 - 크루장이 크루원(대기)상태에서 해당 크루원을 삭제 함(해당 크루 지원 회원에게 전송) - 가입 신청이 거절되었어요!
             eventPublisher.publishEvent(new CrewMemberRejectedEvent(crewId, memberId));
             return;
         }

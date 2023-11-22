@@ -105,8 +105,7 @@ public class GameService {
         final Member member = findMemberById(loggedInMemberId);
 
         game.addGameMember(member);
-        //TODO:게임 알람 - 호스트에게 가입 신청이 왔어요!(호스트에게 전송)
-        eventPublisher.publishEvent(new GameJoinRequestNotificationEvent(gameId));
+        eventPublisher.publishEvent(new GameJoinRequestNotificationEvent(gameId, game.getHost()));
     }
 
     private Game findGameById(final Long gameId) {
@@ -179,7 +178,6 @@ public class GameService {
         enterGameChatRoom(updateStatus, gameMember);
 
         gameMember.updateStatus(updateStatus);
-        //TODO:게임 알람 - 게스트(대기)상태이자, 해당 게임 지원 멤버에게 전송 - 승락이 되었어요!
         eventPublisher.publishEvent(new GameMemberJoinedEvent(gameId, memberId));
     }
 
@@ -208,9 +206,8 @@ public class GameService {
 
         if (game.isHost(loggedInMember)) {
             validateIsHostSelfDeleted(loggedInMember, member);
-            deleteGameMember(gameMember);
 
-            //TODO:게임 알람 - 게스트(대기)상태에서, 해당 지원 게임 멤버를 삭제함(해당 게임 지원 회원)에게 전송 - 거절 되었어요!
+            deleteGameMember(gameMember);
             eventPublisher.publishEvent(new GameMemberRejectedEvent(gameId, memberId));
             return;
         }
