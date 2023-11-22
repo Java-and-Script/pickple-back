@@ -38,10 +38,10 @@ public class ChatRoomFindService {
     private final CrewRepository crewRepository;
     private final GameRepository gameRepository;
 
-    public List<ChatRoomResponse> findAllChatRoomsByType(final Long loggedInMemberId, final RoomType type) {
+    public List<ChatRoomResponse> findAllActiveChatRoomsByType(final Long loggedInMemberId, final RoomType type) {
         final Member loggedInMember = findMemberById(loggedInMemberId);
 
-        return chatRoomMemberRepository.findAllByMember(loggedInMember)
+        return chatRoomMemberRepository.findAllByActiveTrueAndMember(loggedInMember)
                 .stream()
                 .map(ChatRoomMember::getChatRoom)
                 .filter(chatRoom -> chatRoom.isMatchedRoomType(type))
