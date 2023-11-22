@@ -2,8 +2,8 @@ package kr.pickple.back.alarm.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import kr.pickple.back.alarm.domain.AlarmStatus;
-import kr.pickple.back.alarm.domain.AlarmType;
 import kr.pickple.back.alarm.domain.CrewAlarm;
+import kr.pickple.back.alarm.domain.CrewAlarmType;
 import kr.pickple.back.crew.domain.Crew;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class CrewAlarmResponse implements AlarmResponse {
     private final String crewName;
     private final LocalDateTime createdAt;
     private final AlarmStatus isRead;
-    private final AlarmType alarmType;
+    private final CrewAlarmType crewAlarmType;
 
     public static CrewAlarmResponse of(final CrewAlarm crewAlarm) {
         final Crew crew = crewAlarm.getCrew();
@@ -33,7 +33,7 @@ public class CrewAlarmResponse implements AlarmResponse {
                 .crewName(crewAlarm.getCrew().getName())
                 .createdAt(crewAlarm.getCreatedAt())
                 .isRead(crewAlarm.getIsRead())
-                .alarmType(crewAlarm.getAlarmType())
+                .crewAlarmType(crewAlarm.getCrewAlarmType())
                 .build();
     }
 
