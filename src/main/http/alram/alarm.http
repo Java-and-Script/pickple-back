@@ -1,17 +1,14 @@
-### 사용자 알람 sse 연결
+### 해당 사용자 알람 sse 연결
 GET http://localhost:8080/alarms/subscribe
 Content-Type: text/event-stream
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzAwNTU2NDYxLCJleHAiOjE3MDA1NzgwNjF9.ci0mYcVzCTmfwdduNH3HE6KmO-7SX5IqZi4TSuupsAtFc4TIPZeai6_Ock8IVJWnw6VzRziu5Tn2QDkaJbxoYQ
+Authorization:
 
-
-### 사용자 읽지 않은 알림 확인
+### 해당 사용자 읽지 않은 알림 확인
 GET http://localhost:8080/alarms/unread
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzAwNTU3ODQ0LCJleHAiOjE3MDA1Nzk0NDR9.c-5-IbDQLouwzW44jMJzREVl84REZ8_BDN-znqfNxLUfC2xaCpJRQ0VOw5N1p7nyRcXtNswBZ-ZSLVRWevRO0g
+Authorization:
+Content-Type: application/json
 
-### 사용자 알림 수정
-PATCH http://localhost:8080/alarms/
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzAwNTU2NDYxLCJleHAiOjE3MDA1NzgwNjF9.ci0mYcVzCTmfwdduNH3HE6KmO-7SX5IqZi4TSuupsAtFc4TIPZeai6_Ock8IVJWnw6VzRziu5Tn2QDkaJbxoYQ
-
-### 사용자 모든 알람 삭제
+### 해당 사용자의 모든 알람 삭제
 DELETE http://localhost:8080/alarms
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI0IiwiaWF0IjoxNzAwNTU2NDYxLCJleHAiOjE3MDA1NzgwNjF9.ci0mYcVzCTmfwdduNH3HE6KmO-7SX5IqZi4TSuupsAtFc4TIPZeai6_Ock8IVJWnw6VzRziu5Tn2QDkaJbxoYQ
+Authorization:
+Content-Type: application/json

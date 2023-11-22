@@ -27,7 +27,7 @@ Content-Type: application/json
 Authorization:
 
 ### 게스트 모집 참여 신청 수락
-PATCH http://localhost:8080/games/38/members/2
+PATCH http://localhost:8080/games/2/members/3
 Content-Type: application/json
 Authorization:
 

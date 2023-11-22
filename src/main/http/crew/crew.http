@@ -1,11 +1,11 @@
 ### 크루 생성
 POST http://localhost:8080/crews
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIyIiwiaWF0IjoxNzAwNTU5NTA3LCJleHAiOjE3MDA1ODExMDd9.ZqRftJH3Nqh4QR8ppoqaYkJscBm1FEcyvJOcBkOXAUgs1SOW_13XKNJ11fFJGOQUUAlAtnbFWib2BCXVv2eEfA
+Authorization:
 Content-Type: application/json
 
 {
-  "name": "쿠쿠 크루",
-  "content": "안녕하세요, 쿠쿠 크루입니다. 백둥체육관 201호에서 진행합니다.",
+  "name": "밥솥 크루",
+  "content": "안녕하세요, 밭솥 크루입니다. 백둥체육관 201호에서 진행합니다.",
   "maxMemberCount": 15,
   "addressDepth1": "서울시",
   "addressDepth2": "강남구"
@@ -15,8 +15,8 @@ Content-Type: application/json
 GET http://localhost:8080/crews/15
 
 ### 크루가입 신청
-POST http://localhost:8080/crews/3/members
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiI2IiwiaWF0IjoxNzAwNTU4NTQyLCJleHAiOjE3MDA1ODAxNDJ9.fOR4siFedVYqaa5JHA0tIxVS22G0ppAlD8lKMDqpBaQgdCK7iUtPd7zzDg-XgXFOWWl_YcWUZSo9kvtqPOAFLA
+POST http://localhost:8080/crews/11/members
+Authorization:
 Content-Type: application/json
 
 
