@@ -3,7 +3,7 @@ package kr.pickple.back.alarm.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.alarm.util.AlarmStatusConverter;
-import kr.pickple.back.alarm.util.AlarmTypeConverter;
+import kr.pickple.back.alarm.util.CrewAlarmTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.domain.Member;
@@ -29,9 +29,9 @@ public class CrewAlarm extends BaseEntity {
     private AlarmStatus isRead = FALSE;
 
     @NotNull
-    @Column(length = 20)
-    @Convert(converter = AlarmTypeConverter.class)
-    private AlarmType alarmType;
+    @Column(length = 30)
+    @Convert(converter = CrewAlarmTypeConverter.class)
+    private CrewAlarmType crewAlarmType;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crew_id")
@@ -43,16 +43,16 @@ public class CrewAlarm extends BaseEntity {
 
     @Builder
     private CrewAlarm(
-            final AlarmType alarmType,
+            final CrewAlarmType crewAlarmType,
             final Crew crew,
             final Member member
     ) {
-        this.alarmType = alarmType;
+        this.crewAlarmType = crewAlarmType;
         this.crew = crew;
         this.member = member;
     }
 
-    public void updateStatus(AlarmStatus status) {
+    public void updateStatus(final AlarmStatus status) {
         this.isRead = status;
     }
 }
