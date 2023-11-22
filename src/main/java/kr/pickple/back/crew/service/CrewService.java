@@ -1,17 +1,5 @@
 package kr.pickple.back.crew.service;
 
-import static kr.pickple.back.chat.domain.RoomType.*;
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
-import java.util.List;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.chat.domain.ChatRoom;
@@ -29,6 +17,17 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static kr.pickple.back.chat.domain.RoomType.CREW;
+import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
+import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
