@@ -8,6 +8,7 @@ import java.io.IOException;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import jakarta.servlet.http.HttpServletResponse;
 import kr.pickple.back.auth.config.property.JwtProperties;
+import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.dto.response.AccessTokenResponse;
 import kr.pickple.back.auth.service.OauthService;
@@ -78,5 +80,16 @@ public class OauthController {
 
         return ResponseEntity.status(CREATED)
                 .body(regeneratedAccessToken);
+    }
+
+    @DeleteMapping("/logout")
+    public ResponseEntity<Void> logout(
+            @Login final Long loggedInMemberId,
+            @CookieValue("refresh-token") final String refreshToken
+    ) {
+        oauthService.deleteRefreshToken(refreshToken);
+
+        return ResponseEntity.status(NO_CONTENT)
+                .build();
     }
 }

@@ -88,4 +88,8 @@ public class OauthService {
 
         throw new AuthException(AUTH_FAIL_TO_VALIDATE_TOKEN);
     }
+
+    public void deleteRefreshToken(final String refreshToken) {
+        refreshTokenRepository.deleteById(refreshToken);
+    }
 }

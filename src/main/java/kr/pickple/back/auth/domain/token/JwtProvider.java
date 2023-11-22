@@ -76,11 +76,6 @@ public class JwtProvider {
                 .parseSignedClaims(token);
     }
 
-    public void validateTokens(final AuthTokens authTokens) {
-        validateAccessToken(authTokens.getAccessToken());
-        validateRefreshToken(authTokens.getRefreshToken());
-    }
-
     public void validateAccessToken(final String accessToken) {
         try {
             parseToken(accessToken);
