@@ -2,8 +2,8 @@ package kr.pickple.back.alarm.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import kr.pickple.back.alarm.domain.AlarmStatus;
-import kr.pickple.back.alarm.domain.AlarmType;
 import kr.pickple.back.alarm.domain.GameAlarm;
+import kr.pickple.back.alarm.domain.GameAlarmType;
 import kr.pickple.back.game.domain.Game;
 import lombok.Builder;
 import lombok.Getter;
@@ -15,7 +15,7 @@ import java.time.LocalTime;
 
 @Getter
 @Builder
-@JsonSerialize //text/event-stream'의 MIME 타입이기 때문에 JsonSerialize로 Json형식으로 직렬화해야 함
+@JsonSerialize
 @RequiredArgsConstructor
 public class GameAlarmResponse implements AlarmResponse {
 
@@ -27,7 +27,7 @@ public class GameAlarmResponse implements AlarmResponse {
     private final LocalTime playStartTime;
     private final Integer playTimeMinutes;
     private final AlarmStatus isRead;
-    private final AlarmType alarmType;
+    private final GameAlarmType gameAlarmType;
 
     public static GameAlarmResponse of(final GameAlarm gameAlarm) {
         final Game game = gameAlarm.getGame();
@@ -41,7 +41,7 @@ public class GameAlarmResponse implements AlarmResponse {
                 .playStartTime(gameAlarm.getGame().getPlayStartTime())
                 .playTimeMinutes(gameAlarm.getGame().getPlayTimeMinutes())
                 .isRead(gameAlarm.getIsRead())
-                .alarmType(gameAlarm.getAlarmType())
+                .gameAlarmType(gameAlarm.getGameAlarmType())
                 .build();
     }
 
