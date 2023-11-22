@@ -50,12 +50,12 @@ public class ChatRoomController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ChatRoomResponse>> findAllChatRoomsByType(
+    public ResponseEntity<List<ChatRoomResponse>> findAllActiveChatRoomsByType(
             @Login final Long loggedInMemberId,
             @RequestParam final RoomType type
     ) {
         return ResponseEntity.status(OK)
-                .body(chatRoomFindService.findAllChatRoomsByType(loggedInMemberId, type));
+                .body(chatRoomFindService.findAllActiveChatRoomsByType(loggedInMemberId, type));
     }
 
     @GetMapping("/{roomId}")
