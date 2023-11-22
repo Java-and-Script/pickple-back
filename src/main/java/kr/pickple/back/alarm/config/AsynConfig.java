@@ -20,7 +20,7 @@ public class AsynConfig {
     }
 
     static class CustomThreadPoolTaskExecutor extends ThreadPoolTaskExecutor {
-        private CustomThreadPoolTaskExecutor(int corePoolSize, int maxPoolSize, int queueCapacity) {
+        private CustomThreadPoolTaskExecutor(final int corePoolSize, final int maxPoolSize, final int queueCapacity) {
             super();
             this.setCorePoolSize(corePoolSize);
             this.setMaxPoolSize(maxPoolSize);
@@ -37,17 +37,17 @@ public class AsynConfig {
             private int maxPoolSize;
             private int queueCapacity;
 
-            public Builder corePoolSize(int corePoolSize) {
+            public Builder corePoolSize(final int corePoolSize) {
                 this.corePoolSize = corePoolSize;
                 return this;
             }
 
-            public Builder maxPoolSize(int maxPoolSize) {
+            public Builder maxPoolSize(final int maxPoolSize) {
                 this.maxPoolSize = maxPoolSize;
                 return this;
             }
 
-            public Builder queueCapacity(int queueCapacity) {
+            public Builder queueCapacity(final int queueCapacity) {
                 this.queueCapacity = queueCapacity;
                 return this;
             }
