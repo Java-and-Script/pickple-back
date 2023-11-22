@@ -21,18 +21,18 @@ public enum AlarmStatus {
     TRUE("읽음", true),
     FALSE("읽지 않음", false);
 
-    private static final Map<String, AlarmStatus> alarmStatusMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(AlarmStatus::getDescription, Function.identity())));
+    private static final Map<Boolean, AlarmStatus> alarmStatusMap = Collections.unmodifiableMap(Stream.of(values())
+            .collect(Collectors.toMap(AlarmStatus::getBooleanValue, Function.identity())));
 
     private final String description;
     private final Boolean booleanValue;
 
     @JsonCreator
-    public static AlarmStatus from(final String description) {
-        if (alarmStatusMap.containsKey(description)) {
-            return alarmStatusMap.get(description);
+    public static AlarmStatus from(final Boolean booleanValue) {
+        if (alarmStatusMap.containsKey(booleanValue)) {
+            return alarmStatusMap.get(booleanValue);
         }
-        throw new CrewException(ALARM_STATUS_NOT_FOUND, description);
+        throw new CrewException(ALARM_STATUS_NOT_FOUND, booleanValue);
     }
 
     @JsonValue

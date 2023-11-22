@@ -14,6 +14,6 @@ public class AlarmStatusConverter implements AttributeConverter<AlarmStatus, Str
 
     @Override
     public AlarmStatus convertToEntityAttribute(final String status) {
-        return AlarmStatus.from(status);
+        return AlarmStatus.from(Boolean.valueOf(status));
     }
 }
