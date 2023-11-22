@@ -21,23 +21,23 @@ public class GameAlarmEventHandler {
     @Transactional
     @EventListener
     public void sendAlarmToGameHost(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
-        final GameAlarmResponse gameAlarm = gameAlarmService.createGameJoinAlarm(gameJoinRequestNotificationEvent); //알람 생성
-        gameAlarmService.emitMessage(gameAlarm); //SSE로 알람 메시지 전송 - sseServcie로 변경?
+        final GameAlarmResponse gameAlarm = gameAlarmService.createGameJoinAlarm(gameJoinRequestNotificationEvent);
+        gameAlarmService.emitMessage(gameAlarm);
     }
 
     @Async
     @Transactional
     @EventListener
     public void sendAlarmToGameMemberOnJoin(final GameMemberJoinedEvent gameMemberJoinedEvent) {
-        final GameAlarmResponse gameAlarm = gameAlarmService.createGuestApproveAlarm(gameMemberJoinedEvent); //알람 생성
-        gameAlarmService.emitMessage(gameAlarm); //SSE로 알람 메시지 전송
+        final GameAlarmResponse gameAlarm = gameAlarmService.createGuestApproveAlarm(gameMemberJoinedEvent);
+        gameAlarmService.emitMessage(gameAlarm);
     }
 
     @Async
     @Transactional
     @EventListener
     public void sendAlarmToGameMemberOnRejection(final GameMemberRejectedEvent gameMemberRejectedEvent) {
-        final GameAlarmResponse gameAlarm = gameAlarmService.createGuestDeniedAlarm(gameMemberRejectedEvent); //알람 생성
-        gameAlarmService.emitMessage(gameAlarm); //SSE로 알람 메시지 전송
+        final GameAlarmResponse gameAlarm = gameAlarmService.createGuestDeniedAlarm(gameMemberRejectedEvent);
+        gameAlarmService.emitMessage(gameAlarm);
     }
 }
