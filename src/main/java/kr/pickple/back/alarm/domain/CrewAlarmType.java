@@ -24,20 +24,20 @@ public enum CrewAlarmType {
     ;
 
     private static final Map<String, CrewAlarmType> crewAlarmTypeMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(CrewAlarmType::name, Function.identity())));
+            .collect(Collectors.toMap(CrewAlarmType::getDescription, Function.identity())));
 
     private final String description;
 
     @JsonCreator
-    public static CrewAlarmType from(final String name) {
-        if (crewAlarmTypeMap.containsKey(name)) {
-            return crewAlarmTypeMap.get(name);
+    public static CrewAlarmType from(final String description) {
+        if (crewAlarmTypeMap.containsKey(description)) {
+            return crewAlarmTypeMap.get(description);
         }
-        throw new AlarmException(ALARM_TYPE_NOT_FOUND, name);
+        throw new AlarmException(ALARM_TYPE_NOT_FOUND, description);
     }
 
     @JsonValue
-    public String getName() {
-        return name();
+    public String getDescription() {
+        return description;
     }
 }
