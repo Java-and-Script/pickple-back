@@ -14,15 +14,17 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.domain.token.RefreshToken;
-import kr.pickple.back.auth.repository.RefreshTokenRepository;
+import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
@@ -49,9 +51,13 @@ class MemberServiceTest {
     private AddressService addressService;
 
     @Mock
-    private RefreshTokenRepository refreshTokenRepository;
+    private JwtProperties jwtProperties;
+
+    @Mock
+    private RedisRepository redisRepository;
 
     @Test
+    @Transactional
     @DisplayName("회원을 생성할 수 있다.")
     void createMember_ReturnAuthenticatedMemberResponse() {
         // given
@@ -67,18 +73,23 @@ class MemberServiceTest {
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
                 .build();
-        final AuthTokens authTokens = AuthTokens.builder().build();
+        final AuthTokens authTokens = AuthTokens.builder()
+                .accessToken("accessToken")
+                .refreshToken("refreshToken")
+                .build();
+
         final Member member = memberCreateRequest.toEntity(mainAddressResponse);
 
         given(addressService.findMainAddressByNames(anyString(), anyString())).willReturn(mainAddressResponse);
         given(memberRepository.save(any(Member.class))).willReturn(member);
         given(jwtProvider.createLoginToken(anyString())).willReturn(authTokens);
-        given(refreshTokenRepository.save(any(RefreshToken.class))).will(invocation -> null);
+        given(jwtProperties.getRefreshTokenExpirationTime()).willReturn(1000L);
 
         // when
         final AuthenticatedMemberResponse authenticatedMemberResponse = memberService.createMember(memberCreateRequest);
 
         // then
+        verify(redisRepository).saveHash(anyString(), anyString(), any(RefreshToken.class), anyLong());
         assertThat(authenticatedMemberResponse).isNotNull();
     }
 
