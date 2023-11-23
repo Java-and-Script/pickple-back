@@ -1,9 +1,10 @@
 package kr.pickple.back.crew.exception;
 
+import org.springframework.http.HttpStatus;
+
 import kr.pickple.back.common.exception.ExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -20,6 +21,7 @@ public enum CrewExceptionCode implements ExceptionCode {
     CREW_MEMBER_NOT_ALLOWED(HttpStatus.FORBIDDEN, "CRE-009", "해당 사용자는 크루 가입 신청을 거절하거나 취소할 권한 없음"),
     CREW_MEMBER_STATUS_IS_NOT_WAITING(HttpStatus.BAD_REQUEST, "CRE-010", "해당 크루에 가입 신청 대기 상태가 아니라면, 가입 신청을 취소할 수 없음"),
     CREW_LEADER_CANNOT_BE_DELETED(HttpStatus.BAD_REQUEST, "CRE-011", "크루장은 자신의 크루에서 삭제될 수 없음"),
+    CREW_CREATE_MAX_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, "CRE-012", "사용자는 크루를 특정 MAX 값을 초과하여 생성할 수 없음"),
     ;
 
     private final HttpStatus status;
