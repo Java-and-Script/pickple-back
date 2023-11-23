@@ -1,6 +1,5 @@
 package kr.pickple.back.chat.service;
 
-import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
@@ -67,37 +66,41 @@ public class ChatRoomFindService {
     }
 
     private ChatRoomDetailResponse getChatRoomDetailResponse(final Long loggedInMemberId, final ChatRoom chatRoom) {
-        if (chatRoom.isMatchedRoomType(PERSONAL)) {
-            final Member sender = findMemberById(loggedInMemberId);
+        return switch (chatRoom.getType()) {
+            case PERSONAL -> getPersonalChatRoomDetailResponse(loggedInMemberId, chatRoom);
+            case CREW -> getCrewChatRoomDetailResponse(chatRoom);
+            case GAME -> getGameChatRoomDetailResponse(chatRoom);
+        };
+    }
 
-            final Member receiver = chatRoom.getMembersInRoom()
-                    .stream()
-                    .filter(roomMember -> !roomMember.equals(sender))
-                    .findFirst()
-                    .orElseThrow(() -> new ChatException(CHAT_RECEIVER_NOT_FOUND));
+    private ChatRoomDetailResponse getPersonalChatRoomDetailResponse(final Long memberId, final ChatRoom chatRoom) {
+        final Member sender = findMemberById(memberId);
 
-            return ChatRoomDetailResponse.of(chatRoom, receiver);
-        }
+        final Member receiver = chatRoom.getMembersInRoom()
+                .stream()
+                .filter(roomMember -> !roomMember.equals(sender))
+                .findFirst()
+                .orElseThrow(() -> new ChatException(CHAT_RECEIVER_NOT_FOUND));
 
-        if (chatRoom.isMatchedRoomType(CREW)) {
-            final Crew crew = crewRepository.findByChatRoom(chatRoom)
-                    .orElseThrow(() -> new ChatException(CHAT_CREW_NOT_FOUND, chatRoom.getId()));
-
-            return ChatRoomDetailResponse.of(chatRoom, crew);
-        }
-
-        if (chatRoom.isMatchedRoomType(GAME)) {
-            final Game game = gameRepository.findByChatRoom(chatRoom)
-                    .orElseThrow(() -> new ChatException(CHAT_GAME_NOT_FOUND, chatRoom.getId()));
-
-            return ChatRoomDetailResponse.of(chatRoom, game);
-        }
-
-        throw new ChatException(CHAT_ROOM_TYPE_NOT_FOUND);
+        return ChatRoomDetailResponse.of(chatRoom, receiver);
     }
 
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    private ChatRoomDetailResponse getCrewChatRoomDetailResponse(final ChatRoom chatRoom) {
+        final Crew crew = crewRepository.findByChatRoom(chatRoom)
+                .orElseThrow(() -> new ChatException(CHAT_CREW_NOT_FOUND, chatRoom.getId()));
+
+        return ChatRoomDetailResponse.of(chatRoom, crew);
+    }
+
+    private ChatRoomDetailResponse getGameChatRoomDetailResponse(final ChatRoom chatRoom) {
+        final Game game = gameRepository.findByChatRoom(chatRoom)
+                .orElseThrow(() -> new ChatException(CHAT_GAME_NOT_FOUND, chatRoom.getId()));
+
+        return ChatRoomDetailResponse.of(chatRoom, game);
     }
 }
