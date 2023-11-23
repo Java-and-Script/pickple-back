@@ -44,9 +44,8 @@ public class Game extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull
     @Column(length = 1000)
-    private String content;
+    private String content = "즐거운 농구 경기해요!";
 
     @NotNull
     private LocalDate playDate;

@@ -2,6 +2,7 @@ package kr.pickple.back.member.domain;
 
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -55,7 +56,7 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(length = 1000)
-    private String introduction;
+    private String introduction = MessageFormat.format("안녕하세요. {0}입니다.", nickname);
 
     @NotNull
     @Column(length = 300)

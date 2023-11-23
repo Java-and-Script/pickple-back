@@ -3,6 +3,7 @@ package kr.pickple.back.crew.domain;
 import static kr.pickple.back.crew.domain.CrewStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import jakarta.persistence.Column;
@@ -45,7 +46,7 @@ public class Crew extends BaseEntity {
     private String name;
 
     @Column(length = 1000)
-    private String content;
+    private String content = MessageFormat.format("안녕하세요. {0}입니다.", name);
 
     @NotNull
     private Integer memberCount = 1;
