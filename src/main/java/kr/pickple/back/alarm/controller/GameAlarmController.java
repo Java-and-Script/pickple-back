@@ -12,7 +12,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/game-alarm")
+@RequestMapping("/game-alarms")
 public class GameAlarmController {
 
     private final GameAlarmService gameAlarmService;
