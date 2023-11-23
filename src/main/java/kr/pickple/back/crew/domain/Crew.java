@@ -6,6 +6,8 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import java.text.MessageFormat;
 import java.util.List;
 
+import org.springframework.util.StringUtils;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Embedded;
@@ -30,7 +32,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Getter
 @Entity
@@ -46,7 +47,7 @@ public class Crew extends BaseEntity {
     private String name;
 
     @Column(length = 1000)
-    private String content = MessageFormat.format("안녕하세요. {0}입니다.", name);
+    private String content;
 
     @NotNull
     private Integer memberCount = 1;
@@ -107,7 +108,7 @@ public class Crew extends BaseEntity {
             final AddressDepth2 addressDepth2
     ) {
         this.name = name;
-        this.content = content;
+        this.content = getDefaultIfContentIsBlank(content);
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.maxMemberCount = maxMemberCount;
@@ -115,6 +116,14 @@ public class Crew extends BaseEntity {
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
         updateStatusIfCrewMemberFull();
+    }
+
+    private String getDefaultIfContentIsBlank(final String content) {
+        if (StringUtils.hasText(content)) {
+            return content;
+        }
+
+        return MessageFormat.format("안녕하세요. {0}입니다.", name);
     }
 
     public List<Member> getMembersByStatus(final RegistrationStatus status) {
