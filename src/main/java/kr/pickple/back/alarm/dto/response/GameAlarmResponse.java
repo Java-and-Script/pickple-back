@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @Builder
 @JsonSerialize
 @RequiredArgsConstructor
-public class GameAlarmResponse implements AlarmResponse {
+public class GameAlarmResponse {
 
     private final Long id;
     private final Long gameId;
@@ -43,15 +43,5 @@ public class GameAlarmResponse implements AlarmResponse {
                 .isRead(gameAlarm.getIsRead())
                 .gameAlarmMessage(gameAlarm.getGameAlarmType())
                 .build();
-    }
-
-    @Override
-    public LocalDateTime getCreatedAt() {
-        return this.createdAt;
-    }
-
-    @Override
-    public Long getId() {
-        return this.id;
     }
 }
