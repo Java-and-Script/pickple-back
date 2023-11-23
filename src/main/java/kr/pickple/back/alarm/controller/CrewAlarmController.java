@@ -12,7 +12,7 @@ import static org.springframework.http.HttpStatus.NO_CONTENT;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/crew-alarm")
+@RequestMapping("/crew-alarms")
 public class CrewAlarmController {
 
     private final CrewAlarmService crewAlarmService;
