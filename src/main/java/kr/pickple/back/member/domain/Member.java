@@ -126,11 +126,11 @@ public class Member extends BaseEntity {
         memberPositions.updateMemberPositions(this, positions);
     }
 
-    public Boolean isRegisteredByMember(Crew crew) {
+    public Boolean isRegisteredByMember(final Crew crew) {
         return memberCrews.isRegisteredByMember(crew);
     }
 
-    public Boolean isRegisteredByMember(Game game) {
+    public Boolean isRegisteredByMember(final Game game) {
         return memberGames.isRegisteredByMember(game);
     }
 
