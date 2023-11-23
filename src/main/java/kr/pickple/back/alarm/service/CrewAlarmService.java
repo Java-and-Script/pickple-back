@@ -59,7 +59,7 @@ public class CrewAlarmService {
 
         crewAlarmRepository.save(crewAlarm);
 
-        final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
+        final CrewAlarmResponse response = CrewAlarmResponse.from(crewAlarm);
 
         sseEmitters.notify(leader.getId(), response);
         return response;
@@ -80,7 +80,7 @@ public class CrewAlarmService {
 
         crewAlarmRepository.save(crewAlarm);
 
-        final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
+        final CrewAlarmResponse response = CrewAlarmResponse.from(crewAlarm);
 
         sseEmitters.notify(member.getId(), response);
         return response;
@@ -101,7 +101,7 @@ public class CrewAlarmService {
 
         crewAlarmRepository.save(crewAlarm);
 
-        final CrewAlarmResponse response = CrewAlarmResponse.of(crewAlarm);
+        final CrewAlarmResponse response = CrewAlarmResponse.from(crewAlarm);
 
         sseEmitters.notify(member.getId(), response);
         return response;

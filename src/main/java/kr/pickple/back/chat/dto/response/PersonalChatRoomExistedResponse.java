@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(staticName = "of")
+@AllArgsConstructor(staticName = "from")
 public class PersonalChatRoomExistedResponse {
 
     private Long roomId;

@@ -24,7 +24,7 @@ public class CrewAlarmResponse {
     private final AlarmStatus isRead;
     private final CrewAlarmType crewAlarmMessage;
 
-    public static CrewAlarmResponse of(final CrewAlarm crewAlarm) {
+    public static CrewAlarmResponse from(final CrewAlarm crewAlarm) {
         final Crew crew = crewAlarm.getCrew();
 
         return CrewAlarmResponse.builder()

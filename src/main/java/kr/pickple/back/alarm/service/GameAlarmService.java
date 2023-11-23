@@ -61,7 +61,7 @@ public class GameAlarmService {
         gameAlarmRepository.save(gameAlarm);
 
 
-        final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
+        final GameAlarmResponse response = GameAlarmResponse.from(gameAlarm);
 
         sseEmitters.notify(host.getId(), response);
         return response;
@@ -83,7 +83,7 @@ public class GameAlarmService {
 
         gameAlarmRepository.save(gameAlarm);
 
-        final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
+        final GameAlarmResponse response = GameAlarmResponse.from(gameAlarm);
 
         sseEmitters.notify(member.getId(), response);
         return response;
@@ -105,7 +105,7 @@ public class GameAlarmService {
 
         gameAlarmRepository.save(gameAlarm);
 
-        final GameAlarmResponse response = GameAlarmResponse.of(gameAlarm);
+        final GameAlarmResponse response = GameAlarmResponse.from(gameAlarm);
 
         sseEmitters.notify(member.getId(), response);
         return response;
