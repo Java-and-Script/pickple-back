@@ -29,7 +29,7 @@ public class GameAlarmResponse {
     private final AlarmStatus isRead;
     private final GameAlarmType gameAlarmMessage;
 
-    public static GameAlarmResponse of(final GameAlarm gameAlarm) {
+    public static GameAlarmResponse from(final GameAlarm gameAlarm) {
         final Game game = gameAlarm.getGame();
 
         return GameAlarmResponse.builder()
