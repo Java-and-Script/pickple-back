@@ -21,7 +21,7 @@ GET http://localhost:8080/members/1
 
 ### 사용자가 가입한 크루 목록
 GET http://localhost:8080/members/1/crews?status=확정
-Authorization: Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwNzIzNjQzLCJleHAiOjE3MDA3NDUyNDN9.Pdn1K0ZKpN45r3hQVkX6bbyCRYCCA4CRU6MTOJJGfLfx5p3e5BRJmm3jVKS32Yoffe7gN_W3zj91J0l2qMcs9A
+Authorization:
 
 ### 사용자가 만든 크루 목록 조회
 GET http://localhost:8080/members/1/created-crews

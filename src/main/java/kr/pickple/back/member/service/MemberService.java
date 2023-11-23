@@ -199,9 +199,9 @@ public class MemberService {
     }
 
     public MemberGameRegistrationStatusResponse isMemberRegisteredGame(
-            Long loggedInMemberId,
-            Long memberId,
-            Long gameId
+            final Long loggedInMemberId,
+            final Long memberId,
+            final Long gameId
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
@@ -212,9 +212,9 @@ public class MemberService {
     }
 
     public MemberCrewRegistrationStatusResponse isMemberRegisteredCrew(
-            Long loggedInMemberId,
-            Long memberId,
-            Long crewId
+            final Long loggedInMemberId,
+            final Long memberId,
+            final Long crewId
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
