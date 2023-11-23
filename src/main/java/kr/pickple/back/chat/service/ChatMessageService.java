@@ -16,7 +16,6 @@ import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
-import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.member.domain.Member;
@@ -29,8 +28,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ChatMessageService {
 
+    private final ChatValidator chatValidator;
+
     private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final MemberRepository memberRepository;
 
@@ -48,19 +48,13 @@ public class ChatMessageService {
 
     @Transactional
     public ChatMessage enterRoomAndSaveEnteringMessages(final ChatRoom chatRoom, final Member member) {
-        validateIsNotExistedRoomMember(chatRoom, member);
+        chatValidator.validateIsNotExistedRoomMember(chatRoom, member);
 
         final String content = MessageType.makeEnterMessage(member.getNickname());
         final ChatMessage chatMessage = buildChatMessage(ENTER, content, chatRoom, member);
         chatRoom.enterRoom(chatMessage);
 
         return chatMessageRepository.save(chatMessage);
-    }
-
-    private void validateIsNotExistedRoomMember(final ChatRoom chatRoom, final Member member) {
-        if (isExistedRoomMember(chatRoom, member)) {
-            throw new ChatException(CHAT_MEMBER_IS_ALREADY_IN_ROOM, chatRoom.getId(), member.getId());
-        }
     }
 
     @Transactional
@@ -71,7 +65,7 @@ public class ChatMessageService {
         final Member sender = findMemberById(chatMessageCreateRequest.getSenderId());
         final ChatRoom chatRoom = findRoomById(roomId);
 
-        validateIsExistedRoomMember(sender, chatRoom);
+        chatValidator.validateIsExistedRoomMember(sender, chatRoom);
 
         final String content = chatMessageCreateRequest.getContent();
         final ChatMessage chatMessage = buildChatMessage(TALK, content, chatRoom, sender);
@@ -89,7 +83,8 @@ public class ChatMessageService {
         final Member member = findMemberById(chatMessageCreateRequest.getSenderId());
         final ChatRoom chatRoom = findRoomById(roomId);
 
-        validateIsExistedRoomMember(member, chatRoom);
+        chatValidator.validateIsExistedRoomMember(member, chatRoom);
+        chatValidator.validateChatRoomLeavingConditions(member, chatRoom);
 
         final String content = MessageType.makeLeaveMessage(member.getNickname());
         final ChatMessage chatMessage = buildChatMessage(LEAVE, content, chatRoom, member);
@@ -121,7 +116,7 @@ public class ChatMessageService {
         final ChatRoom chatRoom = findRoomById(roomId);
         final Member loggedInMember = findMemberById(loggedInMemberId);
 
-        validateIsExistedRoomMember(loggedInMember, chatRoom);
+        chatValidator.validateIsExistedRoomMember(loggedInMember, chatRoom);
 
         final ChatMessage lastEnteringMessage = chatRoom.getLastEnteringChatMessageByMember(loggedInMember);
 
@@ -147,15 +142,5 @@ public class ChatMessageService {
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-    }
-
-    private void validateIsExistedRoomMember(final Member member, final ChatRoom chatRoom) {
-        if (!isExistedRoomMember(chatRoom, member)) {
-            throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, member.getId(), chatRoom.getId());
-        }
-    }
-
-    private Boolean isExistedRoomMember(final ChatRoom chatRoom, final Member member) {
-        return chatRoomMemberRepository.existsByActiveTrueAndChatRoomAndMember(chatRoom, member);
     }
 }
