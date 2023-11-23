@@ -1,6 +1,6 @@
 package kr.pickple.back.alarm.service;
 
-import kr.pickple.back.alarm.domain.AlarmExistsStatus;
+import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
 import kr.pickple.back.alarm.util.SseEmitters;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
@@ -12,8 +12,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 
-import static kr.pickple.back.alarm.domain.AlarmExistsStatus.EXISTS;
-import static kr.pickple.back.alarm.domain.AlarmExistsStatus.NOT_EXISTS;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
@@ -42,11 +40,14 @@ public class AlarmService {
     }
 
     @Transactional
-    public AlarmExistsStatus checkUnReadAlarms(final Long loggedInMemberId) {
+    public AlarmExistStatusResponse checkUnReadAlarms(final Long loggedInMemberId) {
         final boolean existsUnreadCrewAlarm = crewAlarmService.checkUnreadCrewAlarm(loggedInMemberId);
         final boolean existsUnreadGameAlarm = gameAlarmService.checkUnreadGameAlarm(loggedInMemberId);
+        final boolean unreadAlarmExist = existsUnreadCrewAlarm || existsUnreadGameAlarm;
 
-        return existsUnreadCrewAlarm || existsUnreadGameAlarm ? EXISTS : NOT_EXISTS;
+        return AlarmExistStatusResponse.builder()
+                .unread(unreadAlarmExist)
+                .build();
     }
 
     @Transactional

@@ -22,7 +22,7 @@ public class CrewAlarmResponse implements AlarmResponse {
     private final String crewName;
     private final LocalDateTime createdAt;
     private final AlarmStatus isRead;
-    private final CrewAlarmType crewAlarmType;
+    private final CrewAlarmType crewAlarmMessage;
 
     public static CrewAlarmResponse of(final CrewAlarm crewAlarm) {
         final Crew crew = crewAlarm.getCrew();
@@ -33,7 +33,7 @@ public class CrewAlarmResponse implements AlarmResponse {
                 .crewName(crewAlarm.getCrew().getName())
                 .createdAt(crewAlarm.getCreatedAt())
                 .isRead(crewAlarm.getIsRead())
-                .crewAlarmType(crewAlarm.getCrewAlarmType())
+                .crewAlarmMessage(crewAlarm.getCrewAlarmType())
                 .build();
     }
 

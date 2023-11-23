@@ -5,7 +5,7 @@ Authorization:
 
 ### 해당 사용자 읽지 않은 알림 확인
 GET http://localhost:8080/alarms/unread
-Authorization:
+Authorization:Bearer eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxIiwiaWF0IjoxNzAwNzE3ODAyLCJleHAiOjE3MDA3Mzk0MDJ9.GEkK183UFNCu-qIgoNuhIW3cheA_xZPGfz-Dk1kz0e4QBV_dJIc9yADCB3w5tMupKTKu2PSdunzXXDCrPxUrzQ
 Content-Type: application/json
 
 ### 해당 사용자의 모든 알람 삭제

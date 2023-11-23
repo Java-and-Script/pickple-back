@@ -27,7 +27,7 @@ public class GameAlarmResponse implements AlarmResponse {
     private final LocalTime playStartTime;
     private final Integer playTimeMinutes;
     private final AlarmStatus isRead;
-    private final GameAlarmType gameAlarmType;
+    private final GameAlarmType gameAlarmMessage;
 
     public static GameAlarmResponse of(final GameAlarm gameAlarm) {
         final Game game = gameAlarm.getGame();
@@ -41,7 +41,7 @@ public class GameAlarmResponse implements AlarmResponse {
                 .playStartTime(gameAlarm.getGame().getPlayStartTime())
                 .playTimeMinutes(gameAlarm.getGame().getPlayTimeMinutes())
                 .isRead(gameAlarm.getIsRead())
-                .gameAlarmType(gameAlarm.getGameAlarmType())
+                .gameAlarmMessage(gameAlarm.getGameAlarmType())
                 .build();
     }
 
