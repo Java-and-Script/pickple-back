@@ -31,6 +31,9 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/auth")
 public class OauthController {
 
+    private static final String COOKIE_TOKEN = "refresh-token";
+    private static final Integer COOKIE_LOGOUT_MAX_AGE = 0;
+
     private final OauthService oauthService;
     private final JwtProperties jwtProperties;
 
@@ -55,7 +58,7 @@ public class OauthController {
         final String refreshToken = authenticatedMemberResponse.getRefreshToken();
 
         if (refreshToken != null) {
-            final ResponseCookie cookie = ResponseCookie.from("refresh-token", refreshToken)
+            final ResponseCookie cookie = ResponseCookie.from(COOKIE_TOKEN, refreshToken)
                     .maxAge(jwtProperties.getRefreshTokenExpirationTime())
                     .sameSite("None")
                     .secure(true)
@@ -72,7 +75,7 @@ public class OauthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<AccessTokenResponse> regenerateAccessToken(
-            @CookieValue("refresh-token") final String refreshToken,
+            @CookieValue(COOKIE_TOKEN) final String refreshToken,
             @RequestHeader("Authorization") final String authorizationHeader
     ) {
         final AccessTokenResponse regeneratedAccessToken = oauthService.regenerateAccessToken(refreshToken,
@@ -85,10 +88,19 @@ public class OauthController {
     @DeleteMapping("/logout")
     public ResponseEntity<Void> logout(
             @Login final Long loggedInMemberId,
-            @CookieValue("refresh-token") final String refreshToken
+            @CookieValue(COOKIE_TOKEN) final String refreshToken,
+            final HttpServletResponse httpServletResponse
     ) {
         oauthService.deleteRefreshToken(refreshToken);
+        final ResponseCookie cookie = ResponseCookie.from(COOKIE_TOKEN, "")
+                .maxAge(COOKIE_LOGOUT_MAX_AGE)
+                .sameSite("None")
+                .secure(true)
+                .httpOnly(true)
+                .path("/")
+                .build();
 
+        httpServletResponse.addHeader(SET_COOKIE, cookie.toString());
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
