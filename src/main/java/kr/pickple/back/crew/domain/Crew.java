@@ -179,4 +179,8 @@ public class Crew extends BaseEntity {
         chatRoom.updateMaxMemberCount(maxMemberCount);
         this.chatRoom = chatRoom;
     }
+
+    public Boolean isConfirmedCrewMember(final Member member) {
+        return crewMembers.isAlreadyConfirmed(member);
+    }
 }

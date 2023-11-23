@@ -268,7 +268,7 @@ public class GameService {
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
     }
 
-    private boolean isGameNotOver(final Game game) {
+    private Boolean isGameNotOver(final Game game) {
         return DateTimeUtil.isAfterThanNow(game.getPlayDate(), game.getPlayEndTime());
     }
 

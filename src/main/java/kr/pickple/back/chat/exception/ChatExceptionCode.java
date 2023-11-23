@@ -22,6 +22,8 @@ public enum ChatExceptionCode implements ExceptionCode {
     CHAT_CREW_NOT_FOUND(HttpStatus.NOT_FOUND, "CHT-010", "해당 채팅방을 소유한 크루 정보를 찾을 수 없음"),
     CHAT_GAME_NOT_FOUND(HttpStatus.NOT_FOUND, "CHT-011", "해당 채팅방을 소유한 게스트 모집글 정보를 찾을 수 없음"),
     CHAT_RECEIVER_NOT_FOUND(HttpStatus.NOT_FOUND, "CHT-012", "해당 1:1 채팅방에 나를 제외한 사용자가 존재하지 않음"),
+    CHAT_CREW_CHATROOM_NOT_ALLOWED_TO_LEAVE(HttpStatus.BAD_REQUEST, "CHT-013", "크루 탈퇴 전에는 크루 채팅방을 떠날 수 없음"),
+    CHAT_GAME_CHATROOM_NOT_ALLOWED_TO_LEAVE(HttpStatus.BAD_REQUEST, "CHT-014", "경기 종료 전에는 게스트 모집글 채팅방을 떠날 수 없음"),
     ;
 
     private final HttpStatus status;

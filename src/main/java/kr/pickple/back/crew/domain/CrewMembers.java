@@ -11,6 +11,7 @@ import lombok.Getter;
 import java.util.ArrayList;
 import java.util.List;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREADY_EXISTED;
 
 @Embeddable
@@ -44,7 +45,7 @@ public class CrewMembers {
         }
     }
 
-    private boolean isAlreadyRegistered(final Member member) {
+    private Boolean isAlreadyRegistered(final Member member) {
         return crewMembers.stream()
                 .anyMatch(crewMember -> member.equals(crewMember.getMember()));
     }
@@ -54,5 +55,10 @@ public class CrewMembers {
                 .member(member)
                 .crew(crew)
                 .build();
+    }
+
+    public Boolean isAlreadyConfirmed(final Member member) {
+        return crewMembers.stream()
+                .anyMatch(crewMember -> member.equals(crewMember.getMember()) && crewMember.equalsStatus(CONFIRMED));
     }
 }
