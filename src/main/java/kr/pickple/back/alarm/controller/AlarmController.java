@@ -1,6 +1,6 @@
 package kr.pickple.back.alarm.controller;
 
-import kr.pickple.back.alarm.domain.AlarmExistsStatus;
+import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
 import kr.pickple.back.alarm.service.AlarmService;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
@@ -34,14 +34,14 @@ public class AlarmController {
     }
 
     @GetMapping("/unread")
-    public ResponseEntity<AlarmExistsStatus> findUnreadAlarm(
+    public ResponseEntity<AlarmExistStatusResponse> findUnreadAlarm(
             @Login final Long loggedInMemberId
     ) {
-        AlarmExistsStatus alarmExistsStatus = alarmService.checkUnReadAlarms(loggedInMemberId);
+        AlarmExistStatusResponse response = alarmService.checkUnReadAlarms(loggedInMemberId);
 
         return ResponseEntity
                 .status(OK)
-                .body(alarmExistsStatus);
+                .body(response);
     }
 
     @DeleteMapping
