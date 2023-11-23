@@ -8,6 +8,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import org.locationtech.jts.geom.Point;
+import org.springframework.util.StringUtils;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -45,7 +46,7 @@ public class Game extends BaseEntity {
     private Long id;
 
     @Column(length = 1000)
-    private String content = "즐거운 농구 경기해요!";
+    private String content;
 
     @NotNull
     private LocalDate playDate;
@@ -130,7 +131,7 @@ public class Game extends BaseEntity {
             final AddressDepth2 addressDepth2,
             final List<Position> positions
     ) {
-        this.content = content;
+        this.content = getDefaultIfContentIsBlank(content);
         this.playDate = playDate;
         this.playStartTime = playStartTime;
         this.playEndTime = playEndTime;
@@ -144,6 +145,14 @@ public class Game extends BaseEntity {
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
         updateGamePositions(positions);
+    }
+
+    private String getDefaultIfContentIsBlank(final String content) {
+        if (StringUtils.hasText(content)) {
+            return content;
+        }
+
+        return "즐거운 농구 경기해요!";
     }
 
     private void updateGamePositions(final List<Position> positions) {
