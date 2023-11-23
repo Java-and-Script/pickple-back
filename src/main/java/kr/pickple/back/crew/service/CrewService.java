@@ -35,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewService {
 
+    private static final Integer CREW_CREATE_MAX_SIZE = 3;
+
     private final S3Properties s3Properties;
     private final CrewRepository crewRepository;
     private final MemberRepository memberRepository;
@@ -47,6 +49,8 @@ public class CrewService {
 
         final Member leader = memberRepository.findById(loggedInMemberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND));
+
+        validateMemberCreatedCrewsCount(leader);
 
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
                 crewCreateRequest.getAddressDepth1(),
@@ -67,6 +71,14 @@ public class CrewService {
         final Long crewId = crewRepository.save(crew).getId();
 
         return CrewIdResponse.from(crewId);
+    }
+
+    private void validateMemberCreatedCrewsCount(final Member leader) {
+        final Long createdCrewsCount = leader.getCreatedCrewsCount();
+
+        if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
+            throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
+        }
     }
 
     public CrewProfileResponse findCrewById(final Long crewId) {

@@ -33,4 +33,11 @@ public class MemberCrews {
     public void addMemberCrew(final CrewMember memberCrew) {
         memberCrews.add(memberCrew);
     }
+
+    public Long getCreatedCrewsCountByMember(final Member member) {
+        return memberCrews.stream()
+                .map(CrewMember::getCrew)
+                .filter(crew -> crew.isLeader(member))
+                .count();
+    }
 }
