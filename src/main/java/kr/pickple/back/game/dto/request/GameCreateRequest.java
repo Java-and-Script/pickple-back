@@ -31,7 +31,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameCreateRequest {
 
-    @NotBlank(message = "모집 글 내용은 null이거나, 빈 문자열이거나, 공백 문자만으로 이루어질 수 없음")
     @Size(max = 1000, message = "모집 글 내용은 1000자 이하")
     private String content;
 
