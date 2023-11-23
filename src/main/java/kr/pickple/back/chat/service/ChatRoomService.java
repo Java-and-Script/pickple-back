@@ -3,7 +3,6 @@ package kr.pickple.back.chat.service;
 import static java.lang.Boolean.*;
 import static java.text.MessageFormat.*;
 import static kr.pickple.back.chat.domain.RoomType.*;
-import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.Optional;
@@ -17,7 +16,6 @@ import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.chat.dto.response.PersonalChatRoomExistedResponse;
-import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.member.domain.Member;
@@ -31,6 +29,8 @@ import lombok.RequiredArgsConstructor;
 public class ChatRoomService {
 
     private final ChatMessageService chatMessageService;
+    private final ChatValidator chatValidator;
+
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final MemberRepository memberRepository;
@@ -44,7 +44,7 @@ public class ChatRoomService {
         final Member receiver = findMemberById(receiverId);
         final Member sender = findMemberById(senderId);
 
-        validateIsSelfChat(receiver, sender);
+        chatValidator.validateIsSelfChat(receiver, sender);
 
         final String personalRoomName = format("{0},{1}", sender.getNickname(), receiver.getNickname());
         final ChatRoom savedChatRoom = saveNewChatRoom(sender, personalRoomName, PERSONAL);
@@ -73,7 +73,7 @@ public class ChatRoomService {
         final Member sender = findMemberById(senderId);
         final Member receiver = findMemberById(receiverId);
 
-        validateIsSelfChat(receiver, sender);
+        chatValidator.validateIsSelfChat(receiver, sender);
 
         final Optional<ChatRoomMember> optionalChatRoomMember = chatRoomMemberRepository.findAllByMember(sender)
                 .stream()
@@ -89,12 +89,6 @@ public class ChatRoomService {
         }
 
         return PersonalChatRoomExistedResponse.of(isChatRoomExisted, isSenderActive);
-    }
-
-    private void validateIsSelfChat(Member receiver, Member sender) {
-        if (sender.equals(receiver)) {
-            throw new ChatException(CHAT_MEMBER_CANNOT_CHAT_SELF, sender.getId());
-        }
     }
 
     private Member findMemberById(final Long memberId) {
