@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Builder
 @JsonSerialize
 @RequiredArgsConstructor
-public class CrewAlarmResponse implements AlarmResponse {
+public class CrewAlarmResponse {
 
     private final Long id;
     private final Long crewId;
@@ -35,15 +35,5 @@ public class CrewAlarmResponse implements AlarmResponse {
                 .isRead(crewAlarm.getIsRead())
                 .crewAlarmMessage(crewAlarm.getCrewAlarmType())
                 .build();
-    }
-
-    @Override
-    public LocalDateTime getCreatedAt() {
-        return this.createdAt;
-    }
-
-    @Override
-    public Long getId() {
-        return this.id;
     }
 }
