@@ -126,12 +126,16 @@ public class Member extends BaseEntity {
         memberPositions.updateMemberPositions(this, positions);
     }
 
-    public List<Crew> getCrewsByStatus(RegistrationStatus status) {
-        return memberCrews.getCrewsByStatus(status);
+    public Boolean isRegisteredByMember(Crew crew) {
+        return memberCrews.isRegisteredByMember(crew);
     }
 
-    public List<Crew> getCreatedCrews() {
-        return memberCrews.getCreatedCrewsByMember(this);
+    public Boolean isRegisteredByMember(Game game) {
+        return memberGames.isRegisteredByMember(game);
+    }
+
+    public List<Crew> getCrewsByStatus(RegistrationStatus status) {
+        return memberCrews.getCrewsByStatus(status);
     }
 
     public Long getCreatedCrewsCount() {
@@ -140,6 +144,10 @@ public class Member extends BaseEntity {
 
     public List<Game> getGamesByStatus(final RegistrationStatus status) {
         return memberGames.getGamesByStatus(status);
+    }
+
+    public List<Crew> getCreatedCrews() {
+        return memberCrews.getCreatedCrewsByMember(this);
     }
 
     public List<Game> getCreatedGames() {
