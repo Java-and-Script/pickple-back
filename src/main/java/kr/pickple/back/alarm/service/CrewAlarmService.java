@@ -6,7 +6,6 @@ import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
 import kr.pickple.back.alarm.event.crew.CrewAlarmEvent;
 import kr.pickple.back.alarm.exception.AlarmException;
 import kr.pickple.back.alarm.repository.CrewAlarmRepository;
-import kr.pickple.back.alarm.util.SseEmitters;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
@@ -18,9 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
@@ -39,8 +36,9 @@ public class CrewAlarmService {
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewAlarmRepository crewAlarmRepository;
-    private final SseEmitters sseEmitters;
+    private final SseEmitterService sseEmitterService;
 
+    @Transactional
     public CrewAlarmResponse createCrewJoinAlarm(final CrewAlarmEvent crewAlarmEvent) {
 
         validateIsLeader(crewAlarmEvent);
@@ -59,10 +57,11 @@ public class CrewAlarmService {
 
         final CrewAlarmResponse response = CrewAlarmResponse.from(crewAlarm);
 
-        sseEmitters.notify(leader.getId(), response);
+        sseEmitterService.notify(leader.getId(), response);
         return response;
     }
 
+    @Transactional
     public CrewAlarmResponse createCrewMemberApproveAlarm(final CrewAlarmEvent crewAlarmEvent) {
 
         final Long crewId = crewAlarmEvent.getCrewId();
@@ -80,10 +79,11 @@ public class CrewAlarmService {
 
         final CrewAlarmResponse response = CrewAlarmResponse.from(crewAlarm);
 
-        sseEmitters.notify(member.getId(), response);
+        sseEmitterService.notify(member.getId(), response);
         return response;
     }
 
+    @Transactional
     public CrewAlarmResponse createCrewMemberDeniedAlarm(final CrewAlarmEvent crewAlarmEvent) {
 
         final Long crewId = crewAlarmEvent.getCrewId();
@@ -101,7 +101,7 @@ public class CrewAlarmService {
 
         final CrewAlarmResponse response = CrewAlarmResponse.from(crewAlarm);
 
-        sseEmitters.notify(member.getId(), response);
+        sseEmitterService.notify(member.getId(), response);
         return response;
     }
 
@@ -148,14 +148,11 @@ public class CrewAlarmService {
     }
 
     private void sendAlarmToMember(final Member member, final CrewAlarmResponse crewAlarm) {
-        final SseEmitter crewLeaderEmitter = sseEmitters.get(member.getId());
-        if (crewLeaderEmitter != null) {
-            try {
-                crewLeaderEmitter.send(crewAlarm);
-            } catch (IOException e) {
-                sseEmitters.remove(member.getId());
-                log.error("해당 회원에게 알람 전송 중 오류가 발생했습니다. : " + member.getId(), e);
-            }
+        try {
+            sseEmitterService.notify(member.getId(), crewAlarm);
+        } catch (Exception e) {
+            log.error("해당 회원에게 알람 전송 중 오류가 발생했습니다. : " + member.getId(), e);
+            sseEmitterService.deleteById(member.getId());
         }
     }
 
@@ -164,9 +161,12 @@ public class CrewAlarmService {
     }
 
     private void sendAlarmToCrewApplyMembers(final List<Member> members, final CrewAlarmResponse crewAlarm) {
-        for (final Member member : members) {
-            sendAlarmToMember(member, crewAlarm);
+
+        if (members == null) {
+            log.debug("해당 크루에 가입 신청을 한 회원을 찾지 못하였습니다.");
+            return;
         }
+        members.forEach(member -> sendAlarmToMember(member, crewAlarm));
     }
 
     public boolean checkUnreadCrewAlarm(final Long memberId) {

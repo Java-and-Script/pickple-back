@@ -6,7 +6,6 @@ import kr.pickple.back.alarm.dto.response.GameAlarmResponse;
 import kr.pickple.back.alarm.event.game.GameAlarmEvent;
 import kr.pickple.back.alarm.exception.AlarmException;
 import kr.pickple.back.alarm.repository.GameAlarmRepository;
-import kr.pickple.back.alarm.util.SseEmitters;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.exception.GameException;
@@ -18,9 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.List;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
@@ -39,7 +36,7 @@ public class GameAlarmService {
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
     private final GameAlarmRepository gameAlarmRepository;
-    private final SseEmitters sseEmitters;
+    private final SseEmitterService sseEmitterService;
 
     @Transactional
     public GameAlarmResponse createGameJoinAlarm(final GameAlarmEvent gameAlarmEvent) {
@@ -61,7 +58,7 @@ public class GameAlarmService {
 
         final GameAlarmResponse response = GameAlarmResponse.from(gameAlarm);
 
-        sseEmitters.notify(host.getId(), response);
+        sseEmitterService.notify(host.getId(), response);
         return response;
     }
 
@@ -83,7 +80,7 @@ public class GameAlarmService {
 
         final GameAlarmResponse response = GameAlarmResponse.from(gameAlarm);
 
-        sseEmitters.notify(member.getId(), response);
+        sseEmitterService.notify(member.getId(), response);
         return response;
     }
 
@@ -105,10 +102,9 @@ public class GameAlarmService {
 
         final GameAlarmResponse response = GameAlarmResponse.from(gameAlarm);
 
-        sseEmitters.notify(member.getId(), response);
+        sseEmitterService.notify(member.getId(), response);
         return response;
     }
-
 
     private void validateIsHost(final GameAlarmEvent gameAlarmEvent) {
         final Long gameId = gameAlarmEvent.getGameId();
@@ -150,14 +146,10 @@ public class GameAlarmService {
     }
 
     private void sendAlarmToMember(final Member member, final GameAlarmResponse gameAlarm) {
-        final SseEmitter gameHostEmitter = sseEmitters.get(member.getId());
-        if (gameHostEmitter != null) {
-            try {
-                gameHostEmitter.send(gameAlarm);
-            } catch (IOException e) {
-                sseEmitters.remove(member.getId());
-                log.info("해당 회원에게 알람 전송 중 오류가 발생되었습니다. : " + member.getId(), e);
-            }
+        try {
+            sseEmitterService.notify(member.getId(), gameAlarm);
+        } catch (Exception e) {
+            log.info("해당 회원에게 알람 전송 중 오류가 발생되었습니다. : " + member.getId(), e);
         }
     }
 
@@ -166,9 +158,12 @@ public class GameAlarmService {
     }
 
     private void sendAlarmToGameApplyMembers(List<Member> members, GameAlarmResponse gameAlarm) {
-        for (final Member member : members) {
-            sendAlarmToMember(member, gameAlarm);
+
+        if (members == null) {
+            log.debug("해당 경기에 참여 신청을 한 회원을 찾지 못하였습니다.");
+            return;
         }
+        members.forEach(member -> sendAlarmToMember(member, gameAlarm));
     }
 
     public boolean checkUnreadGameAlarm(final Long memberId) {
@@ -176,10 +171,12 @@ public class GameAlarmService {
         return existsUnreadGameAlarm;
     }
 
+    @Transactional
     public void deleteAllGameAlarms(final Long memberId) {
         gameAlarmRepository.deleteByMemberId(memberId);
     }
 
+    @Transactional
     public void updateGameAlarmById(
             final Long loggedInMemberId,
             final Long gameAlarmId,
