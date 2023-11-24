@@ -134,7 +134,7 @@ public class CrewAlarmService {
         final Long crewId = crewJoinRequestNotificationEvent.getCrewId();
         final Crew crew = crewRepository.findById(crewId).orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
-        if (!crew.isLeader(crewJoinRequestNotificationEvent.getCrewLeader().getId())) {
+        if (!crew.isLeader(crewJoinRequestNotificationEvent.getMemberId())) {
             throw new CrewException(CREW_IS_NOT_LEADER, crewId, crew.getLeader());
         }
     }

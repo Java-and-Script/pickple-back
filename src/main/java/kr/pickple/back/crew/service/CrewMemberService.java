@@ -1,6 +1,5 @@
 package kr.pickple.back.crew.service;
 
-import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.chat.service.ChatMessageService;
@@ -45,7 +44,11 @@ public class CrewMemberService {
         final Member member = findMemberById(loggedInMemberId);
 
         crew.addCrewMember(member);
-        eventPublisher.publishEvent(new CrewJoinRequestNotificationEvent(crewId, crew.getLeader()));
+
+        eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
+                .crewId(crewId)
+                .memberId(crew.getLeader().getId())
+                .build());
     }
 
     public CrewProfileResponse findAllCrewMembers(
@@ -92,7 +95,11 @@ public class CrewMemberService {
 
         crewMember.updateStatus(updateStatus);
         crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
-        eventPublisher.publishEvent(new CrewMemberJoinedEvent(crewId, memberId));
+
+        eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
+                .crewId(crewId)
+                .memberId(memberId)
+                .build());
     }
 
     private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
@@ -118,7 +125,11 @@ public class CrewMemberService {
             validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
 
             deleteCrewMember(crewMember);
-            eventPublisher.publishEvent(new CrewMemberRejectedEvent(crewId, memberId));
+
+            eventPublisher.publishEvent(CrewMemberRejectedEvent.builder()
+                    .crewId(crewId)
+                    .memberId(memberId)
+                    .build());
             return;
         }
 
