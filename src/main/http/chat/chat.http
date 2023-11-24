@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### 특정 사용자와의 1:1 채팅방 존재 여부 조회
-GET http://localhost:8080/rooms/personal/existed?receiver=2
+GET http://localhost:8080/rooms/personal?receiver=1
 Authorization:
 
 ### 참여중인 모든 채팅방 목록 조회(개인)
