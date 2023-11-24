@@ -7,6 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor(staticName = "of")
 public class PersonalChatRoomExistedResponse {
 
-    private Boolean isRoomExisted;
+    private Long roomId;
     private Boolean isSenderActive;
 }

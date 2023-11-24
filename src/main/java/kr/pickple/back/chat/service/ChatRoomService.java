@@ -1,11 +1,9 @@
 package kr.pickple.back.chat.service;
 
-import static java.lang.Boolean.*;
 import static java.text.MessageFormat.*;
 import static kr.pickple.back.chat.domain.RoomType.*;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,6 +14,7 @@ import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.chat.dto.response.PersonalChatRoomExistedResponse;
+import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.member.domain.Member;
@@ -66,7 +65,7 @@ public class ChatRoomService {
         return savedChatRoom;
     }
 
-    public PersonalChatRoomExistedResponse getActivePersonalChatRoomWithReceiver(
+    public PersonalChatRoomExistedResponse findActivePersonalChatRoomWithReceiver(
             final Long senderId,
             final Long receiverId
     ) {
@@ -75,20 +74,16 @@ public class ChatRoomService {
 
         chatValidator.validateIsSelfChat(receiver, sender);
 
-        final Optional<ChatRoomMember> optionalChatRoomMember = chatRoomMemberRepository.findAllByMember(sender)
+        final ChatRoomMember foundChatRoomMember = chatRoomMemberRepository.findAllByMember(sender)
                 .stream()
                 .filter(chatRoomMember -> isPersonalChatRoomWithReceiver(chatRoomMember, receiver))
-                .findFirst();
+                .findFirst()
+                .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
 
-        final Boolean isChatRoomExisted = optionalChatRoomMember.isPresent();
-        Boolean isSenderActive = FALSE;
+        final Long personalChatRoomId = foundChatRoomMember.getChatRoom().getId();
+        final Boolean isSenderActive = foundChatRoomMember.isActive();
 
-        if (isChatRoomExisted) {
-            final ChatRoomMember chatRoomMember = optionalChatRoomMember.get();
-            isSenderActive = chatRoomMember.isActive();
-        }
-
-        return PersonalChatRoomExistedResponse.of(isChatRoomExisted, isSenderActive);
+        return PersonalChatRoomExistedResponse.of(personalChatRoomId, isSenderActive);
     }
 
     private Member findMemberById(final Long memberId) {

@@ -40,13 +40,13 @@ public class ChatRoomController {
                 .body(chatRoomService.createPersonalRoom(senderId, personalChatRoomCreateRequest));
     }
 
-    @GetMapping("/personal/existed")
-    public ResponseEntity<PersonalChatRoomExistedResponse> getActivePersonalChatRoomWithReceiver(
+    @GetMapping("/personal")
+    public ResponseEntity<PersonalChatRoomExistedResponse> findActivePersonalChatRoomWithReceiver(
             @Login final Long senderId,
             @RequestParam("receiver") final Long receiverId
     ) {
         return ResponseEntity.status(OK)
-                .body(chatRoomService.getActivePersonalChatRoomWithReceiver(senderId, receiverId));
+                .body(chatRoomService.findActivePersonalChatRoomWithReceiver(senderId, receiverId));
     }
 
     @GetMapping
