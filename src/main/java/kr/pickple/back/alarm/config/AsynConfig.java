@@ -13,9 +13,9 @@ public class AsynConfig {
     @Bean
     public TaskExecutor taskExecutor() {
         return CustomThreadPoolTaskExecutor.builder()
-                .corePoolSize(50)
-                .maxPoolSize(70)
-                .queueCapacity(100)
+                .corePoolSize(30)
+                .maxPoolSize(50)
+                .queueCapacity(70)
                 .build();
     }
 
