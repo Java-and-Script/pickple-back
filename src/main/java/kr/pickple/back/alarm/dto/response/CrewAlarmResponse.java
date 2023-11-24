@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class CrewAlarmResponse {
 
-    private final Long id;
+    private final Long crewAlarmId;
     private final Long crewId;
     private final String crewName;
     private final LocalDateTime createdAt;
@@ -28,7 +28,7 @@ public class CrewAlarmResponse {
         final Crew crew = crewAlarm.getCrew();
 
         return CrewAlarmResponse.builder()
-                .id(crewAlarm.getId())
+                .crewAlarmId(crewAlarm.getId())
                 .crewId(crew.getId())
                 .crewName(crewAlarm.getCrew().getName())
                 .createdAt(crewAlarm.getCreatedAt())
