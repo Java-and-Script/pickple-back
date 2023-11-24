@@ -23,6 +23,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alarm.domain.AlarmType.*;
@@ -192,9 +193,18 @@ public class CrewAlarmService {
         }
     }
 
-    //크루 알람 모두 찾기 - 미정
-    public void findCrewAlarmAll() {
+    //저장된 크루 알람을 모두 찾기 위한 메소드
+    public List<CrewAlarmResponse> findCrewAlarmAll() {
+        //1.DB에서 모든 CrewAlarm을 조회
+        List<CrewAlarm> crewAlarms = crewAlarmRepository.findAll();
 
+        //2.조회한 CrewAlarm을 CrewAlarmResponse로 변환
+        List<CrewAlarmResponse> crewAlarmResponses = crewAlarms.stream()
+                .map(CrewAlarmResponse::of)
+                .collect(Collectors.toList());
+
+        //3.변환한 CrewAlarmResponse를 반환
+        return crewAlarmResponses;
     }
 
     //크루 알림에서 isRead가 False가 있는지 체크하는 메소드

@@ -2,7 +2,9 @@ package kr.pickple.back.alarm.controller;
 
 import jakarta.validation.Valid;
 import kr.pickple.back.alarm.domain.AlarmExistsStatus;
+import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.service.AlarmService;
+import kr.pickple.back.alarm.util.CursorResult;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,16 +45,17 @@ public class AlarmController {
 
     }
 
-//    @GetMapping
-//    public ResponseEntity<List<>> findAllAlarams(
-//            @Login final  Long loggedInMemberId,
-//            final Cursor cursor
-//            ){
-//        //커시 기반 조회 서비스 구현 후, 채움
-//        return  ResponseEntity.status(OK)
-//                .body(AlarmService.findAllAlarms());
-//    }
-
+    //모든 알람 조회시
+    //처음에 cursorId 없으면 0,한번에 불러오는 size = 10
+    @GetMapping
+    public ResponseEntity<CursorResult<AlarmResponse>> findAllAlarms(
+            @Login final Long loggedInMemberId,
+            @RequestParam(defaultValue = "0") Long cursorId,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return ResponseEntity.status(OK)
+                .body(alarmService.findAllAlarms(loggedInMemberId, cursorId, size));
+    }
 
     //알람 수정
     @PatchMapping("/{alarmId}")
