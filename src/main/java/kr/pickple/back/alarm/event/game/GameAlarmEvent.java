@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class GameMemberJoinedEvent {
+public class GameAlarmEvent {
 
     private final Long gameId;
     private final Long memberId;
