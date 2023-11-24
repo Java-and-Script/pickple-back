@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @Builder
 @JsonSerialize //text/event-stream'의 MIME 타입이기 때문에 JsonSerialize로 Json형식으로 직렬화해야 함
 @RequiredArgsConstructor
-public class GameAlarmResponse {
+public class GameAlarmResponse implements AlarmResponse {
 
     private final Long id;
     private final Long gameId;
@@ -43,5 +43,15 @@ public class GameAlarmResponse {
                 .isRead(gameAlarm.getIsRead())
                 .alarmType(gameAlarm.getAlarmType())
                 .build();
+    }
+
+    @Override
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    @Override
+    public Long getId() {
+        return this.id;
     }
 }

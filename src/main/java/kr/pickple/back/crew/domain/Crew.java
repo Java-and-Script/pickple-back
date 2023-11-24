@@ -1,24 +1,6 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.crew.domain.CrewStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-
-import java.text.MessageFormat;
-import java.util.List;
-
-import org.springframework.util.StringUtils;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -32,6 +14,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
+
+import java.text.MessageFormat;
+import java.util.List;
+
+import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
+import static kr.pickple.back.crew.domain.CrewStatus.OPEN;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_CAPACITY_LIMIT_REACHED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_STATUS_IS_CLOSED;
 
 @Getter
 @Entity

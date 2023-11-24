@@ -3,8 +3,13 @@ package kr.pickple.back.alarm.service;
 import kr.pickple.back.alarm.domain.AlarmExistsStatus;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.domain.GameAlarm;
+import kr.pickple.back.alarm.dto.response.AlarmResponse;
+import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
+import kr.pickple.back.alarm.dto.response.GameAlarmResponse;
 import kr.pickple.back.alarm.exception.AlarmException;
 import kr.pickple.back.alarm.exception.AlarmExceptionCode;
+import kr.pickple.back.alarm.repository.AlarmRepository;
+import kr.pickple.back.alarm.util.CursorResult;
 import kr.pickple.back.alarm.util.SseEmitters;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
@@ -14,6 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 import static kr.pickple.back.alarm.domain.AlarmExistsStatus.EXISTS;
 import static kr.pickple.back.alarm.domain.AlarmExistsStatus.NOT_EXISTS;
@@ -27,7 +35,9 @@ public class AlarmService {
     private final GameAlarmService gameAlarmService;
     private final CrewAlarmService crewAlarmService;
     private final MemberRepository memberRepository;
+    private final AlarmRepository alarmRepository;
     private final SseEmitters sseEmitters;
+
 
     //1.SSE 연결 - 이벤트가 발생 된 후, 30초동안 지속 연결
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
@@ -46,27 +56,38 @@ public class AlarmService {
         return emitter;
     }
 
-    //특정 사용자(loggedInMemberId)에게 이벤트(event)를 전송하는 역할을 함
-    //SseEmitters에서 해당 사용자의 SseEmitter를 가져오고, 이를 통해 이벤트를 클라이언트에게 전송
-    //특정 이벤트가 발생했을 때 해당 이벤트를 클라이언트에게 실시간으로 전달하는데 사용됨
-    //새로운 알림이 도착했을 때 이를 클라이언트에게 실시간으로 알려주는 등의 기능을 구현하고자 할 때 notify 메서드를 사용
-//    public void notify(final Long loggedInMemberId, final Object event) {
-//        final SseEmitter emitter = sseEmitters.get(loggedInMemberId);
-//        if (emitter != null) {
-//            try {
-//                emitter.send(event);
-//            } catch (IOException e) {
-//                sseEmitters.remove(loggedInMemberId);
-//                emitter.completeWithError(e);
-//            }
-//        }
-//    }
+    //1. 해당 사용자의 모든 알람 목록 조회 시 - 생성일 순
+    //2. 두, 알림에 대해서 가장 빠른 생성일 순으로 조회
+    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final Integer size) {
+        final Member member = findMemberById(loggedInMemberId);
 
-    //모든 알람 찾기 모두 - 각 알림에서 생성일 순으로 조회
+        //1.각 알림을 조회하고, Response DTO로 변환
+        final List<CrewAlarmResponse> AllCrewAlarmList = crewAlarmService.findCrewAlarmAll();
+        final List<GameAlarmResponse> AllGameAlarmList = gameAlarmService.findGameAlarmAll();
 
-//    public static List<AlaramProfileResponse> findAllAlarms() {
-//        return null;
-//    }
+        //2.서로 다른 알람을 하나의 리스트에 넣음
+        final List<AlarmResponse> alarmResponses = new ArrayList<>();
+        alarmResponses.addAll(AllCrewAlarmList);
+        alarmResponses.addAll(AllGameAlarmList);
+
+        //3.서로 다른 알람들을 생성일 순으로 정렬
+        alarmResponses.sort(Comparator.comparing(AlarmResponse::getCreatedAt).reversed());
+
+        final Long lastIdOfList = alarmResponses.isEmpty() ? null : alarmResponses.get(alarmResponses.size() - 1).getId();
+
+
+        return CursorResult.<AlarmResponse>builder()
+                .alarmResponses(alarmResponses)
+                .hasNext(hasNext(lastIdOfList))
+                .build();
+    }
+
+    //3.커서 기반 페이징 - 다음 페이지가 있는지 조회
+    private Boolean hasNext(Long id) {
+        if (id == null) return false;
+
+        return this.alarmRepository.existsByIdLessThan(id);
+    }
 
     //특정 알림 읽음, 읽지 않음 상태 확인
     //1. memberId를 통해, 각 알림의 Repository에서 읽지 않은 알림이 있는지 판별

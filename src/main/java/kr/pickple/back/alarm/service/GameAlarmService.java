@@ -19,10 +19,12 @@ import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alarm.domain.AlarmType.*;
@@ -44,6 +46,7 @@ public class GameAlarmService {
     //private final AlarmService alarmService;
     private final SseEmitters sseEmitters;
 
+    @Transactional
     public GameAlarmResponse createGameJoinAlarm(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
         //1.게임 리포지토리에서 해당 게임의 호스트인지 확인
         validateIsHost(gameJoinRequestNotificationEvent);
@@ -71,6 +74,7 @@ public class GameAlarmService {
         return response;
     }
 
+    @Transactional
     public GameAlarmResponse createGuestApproveAlarm(final GameMemberJoinedEvent gameMemberJoinedEvent) {
 
         //1.이벤트로부터 게임 정보, 회원 정보 가져오기
@@ -97,6 +101,7 @@ public class GameAlarmService {
         return response;
     }
 
+    @Transactional
     public GameAlarmResponse createGuestDeniedAlarm(final GameMemberRejectedEvent gameMemberRejectedEvent) {
 
         //1.이벤트로부터 게임 정보, 회원 정보 가져오기
@@ -191,10 +196,19 @@ public class GameAlarmService {
         }
     }
 
-//    //게임 알림 찾기 모두 - 미정
-//    public void findGameAlarmAll() {
-//
-//    }
+    //저장된 게임  알람을 모두 찾기 위한 메소드
+    public List<GameAlarmResponse> findGameAlarmAll() {
+        //1.DB에서 모든 GameAlarm을 조회
+        List<GameAlarm> gameAlarms = gameAlarmRepository.findAll();
+
+        //2.조회한 GameAlarm을 GameAlarmResponse로 변환
+        List<GameAlarmResponse> gameAlarmResponses = gameAlarms.stream()
+                .map(GameAlarmResponse::of)
+                .collect(Collectors.toList());
+
+        //3.변환한 GameAlarmResponse를 반환
+        return gameAlarmResponses;
+    }
 
     //게임 알람에서 isRead가 False가 있는지 체크하는 메소드
     public boolean checkUnreadGameAlarm(final Long memberId) {
