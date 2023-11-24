@@ -3,9 +3,7 @@ package kr.pickple.back.game.service;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
-import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
-import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
-import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
+import kr.pickple.back.alarm.event.game.GameAlarmEvent;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.chat.service.ChatRoomService;
@@ -106,7 +104,7 @@ public class GameService {
 
         game.addGameMember(member);
 
-        eventPublisher.publishEvent(GameJoinRequestNotificationEvent.builder()
+        eventPublisher.publishEvent(GameAlarmEvent.builder()
                 .gameId(gameId)
                 .memberId(game.getHost().getId())
                 .build());
@@ -183,7 +181,7 @@ public class GameService {
 
         gameMember.updateStatus(updateStatus);
 
-        eventPublisher.publishEvent(GameMemberJoinedEvent.builder()
+        eventPublisher.publishEvent(GameAlarmEvent.builder()
                 .gameId(gameId)
                 .memberId(memberId)
                 .build());
@@ -217,7 +215,7 @@ public class GameService {
 
             deleteGameMember(gameMember);
 
-            eventPublisher.publishEvent(GameMemberRejectedEvent.builder()
+            eventPublisher.publishEvent(GameAlarmEvent.builder()
                     .gameId(gameId)
                     .memberId(memberId)
                     .build());
