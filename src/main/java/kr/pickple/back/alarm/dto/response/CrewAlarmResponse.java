@@ -20,6 +20,7 @@ public class CrewAlarmResponse {
     private final Long crewAlarmId;
     private final Long crewId;
     private final String crewName;
+    private final String crewProfileImageUrl;
     private final LocalDateTime createdAt;
     private final AlarmStatus isRead;
     private final CrewAlarmType crewAlarmMessage;
@@ -31,6 +32,7 @@ public class CrewAlarmResponse {
                 .crewAlarmId(crewAlarm.getId())
                 .crewId(crew.getId())
                 .crewName(crewAlarm.getCrew().getName())
+                .crewProfileImageUrl(crew.getProfileImageUrl())
                 .createdAt(crewAlarm.getCreatedAt())
                 .isRead(crewAlarm.getIsRead())
                 .crewAlarmMessage(crewAlarm.getCrewAlarmType())

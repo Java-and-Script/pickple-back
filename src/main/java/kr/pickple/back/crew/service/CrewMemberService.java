@@ -1,7 +1,6 @@
 package kr.pickple.back.crew.service;
 
-import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
-import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
+import kr.pickple.back.alarm.event.crew.CrewAlarmEvent;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
@@ -45,7 +44,7 @@ public class CrewMemberService {
 
         crew.addCrewMember(member);
 
-        eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
+        eventPublisher.publishEvent(CrewAlarmEvent.builder()
                 .crewId(crewId)
                 .memberId(crew.getLeader().getId())
                 .build());
@@ -96,7 +95,7 @@ public class CrewMemberService {
         crewMember.updateStatus(updateStatus);
         crewMember.updateStatus(crewMemberUpdateStatusRequest.getStatus());
 
-        eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
+        eventPublisher.publishEvent(CrewAlarmEvent.builder()
                 .crewId(crewId)
                 .memberId(memberId)
                 .build());
@@ -126,7 +125,7 @@ public class CrewMemberService {
 
             deleteCrewMember(crewMember);
 
-            eventPublisher.publishEvent(CrewMemberRejectedEvent.builder()
+            eventPublisher.publishEvent(CrewAlarmEvent.builder()
                     .crewId(crewId)
                     .memberId(memberId)
                     .build());
