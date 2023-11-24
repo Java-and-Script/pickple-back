@@ -184,4 +184,7 @@ public class Crew extends BaseEntity {
     public Boolean isConfirmedCrewMember(final Member member) {
         return crewMembers.isAlreadyConfirmed(member);
     }
+    public List<Member> getCrewMembers(RegistrationStatus status) {
+        return crewMembers.getCrewMembers(status);
+    }
 }
