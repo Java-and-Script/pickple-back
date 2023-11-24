@@ -1,19 +1,14 @@
 package kr.pickple.back.alarm.event.game;
 
-import kr.pickple.back.member.domain.Member;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
+@Builder
 @RequiredArgsConstructor
 public class GameJoinRequestNotificationEvent {
 
     private final Long gameId;
-    private final Member host;
-
-    public Long getGameId() {
-        return gameId;
-    }
-
-    public Member getHost() {
-        return host;
-    }
+    private final Long memberId;
 }
