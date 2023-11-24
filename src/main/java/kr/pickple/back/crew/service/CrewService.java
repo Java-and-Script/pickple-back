@@ -26,6 +26,7 @@ import java.util.List;
 
 import static kr.pickple.back.chat.domain.RoomType.CREW;
 import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_CREATE_MAX_COUNT_EXCEEDED;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 

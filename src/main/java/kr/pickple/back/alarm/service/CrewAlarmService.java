@@ -3,7 +3,9 @@ package kr.pickple.back.alarm.service;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.dto.request.CrewAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
-import kr.pickple.back.alarm.event.crew.CrewAlarmEvent;
+import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
+import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
+import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.alarm.exception.AlarmException;
 import kr.pickple.back.alarm.repository.CrewAlarmRepository;
 import kr.pickple.back.crew.domain.Crew;
@@ -35,11 +37,11 @@ public class CrewAlarmService {
     private final SseEmitterService sseEmitterService;
 
     @Transactional
-    public void createCrewJoinAlarm(final CrewAlarmEvent crewAlarmEvent) {
+    public void createCrewJoinAlarm(final CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
 
-        validateIsLeader(crewAlarmEvent);
+        validateIsLeader(crewJoinRequestNotificationEvent);
 
-        final Long crewId = crewAlarmEvent.getCrewId();
+        final Long crewId = crewJoinRequestNotificationEvent.getCrewId();
         final Crew crew = getCrewInfo(crewId);
         final Member leader = crew.getLeader();
 
@@ -56,10 +58,10 @@ public class CrewAlarmService {
     }
 
     @Transactional
-    public void createCrewMemberApproveAlarm(final CrewAlarmEvent crewAlarmEvent) {
-        final Long crewId = crewAlarmEvent.getCrewId();
+    public void createCrewMemberApproveAlarm(final CrewMemberJoinedEvent crewMemberJoinedEvent) {
+        final Long crewId = crewMemberJoinedEvent.getCrewId();
         final Crew crew = getCrewInfo(crewId);
-        final Long memberId = crewAlarmEvent.getMemberId();
+        final Long memberId = crewMemberJoinedEvent.getMemberId();
         final Member member = getMemberInfo(memberId);
 
         final CrewAlarm crewAlarm = CrewAlarm.builder()
@@ -75,10 +77,10 @@ public class CrewAlarmService {
     }
 
     @Transactional
-    public void createCrewMemberDeniedAlarm(final CrewAlarmEvent crewAlarmEvent) {
-        final Long crewId = crewAlarmEvent.getCrewId();
+    public void createCrewMemberDeniedAlarm(final CrewMemberRejectedEvent crewMemberRejectedEvent) {
+        final Long crewId = crewMemberRejectedEvent.getCrewId();
         final Crew crew = getCrewInfo(crewId);
-        final Long memberId = crewAlarmEvent.getMemberId();
+        final Long memberId = crewMemberRejectedEvent.getMemberId();
         final Member member = getMemberInfo(memberId);
 
         final CrewAlarm crewAlarm = CrewAlarm.builder()
@@ -106,7 +108,7 @@ public class CrewAlarmService {
         return member;
     }
 
-    private void validateIsLeader(final CrewAlarmEvent crewAlarmEvent) {
+    private void validateIsLeader(final CrewJoinRequestNotificationEvent crewAlarmEvent) {
         final Long crewId = crewAlarmEvent.getCrewId();
         final Crew crew = crewRepository.findById(crewId).orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 

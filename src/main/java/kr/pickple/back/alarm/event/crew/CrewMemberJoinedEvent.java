@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @Builder
 @RequiredArgsConstructor
-public class CrewAlarmEvent {
+public class CrewMemberJoinedEvent {
 
     private final Long crewId;
     private final Long memberId;
