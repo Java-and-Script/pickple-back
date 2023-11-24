@@ -19,7 +19,7 @@ import java.time.LocalTime;
 @RequiredArgsConstructor
 public class GameAlarmResponse {
 
-    private final Long id;
+    private final Long GameAlarmId;
     private final Long gameId;
     private final String mainAddress;
     private final LocalDateTime createdAt;
@@ -33,7 +33,7 @@ public class GameAlarmResponse {
         final Game game = gameAlarm.getGame();
 
         return GameAlarmResponse.builder()
-                .id(gameAlarm.getId())
+                .GameAlarmId(gameAlarm.getId())
                 .gameId(game.getId())
                 .mainAddress(gameAlarm.getGame().getMainAddress())
                 .createdAt(gameAlarm.getCreatedAt())

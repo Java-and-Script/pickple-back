@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor(staticName = "from")
+@AllArgsConstructor(staticName = "of")
 public class AccessTokenResponse {
 
     private String accessToken;
