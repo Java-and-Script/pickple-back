@@ -41,7 +41,7 @@ public class SseEmitterService {
 
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
         final Member member = findMemberById(loggedInMemberId);
-        final SseEmitter emitter = new SseEmitter();
+        final SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         try {
             emitter.send(SseEmitter.event()
