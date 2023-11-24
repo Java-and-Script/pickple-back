@@ -105,7 +105,11 @@ public class GameService {
         final Member member = findMemberById(loggedInMemberId);
 
         game.addGameMember(member);
-        eventPublisher.publishEvent(new GameJoinRequestNotificationEvent(gameId, game.getHost()));
+
+        eventPublisher.publishEvent(GameJoinRequestNotificationEvent.builder()
+                .gameId(gameId)
+                .memberId(game.getHost().getId())
+                .build());
     }
 
     private Game findGameById(final Long gameId) {
@@ -178,7 +182,11 @@ public class GameService {
         enterGameChatRoom(updateStatus, gameMember);
 
         gameMember.updateStatus(updateStatus);
-        eventPublisher.publishEvent(new GameMemberJoinedEvent(gameId, memberId));
+
+        eventPublisher.publishEvent(GameMemberJoinedEvent.builder()
+                .gameId(gameId)
+                .memberId(memberId)
+                .build());
     }
 
     private void validateIsHost(final Long loggedInMemberId, final Game game) {
@@ -208,7 +216,11 @@ public class GameService {
             validateIsHostSelfDeleted(loggedInMember, member);
 
             deleteGameMember(gameMember);
-            eventPublisher.publishEvent(new GameMemberRejectedEvent(gameId, memberId));
+
+            eventPublisher.publishEvent(GameMemberRejectedEvent.builder()
+                    .gameId(gameId)
+                    .memberId(memberId)
+                    .build());
             return;
         }
 

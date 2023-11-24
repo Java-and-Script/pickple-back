@@ -116,7 +116,7 @@ public class GameAlarmService {
         final Long gameId = gameJoinRequestNotificationEvent.getGameId();
         final Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
 
-        if (!game.isHost(gameJoinRequestNotificationEvent.getHost().getId())) {
+        if (!game.isHost(gameJoinRequestNotificationEvent.getMemberId())) {
             throw new GameException(GAME_IS_NOT_HOST, gameId, game.getHost());
         }
     }
