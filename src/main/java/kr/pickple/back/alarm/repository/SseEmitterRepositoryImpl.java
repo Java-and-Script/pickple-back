@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -47,16 +46,6 @@ public class SseEmitterRepositoryImpl implements SseEmitterRepository {
     }
 
     @Override
-    public Map<Long, SseEmitter> findAllEmitterStartWithByMemberIdInList(final List<Long> memberId) {
-        final Map<Long, SseEmitter> result = emitters.entrySet().stream()
-                .filter(entry -> memberId.contains(entry.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        log.debug("emitters for memberIds {}: {}", memberId, result);
-        return result;
-    }
-
-    @Override
     public Map<Long, Object> findAllEventCacheStartWithByMemberId(final Long memberId) {
         final Map<Long, Object> result = eventCache.entrySet().stream()
                 .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
@@ -71,13 +60,6 @@ public class SseEmitterRepositoryImpl implements SseEmitterRepository {
         emitters.remove(emitterId);
 
         log.debug("emitter with id {} removed", emitterId);
-    }
-
-    @Override
-    public void deleteAllEmitterStartWithId(final Long memberId) {
-        emitters.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
-
-        log.debug("all emitters starting with memberId {} removed", memberId);
     }
 
     @Override

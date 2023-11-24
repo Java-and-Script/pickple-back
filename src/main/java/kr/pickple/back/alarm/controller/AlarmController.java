@@ -2,6 +2,7 @@ package kr.pickple.back.alarm.controller;
 
 import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
 import kr.pickple.back.alarm.service.AlarmService;
+import kr.pickple.back.alarm.service.SseEmitterService;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,12 +22,14 @@ import static org.springframework.http.HttpStatus.OK;
 public class AlarmController {
 
     private final AlarmService alarmService;
+    private final SseEmitterService sseEmitterService;
 
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribeToSse(
             @Login final Long loggedInMemberId
     ) {
         final SseEmitter emitter = alarmService.subscribeToSse(loggedInMemberId);
+        sseEmitterService.sendCachedEventToUser(loggedInMemberId);
 
         return ResponseEntity.status(OK)
                 .header("X-Accel-Buffering", "no")
