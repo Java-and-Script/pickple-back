@@ -27,22 +27,30 @@ import com.epages.restdocs.apispec.SimpleType;
 
 import jakarta.servlet.http.Cookie;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
+import kr.pickple.back.auth.domain.token.AuthTokens;
+import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.dto.response.AccessTokenResponse;
 import kr.pickple.back.auth.service.OauthService;
-import kr.pickple.back.fixture.dto.AuthDtoFixtures;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-public class AuthDocumentTest {
+class AuthDocumentTest {
+
+    private static final String BASE_URL = "/auth";
+    private static final String OAUTH_PROVIDER = "kakao";
+    private static final String AUTH_CODE = "authCode";
 
     @MockBean
     private OauthService oauthService;
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("oauth 제공자를 받으면 로그인 페이지로 리다이렉트 시킬 수 있다.")
@@ -53,7 +61,7 @@ public class AuthDocumentTest {
         given(oauthService.getAuthCodeRequestUrl(any(OauthProvider.class))).willReturn(REDIRECT_URL);
 
         // when
-        final ResultActions resultActions = mockMvc.perform(get("/auth/{oauthProvider}", "kakao"))
+        final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{oauthProvider}", OAUTH_PROVIDER))
                 .andExpect(status().is3xxRedirection());
 
         // then
@@ -67,7 +75,7 @@ public class AuthDocumentTest {
                                         .description("클라이언트에서 로그인 버튼을 클릭하면 oauth 페이지로 리다이렉트 한다.")
                                         .pathParameters(
                                                 parameterWithName("oauthProvider")
-                                                        .defaultValue("kakao")
+                                                        .defaultValue(OAUTH_PROVIDER)
                                                         .type(SimpleType.STRING)
                                                         .description("oauth 제공자")
                                         )
@@ -90,7 +98,7 @@ public class AuthDocumentTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        get("/auth/login/{oauthProvider}", "kakao").param("authCode", "testCode"))
+                        get(BASE_URL + "/login/{oauthProvider}", OAUTH_PROVIDER).param("authCode", AUTH_CODE))
                 .andExpect(status().isOk());
 
         // then
@@ -105,13 +113,13 @@ public class AuthDocumentTest {
                                         .responseSchema(schema("Authenticated"))
                                         .pathParameters(
                                                 parameterWithName("oauthProvider")
-                                                        .defaultValue("kakao")
+                                                        .defaultValue(OAUTH_PROVIDER)
                                                         .type(SimpleType.STRING)
                                                         .description("oauth 제공자")
                                         )
                                         .queryParameters(
                                                 parameterWithName("authCode")
-                                                        .defaultValue("testCode")
+                                                        .defaultValue(AUTH_CODE)
                                                         .type(SimpleType.STRING)
                                                         .description("oauth 로그인 후 받은 authCode")
                                         )
@@ -153,7 +161,7 @@ public class AuthDocumentTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        get("/auth/login/{oauthProvider}", "kakao").param("authCode", "testCode"))
+                        get(BASE_URL + "/login/{oauthProvider}", OAUTH_PROVIDER).param("authCode", AUTH_CODE))
                 .andExpect(status().isOk());
 
         // then
@@ -168,13 +176,13 @@ public class AuthDocumentTest {
                                         .responseSchema(schema("Registration"))
                                         .pathParameters(
                                                 parameterWithName("oauthProvider")
-                                                        .defaultValue("kakao")
+                                                        .defaultValue(OAUTH_PROVIDER)
                                                         .type(SimpleType.STRING)
                                                         .description("oauth 제공자")
                                         )
                                         .queryParameters(
                                                 parameterWithName("authCode")
-                                                        .defaultValue("testCode")
+                                                        .defaultValue(AUTH_CODE)
                                                         .type(SimpleType.STRING)
                                                         .description("oauth 로그인 후 받은 authCode")
                                         )
@@ -206,16 +214,18 @@ public class AuthDocumentTest {
     @DisplayName("accessToken이 만료되었을 때 새로 갱신 할 수 있다.")
     void regenerateAccessToken() throws Exception {
         // given
-        final AccessTokenResponse accessTokenResponse = AuthDtoFixtures.accessTokenResponseBuild();
-        final String accessTokenRequest = "accessToken";
+        final Long memberId = 1L;
+        final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(memberId));
+        final String regeneratedAccessToken = jwtProvider.regenerateAccessToken(String.valueOf(memberId));
+        final AccessTokenResponse accessTokenResponse = AccessTokenResponse.of(regeneratedAccessToken);
 
         given(oauthService.regenerateAccessToken(anyString(), anyString())).willReturn(accessTokenResponse);
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        post("/auth/refresh")
-                                .header(AUTHORIZATION, "Bearer " + accessTokenRequest)
-                                .cookie(new Cookie("refresh-token", "refreshToken")))
+                        post(BASE_URL + "/refresh")
+                                .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
+                                .cookie(new Cookie("refresh-token", authTokens.getRefreshToken())))
                 .andExpect(status().isCreated());
 
         // then
@@ -231,11 +241,45 @@ public class AuthDocumentTest {
                                         .requestHeaders(
                                                 headerWithName("Authorization")
                                                         .type(SimpleType.STRING)
-                                                        .description("Register Token")
+                                                        .description("AccessToken")
                                         )
                                         .responseFields(
                                                 fieldWithPath("accessToken").type(JsonFieldType.STRING)
                                                         .description("AccessToken")
+                                        )
+                                        .build()
+                        )
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("로그인된 사용자는 로그아웃을 할 수 있다.")
+    void logout() throws Exception {
+        // given
+        final Long memberId = 1L;
+        final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(memberId));
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(
+                        delete(BASE_URL + "/logout")
+                                .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
+                                .cookie(new Cookie("refresh-token", authTokens.getRefreshToken())))
+                .andExpect(status().isNoContent());
+
+        // then
+        resultActions.andDo(document("auth-logout",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Auth")
+                                        .summary("로그아웃")
+                                        .description("로그인된 사용자는 로그아웃을 할 수 있다.")
+                                        .requestHeaders(
+                                                headerWithName("Authorization")
+                                                        .type(SimpleType.STRING)
+                                                        .description("accessToken")
                                         )
                                         .build()
                         )
