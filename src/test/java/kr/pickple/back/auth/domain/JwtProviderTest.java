@@ -4,20 +4,14 @@ import static org.assertj.core.api.Assertions.*;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
+import kr.pickple.back.auth.IntegrationAuthTest;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.auth.domain.token.JwtProvider;
 
-@SpringBootTest
-class JwtProviderTest {
+class JwtProviderTest extends IntegrationAuthTest {
 
     private static final Long MEMBER_ID = 1L;
-
-    @Autowired
-    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("memberId로 accessToken과 refreshToken을 만들 수 있다.")

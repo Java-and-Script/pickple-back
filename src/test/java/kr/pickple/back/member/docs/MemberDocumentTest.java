@@ -11,48 +11,22 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
-import kr.pickple.back.fixture.setup.CrewSetup;
-import kr.pickple.back.fixture.setup.MemberSetup;
+import kr.pickple.back.member.IntegrationMemberTest;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 
 @Transactional
-@SpringBootTest
-@AutoConfigureRestDocs
-@AutoConfigureMockMvc
-class MemberDocumentTest {
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private MemberSetup memberSetup;
-
-    @Autowired
-    private CrewSetup crewSetup;
-
-    @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
-    private JwtProvider jwtProvider;
+class MemberDocumentTest extends IntegrationMemberTest {
 
     @Test
     @DisplayName("회원을 생성할 수 있다.")

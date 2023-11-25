@@ -13,44 +13,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
 
 import jakarta.servlet.http.Cookie;
+import kr.pickple.back.auth.IntegrationAuthTest;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.dto.response.AccessTokenResponse;
-import kr.pickple.back.auth.service.OauthService;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-class AuthDocumentTest {
+class AuthDocumentTest extends IntegrationAuthTest {
 
     private static final String BASE_URL = "/auth";
     private static final String OAUTH_PROVIDER = "kakao";
     private static final String AUTH_CODE = "authCode";
-
-    @MockBean
-    private OauthService oauthService;
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private JwtProvider jwtProvider;
 
     @Test
     @DisplayName("oauth 제공자를 받으면 로그인 페이지로 리다이렉트 시킬 수 있다.")
