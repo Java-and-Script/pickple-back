@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 public class CursorResult<T> {
 
-    private List<T> alarmResponses;
+    private List<T> alarmResponse;
     private Boolean hasNext;
 }

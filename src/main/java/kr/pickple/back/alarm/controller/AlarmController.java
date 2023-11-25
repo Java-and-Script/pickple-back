@@ -1,19 +1,16 @@
 package kr.pickple.back.alarm.controller;
 
 import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
+import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.service.AlarmService;
 import kr.pickple.back.alarm.service.SseEmitterService;
+import kr.pickple.back.alarm.util.CursorResult;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
@@ -50,11 +47,13 @@ public class AlarmController {
     }
 
     @GetMapping
-    public ResponseEntity<Map<String, Object>> findAllAlarms(
-            @Login final Long loggedInMemberId
+    public ResponseEntity<CursorResult<AlarmResponse>> findAllAlarms(
+            @Login final Long loggedInMemberId,
+            @RequestParam(value = "cursorId", required = false) Long cursorId,
+            @RequestParam(value = "size", defaultValue = "6") int size
     ) {
-        return ResponseEntity.status(OK)
-                .body(alarmService.findAllAlarms(loggedInMemberId));
+        final CursorResult<AlarmResponse> result = alarmService.findAllAlarms(loggedInMemberId, cursorId, size);
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping

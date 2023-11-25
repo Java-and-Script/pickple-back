@@ -8,6 +8,11 @@ GET http://localhost:8080/alarms/unread
 Authorization:
 Content-Type: application/json
 
+### 해당 사용자의 모든 알람 목록 조회
+GET http://localhost:8080/alarms?size=6
+Authorization:
+Content-Type: application/json
+
 ### 해당 사용자의 모든 알람 삭제
 DELETE http://localhost:8080/alarms
 Authorization:
