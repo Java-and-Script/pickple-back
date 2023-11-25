@@ -10,8 +10,6 @@ public interface SseEmitterRepository {
 
     void saveEventCache(final String eventCacheId, final Object event);
 
-    Map<Long, SseEmitter> findAllEmitterStartWithByMemberId(final Long memberId);
-
     Map<Long, Object> findAllEventCacheStartWithByMemberId(final Long memberId);
 
     void deleteById(final Long emitterId);
