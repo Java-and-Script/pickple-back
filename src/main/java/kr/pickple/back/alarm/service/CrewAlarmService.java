@@ -16,10 +16,12 @@ import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
@@ -121,8 +123,17 @@ public class CrewAlarmService {
         }
     }
 
-    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId) {
-        final List<CrewAlarm> crewAlarms = crewAlarmRepository.findByMemberId(loggedInMemberId);
+    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
+        final List<CrewAlarm> crewAlarms = Optional.ofNullable(cursorId)
+                .map(id -> crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+                        loggedInMemberId,
+                        id,
+                        PageRequest.of(0, size)
+                ))
+                .orElse(crewAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
+                        loggedInMemberId,
+                        PageRequest.of(0, size)
+                ));
 
         return crewAlarms.stream()
                 .map(CrewAlarmResponse::from)
