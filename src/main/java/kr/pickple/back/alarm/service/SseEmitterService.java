@@ -58,7 +58,7 @@ public class SseEmitterService {
 
     public void notify(final Long loggedInMemberId, final Object event) {
         try {
-            sseEmitterRepository.notify(loggedInMemberId, event);
+            notify(loggedInMemberId, event);
         } catch (Exception e) {
             sseEmitterRepository.saveEventCache(String.valueOf(loggedInMemberId), event);
             sseEmitterRepository.deleteById(loggedInMemberId);

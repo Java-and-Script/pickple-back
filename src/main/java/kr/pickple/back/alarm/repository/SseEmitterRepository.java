@@ -17,6 +17,4 @@ public interface SseEmitterRepository {
     void deleteById(final Long emitterId);
 
     void deleteAllEventCacheStartWithId(final Long memberId);
-
-    void notify(final Long memberId, final Object event);
 }

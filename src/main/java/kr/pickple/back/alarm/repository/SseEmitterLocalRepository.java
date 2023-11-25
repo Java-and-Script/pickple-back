@@ -5,7 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -13,7 +12,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @Repository
 @NoArgsConstructor
-public class SseEmitterRepositoryImpl implements SseEmitterRepository {
+public class SseEmitterLocalRepository implements SseEmitterRepository {
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
     private final Map<Long, Object> eventCache = new ConcurrentHashMap<>();
@@ -67,23 +66,5 @@ public class SseEmitterRepositoryImpl implements SseEmitterRepository {
         eventCache.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
 
         log.debug("all event cache starting with memberId {} removed", memberId);
-    }
-
-    @Override
-    public void notify(final Long loggedInMemberId, final Object event) {
-        final Map<Long, SseEmitter> emitters = findAllEmitterStartWithByMemberId(loggedInMemberId);
-
-        emitters.values().forEach(emitter -> {
-            try {
-                emitter.send(event);
-
-                log.debug("event {} sent to emitter {}", event, emitter);
-            } catch (IOException e) {
-                deleteById(loggedInMemberId);
-                emitter.completeWithError(e);
-
-                log.debug("error sending event to emitter", e);
-            }
-        });
     }
 }
