@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class SseEmitterLocalRepository implements SseEmitterRepository {
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private final Map<Long, Object> eventCache = new ConcurrentHashMap<>();
+    private final Map<Long, Object> fallbackEmitters = new ConcurrentHashMap<>();
 
     @Override
     public SseEmitter save(final String emitterId, final SseEmitter sseEmitter) {
@@ -24,13 +24,23 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     }
 
     @Override
+    public SseEmitter findEmitterById(final Long emitterId) {
+        return emitters.get(emitterId);
+    }
+
+    @Override
     public void saveEventCache(final String eventCacheId, final Object event) {
-        eventCache.put(Long.parseLong(eventCacheId), event);
+        fallbackEmitters.put(Long.parseLong(eventCacheId), event);
+    }
+
+    @Override
+    public void deleteEventCache(final String eventCacheId) {
+        fallbackEmitters.remove(Long.parseLong(eventCacheId));
     }
 
     @Override
     public Map<Long, Object> findAllEventCacheStartWithByMemberId(final Long memberId) {
-        final Map<Long, Object> result = eventCache.entrySet().stream()
+        final Map<Long, Object> result = fallbackEmitters.entrySet().stream()
                 .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
@@ -44,6 +54,6 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
 
     @Override
     public void deleteAllEventCacheStartWithId(final Long memberId) {
-        eventCache.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
+        fallbackEmitters.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
     }
 }
