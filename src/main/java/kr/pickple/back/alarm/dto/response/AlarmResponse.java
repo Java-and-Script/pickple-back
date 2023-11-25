@@ -4,6 +4,4 @@ import java.time.LocalDateTime;
 
 public interface AlarmResponse {
     LocalDateTime getCreatedAt();
-
-    Long getId();
 }

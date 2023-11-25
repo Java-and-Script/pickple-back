@@ -108,6 +108,7 @@ public class CrewAlarmService {
     private Member getMemberInfo(final Long memberId) {
         final Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+
         return member;
     }
 
