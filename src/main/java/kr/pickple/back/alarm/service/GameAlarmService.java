@@ -39,7 +39,6 @@ public class GameAlarmService {
     private final GameAlarmRepository gameAlarmRepository;
     private final SseEmitterService sseEmitterService;
 
-
     @Transactional
     public void createGameJoinAlarm(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
 

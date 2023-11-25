@@ -49,9 +49,4 @@ public class GameAlarmResponse implements AlarmResponse{
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
     }
-
-    @Override
-    public Long getId() {
-        return this.gameAlarmId;
-    }
 }
