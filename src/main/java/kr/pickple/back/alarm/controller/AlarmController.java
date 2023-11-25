@@ -29,7 +29,7 @@ public class AlarmController {
             @Login final Long loggedInMemberId
     ) {
         final SseEmitter emitter = alarmService.subscribeToSse(loggedInMemberId);
-        sseEmitterService.sendCachedEventToUser(loggedInMemberId);
+        sseEmitterService.sendCachedEventToUser(loggedInMemberId, emitter);
 
         return ResponseEntity.status(OK)
                 .header("X-Accel-Buffering", "no")
