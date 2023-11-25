@@ -14,25 +14,17 @@ import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.fixture.dto.GameDtoFixtures;
-import kr.pickple.back.fixture.setup.GameSetup;
-import kr.pickple.back.fixture.setup.MemberSetup;
+import kr.pickple.back.game.IntegrationGameTest;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
@@ -40,27 +32,9 @@ import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.member.domain.Member;
 
 @Transactional
-@SpringBootTest
-@AutoConfigureRestDocs
-@AutoConfigureMockMvc
-class GameDocumentTest {
+class GameDocumentTest extends IntegrationGameTest {
 
     private static final String BASE_URL = "/games";
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private JwtProvider jwtProvider;
-
-    @Autowired
-    private MemberSetup memberSetup;
-
-    @Autowired
-    private GameSetup gameSetup;
-
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Test
     @DisplayName("게스트 모집글 상세 조회")
