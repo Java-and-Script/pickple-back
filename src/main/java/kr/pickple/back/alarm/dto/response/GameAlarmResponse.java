@@ -17,9 +17,9 @@ import java.time.LocalTime;
 @Builder
 @JsonSerialize
 @RequiredArgsConstructor
-public class GameAlarmResponse {
+public class GameAlarmResponse implements AlarmResponse{
 
-    private final Long GameAlarmId;
+    private final Long gameAlarmId;
     private final Long gameId;
     private final String mainAddress;
     private final LocalDateTime createdAt;
@@ -33,7 +33,7 @@ public class GameAlarmResponse {
         final Game game = gameAlarm.getGame();
 
         return GameAlarmResponse.builder()
-                .GameAlarmId(gameAlarm.getId())
+                .gameAlarmId(gameAlarm.getId())
                 .gameId(game.getId())
                 .mainAddress(gameAlarm.getGame().getMainAddress())
                 .createdAt(gameAlarm.getCreatedAt())
@@ -43,5 +43,15 @@ public class GameAlarmResponse {
                 .isRead(gameAlarm.getIsRead())
                 .gameAlarmMessage(gameAlarm.getGameAlarmType())
                 .build();
+    }
+
+    @Override
+    public LocalDateTime getCreatedAt() {
+        return this.createdAt;
+    }
+
+    @Override
+    public Long getId() {
+        return this.gameAlarmId;
     }
 }

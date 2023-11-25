@@ -1,6 +1,9 @@
 package kr.pickple.back.alarm.service;
 
 import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
+import kr.pickple.back.alarm.dto.response.AlarmResponse;
+import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
+import kr.pickple.back.alarm.dto.response.GameAlarmResponse;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
@@ -8,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.*;
 
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
@@ -22,6 +27,23 @@ public class AlarmService {
 
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
         return sseEmitterService.subscribeToSse(loggedInMemberId);
+    }
+
+    public Map<String, Object> findAllAlarms(final Long loggedInMemberId) {
+        final List<AlarmResponse> alarms = new ArrayList<>();
+
+        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId);
+        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId);
+
+        alarms.addAll(crewAlarms);
+        alarms.addAll(gameAlarms);
+
+        alarms.sort(Comparator.comparing(AlarmResponse::getCreatedAt).reversed());
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("alarms", alarms);
+
+        return response;
     }
 
     @Transactional

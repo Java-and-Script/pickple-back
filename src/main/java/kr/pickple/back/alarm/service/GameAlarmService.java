@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alarm.domain.GameAlarmType.*;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
@@ -35,6 +38,7 @@ public class GameAlarmService {
     private final GameRepository gameRepository;
     private final GameAlarmRepository gameAlarmRepository;
     private final SseEmitterService sseEmitterService;
+
 
     @Transactional
     public void createGameJoinAlarm(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
@@ -114,6 +118,14 @@ public class GameAlarmService {
     private Member getMemberInfo(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId) {
+        final List<GameAlarm> gameAlarms = gameAlarmRepository.findByMemberId(loggedInMemberId);
+
+        return gameAlarms.stream()
+                .map(GameAlarmResponse::from)
+                .collect(Collectors.toList());
     }
 
     public boolean checkUnreadGameAlarm(final Long memberId) {
