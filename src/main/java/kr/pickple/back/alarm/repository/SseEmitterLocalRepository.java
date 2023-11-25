@@ -20,28 +20,12 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     @Override
     public SseEmitter save(final String emitterId, final SseEmitter sseEmitter) {
         emitters.put(Long.parseLong(emitterId), sseEmitter);
-
-        log.debug("new emitter added: {}", sseEmitter);
-        log.debug("emitter list size: {}", emitters.size());
         return sseEmitter;
     }
 
     @Override
     public void saveEventCache(final String eventCacheId, final Object event) {
         eventCache.put(Long.parseLong(eventCacheId), event);
-
-        log.debug("new event cached: {}", event);
-        log.debug("event cache size: {}", eventCache.size());
-    }
-
-    @Override
-    public Map<Long, SseEmitter> findAllEmitterStartWithByMemberId(final Long memberId) {
-        final Map<Long, SseEmitter> result = emitters.entrySet().stream()
-                .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        log.debug("emitters for memberId {}: {}", memberId, result);
-        return result;
     }
 
     @Override
@@ -50,21 +34,16 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
                 .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
-        log.debug("event cache for memberId {}: {}", memberId, result);
         return result;
     }
 
     @Override
     public void deleteById(final Long emitterId) {
         emitters.remove(emitterId);
-
-        log.debug("emitter with id {} removed", emitterId);
     }
 
     @Override
     public void deleteAllEventCacheStartWithId(final Long memberId) {
         eventCache.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
-
-        log.debug("all event cache starting with memberId {} removed", memberId);
     }
 }
