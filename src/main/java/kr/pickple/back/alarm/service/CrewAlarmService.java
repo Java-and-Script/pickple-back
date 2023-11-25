@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alarm.domain.CrewAlarmType.*;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
@@ -115,6 +118,14 @@ public class CrewAlarmService {
         if (!crew.isLeader(crewAlarmEvent.getMemberId())) {
             throw new CrewException(CREW_IS_NOT_LEADER, crewId, crew.getLeader());
         }
+    }
+
+    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId) {
+        final List<CrewAlarm> crewAlarms = crewAlarmRepository.findByMemberId(loggedInMemberId);
+
+        return crewAlarms.stream()
+                .map(CrewAlarmResponse::from)
+                .collect(Collectors.toList());
     }
 
     public boolean checkUnreadCrewAlarm(final Long memberId) {

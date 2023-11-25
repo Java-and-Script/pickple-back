@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.util.Map;
+
 import static org.springframework.http.HttpStatus.NO_CONTENT;
 import static org.springframework.http.HttpStatus.OK;
 
@@ -45,6 +47,14 @@ public class AlarmController {
         return ResponseEntity
                 .status(OK)
                 .body(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> findAllAlarms(
+            @Login final Long loggedInMemberId
+    ) {
+        return ResponseEntity.status(OK)
+                .body(alarmService.findAllAlarms(loggedInMemberId));
     }
 
     @DeleteMapping
