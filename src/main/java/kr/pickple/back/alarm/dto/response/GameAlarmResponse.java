@@ -17,7 +17,7 @@ import java.time.LocalTime;
 @Builder
 @JsonSerialize
 @RequiredArgsConstructor
-public class GameAlarmResponse implements AlarmResponse{
+public class GameAlarmResponse implements AlarmResponse {
 
     private final Long gameAlarmId;
     private final Long gameId;
@@ -48,5 +48,10 @@ public class GameAlarmResponse implements AlarmResponse{
     @Override
     public LocalDateTime getCreatedAt() {
         return this.createdAt;
+    }
+
+    @Override
+    public Long getAlarmId() {
+        return gameAlarmId;
     }
 }
