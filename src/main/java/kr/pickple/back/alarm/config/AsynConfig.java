@@ -1,5 +1,7 @@
 package kr.pickple.back.alarm.config;
 
+import kr.pickple.back.common.config.property.AsyncProperties;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskExecutor;
@@ -8,14 +10,17 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Configuration
 @EnableAsync
+@RequiredArgsConstructor
 public class AsynConfig {
+
+    private final AsyncProperties asyncProperties;
 
     @Bean
     public TaskExecutor taskExecutor() {
         return CustomThreadPoolTaskExecutor.builder()
-                .corePoolSize(30)
-                .maxPoolSize(50)
-                .queueCapacity(70)
+                .corePoolSize(asyncProperties.getCorePoolSize())
+                .maxPoolSize(asyncProperties.getMaxPoolSize())
+                .queueCapacity(asyncProperties.getQueueCapacity())
                 .build();
     }
 
