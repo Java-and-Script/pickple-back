@@ -5,9 +5,9 @@ import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
 import kr.pickple.back.alarm.service.CrewAlarmService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor
@@ -16,19 +16,19 @@ public class CrewAlarmEventHandler {
     private final CrewAlarmService crewAlarmService;
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void sendAlarmToCrewLeader(final CrewJoinRequestNotificationEvent crewJoinRequestNotificationEvent) {
         crewAlarmService.createCrewJoinAlarm(crewJoinRequestNotificationEvent);
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void sendAlarmToCrewMemberOnJoin(final CrewMemberJoinedEvent crewMemberJoinedEvent) {
         crewAlarmService.createCrewMemberApproveAlarm(crewMemberJoinedEvent);
     }
 
     @Async
-    @EventListener
+    @TransactionalEventListener
     public void sendAlarmToCrewMemberOnRejection(final CrewMemberRejectedEvent crewMemberRejectedEvent) {
         crewAlarmService.createCrewMemberDeniedAlarm(crewMemberRejectedEvent);
     }
