@@ -215,12 +215,12 @@ public class GameService {
         if (game.isHost(loggedInMember)) {
             validateIsHostSelfDeleted(loggedInMember, member);
 
-            deleteGameMember(gameMember);
-
             eventPublisher.publishEvent(GameMemberRejectedEvent.builder()
                     .gameId(gameId)
                     .memberId(memberId)
                     .build());
+
+            deleteGameMember(gameMember);
             return;
         }
 
