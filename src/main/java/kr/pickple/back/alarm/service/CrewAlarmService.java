@@ -15,13 +15,11 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
@@ -31,7 +29,6 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADE
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CrewAlarmService {
@@ -123,17 +120,21 @@ public class CrewAlarmService {
         }
     }
 
-    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
-        final List<CrewAlarm> crewAlarms = Optional.ofNullable(cursorId)
-                .map(id -> crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
-                        loggedInMemberId,
-                        id,
-                        PageRequest.of(0, size)
-                ))
-                .orElse(crewAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
-                        loggedInMemberId,
-                        PageRequest.of(0, size)
-                ));
+    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long lastCrewAlarmId, final int size) {
+        final List<CrewAlarm> crewAlarms;
+
+        if (lastCrewAlarmId == null) {
+            crewAlarms = crewAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
+                    loggedInMemberId,
+                    PageRequest.of(0, size)
+            );
+        } else {
+            crewAlarms = crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+                    loggedInMemberId,
+                    lastCrewAlarmId,
+                    PageRequest.of(0, size)
+            );
+        }
 
         return crewAlarms.stream()
                 .map(CrewAlarmResponse::from)
