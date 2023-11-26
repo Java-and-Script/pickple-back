@@ -125,12 +125,12 @@ public class CrewMemberService {
         if (crew.isLeader(loggedInMemberId)) {
             validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
 
-            deleteCrewMember(crewMember);
-
             eventPublisher.publishEvent(CrewMemberRejectedEvent.builder()
                     .crewId(crewId)
                     .memberId(memberId)
                     .build());
+
+            deleteCrewMember(crewMember);
             return;
         }
 
