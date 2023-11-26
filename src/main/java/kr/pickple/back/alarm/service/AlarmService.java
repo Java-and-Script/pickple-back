@@ -31,11 +31,11 @@ public class AlarmService {
         return sseEmitterService.subscribeToSse(loggedInMemberId);
     }
 
-    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final int size) {
+    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long lastCrewAlarmId, final Long lastGameAlarmId, final int size) {
         final List<AlarmResponse> alarms = new ArrayList<>();
 
-        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, cursorId, size / 2 + 1);
-        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, cursorId, size / 2 + 1);
+        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, lastCrewAlarmId, size / 2 + 1);
+        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, lastGameAlarmId, size / 2 + 1);
 
         alarms.addAll(crewAlarms);
         alarms.addAll(gameAlarms);
@@ -51,7 +51,6 @@ public class AlarmService {
                 .hasNext(hasNext)
                 .build();
     }
-
 
     @Transactional
     public AlarmExistStatusResponse checkUnReadAlarms(final Long loggedInMemberId) {

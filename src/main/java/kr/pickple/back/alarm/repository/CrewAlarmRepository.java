@@ -22,14 +22,18 @@ public interface CrewAlarmRepository extends JpaRepository<CrewAlarm, Long> {
             "FROM CrewAlarm ca LEFT JOIN FETCH ca.crew " +
             "WHERE ca.member.id = :memberId AND ca.id < :cursorId " +
             "ORDER BY ca.createdAt DESC")
-    List<CrewAlarm> findByMemberIdAndIdLessThanOrderByCreatedAtDesc(@Param("memberId") final Long loggedInMemberId,
-                                                                    @Param("cursorId") final Long cursorId,
-                                                                    final PageRequest of);
+    List<CrewAlarm> findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+            @Param("memberId") final Long loggedInMemberId,
+            @Param("cursorId") final Long cursorId,
+            final PageRequest of
+    );
 
     @Query("SELECT ca " +
             "FROM CrewAlarm ca LEFT JOIN FETCH ca.crew " +
             "WHERE ca.member.id = :memberId " +
             "ORDER BY ca.createdAt DESC")
-    List<CrewAlarm> findByMemberIdOrderByCreatedAtDesc(@Param("memberId") final Long loggedInMemberId,
-                                                       final PageRequest of);
+    List<CrewAlarm> findByMemberIdOrderByCreatedAtDesc(
+            @Param("memberId") final Long loggedInMemberId,
+            final PageRequest of
+    );
 }

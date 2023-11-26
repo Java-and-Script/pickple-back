@@ -15,13 +15,11 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
@@ -31,7 +29,6 @@ import static kr.pickple.back.game.exception.GameExceptionCode.GAME_IS_NOT_HOST;
 import static kr.pickple.back.game.exception.GameExceptionCode.GAME_NOT_FOUND;
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class GameAlarmService {
@@ -121,17 +118,21 @@ public class GameAlarmService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
-        final List<GameAlarm> gameAlarms = Optional.ofNullable(cursorId)
-                .map(id -> gameAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
-                        loggedInMemberId,
-                        id,
-                        PageRequest.of(0, size)
-                ))
-                .orElse(gameAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
-                        loggedInMemberId,
-                        PageRequest.of(0, size)
-                ));
+    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long lastGameAlarmId, final int size) {
+        final List<GameAlarm> gameAlarms;
+
+        if (lastGameAlarmId == null) {
+            gameAlarms = gameAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
+                    loggedInMemberId,
+                    PageRequest.of(0, size)
+            );
+        } else {
+            gameAlarms = gameAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+                    loggedInMemberId,
+                    lastGameAlarmId,
+                    PageRequest.of(0, size)
+            );
+        }
 
         return gameAlarms.stream()
                 .map(GameAlarmResponse::from)

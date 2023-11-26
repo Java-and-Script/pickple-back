@@ -20,16 +20,20 @@ public interface GameAlarmRepository extends JpaRepository<GameAlarm, Long> {
 
     @Query("SELECT ga " +
             "FROM GameAlarm ga LEFT JOIN FETCH ga.game " +
-            "WHERE ga.member.id = :memberId AND ga.id < :cursorId " +
+            "WHERE ga.member.id = :memberId " +
             "ORDER BY ga.createdAt DESC")
-    List<GameAlarm> findByMemberIdAndIdLessThanOrderByCreatedAtDesc(@Param("memberId") final Long loggedInMemberId,
-                                                                    @Param("cursorId") final Long cuserId,
-                                                                    final PageRequest of);
+    List<GameAlarm> findByMemberIdOrderByCreatedAtDesc(
+            @Param("memberId") final Long loggedInMemberId,
+            final PageRequest of
+    );
 
     @Query("SELECT ga " +
             "FROM GameAlarm ga LEFT JOIN FETCH ga.game " +
-            "WHERE ga.member.id = :memberId " +
+            "WHERE ga.member.id = :memberId AND ga.id < :cursorId " +
             "ORDER BY ga.createdAt DESC")
-    List<GameAlarm> findByMemberIdOrderByCreatedAtDesc(@Param("memberId") final Long loggedInMemberId,
-                                                       final PageRequest of);
+    List<GameAlarm> findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+            @Param("memberId") final Long loggedInMemberId,
+            @Param("cursorId") final Long cursorId,
+            final PageRequest of
+    );
 }
