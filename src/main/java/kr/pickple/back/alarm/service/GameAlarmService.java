@@ -118,10 +118,10 @@ public class GameAlarmService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long lastGameAlarmId, final int size) {
+    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
         final List<GameAlarm> gameAlarms;
 
-        if (lastGameAlarmId == null) {
+        if (cursorId == null) {
             gameAlarms = gameAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
                     loggedInMemberId,
                     PageRequest.of(0, size)
@@ -129,7 +129,7 @@ public class GameAlarmService {
         } else {
             gameAlarms = gameAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
                     loggedInMemberId,
-                    lastGameAlarmId,
+                    cursorId,
                     PageRequest.of(0, size)
             );
         }

@@ -120,10 +120,10 @@ public class CrewAlarmService {
         }
     }
 
-    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long lastCrewAlarmId, final int size) {
+    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
         final List<CrewAlarm> crewAlarms;
 
-        if (lastCrewAlarmId == null) {
+        if (cursorId == null) {
             crewAlarms = crewAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
                     loggedInMemberId,
                     PageRequest.of(0, size)
@@ -131,7 +131,7 @@ public class CrewAlarmService {
         } else {
             crewAlarms = crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
                     loggedInMemberId,
-                    lastCrewAlarmId,
+                    cursorId,
                     PageRequest.of(0, size)
             );
         }

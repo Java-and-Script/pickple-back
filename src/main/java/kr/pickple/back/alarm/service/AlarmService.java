@@ -31,23 +31,31 @@ public class AlarmService {
         return sseEmitterService.subscribeToSse(loggedInMemberId);
     }
 
-    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long lastCrewAlarmId, final Long lastGameAlarmId, final int size) {
+    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final int size) {
         final List<AlarmResponse> alarms = new ArrayList<>();
 
-        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, lastCrewAlarmId, size / 2 + 1);
-        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, lastGameAlarmId, size / 2 + 1);
+        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, cursorId, size / 2 + 1);
+        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, cursorId, size / 2 + 1);
 
         alarms.addAll(crewAlarms);
         alarms.addAll(gameAlarms);
         alarms.sort(Comparator.comparing(AlarmResponse::getCreatedAt).reversed());
 
         final Boolean hasNext = alarms.size() > size;
+        Long nextCursorId = null;
+
+        if (hasNext) {
+            AlarmResponse lastAlarm = alarms.remove(alarms.size() - 1);
+            nextCursorId = lastAlarm.getAlarmId();
+        }
+
         while (alarms.size() > size) {
             alarms.remove(alarms.size() - 1);
         }
 
         return CursorResult.<AlarmResponse>builder()
                 .alarmResponse(alarms)
+                .cursorId(nextCursorId)
                 .hasNext(hasNext)
                 .build();
     }

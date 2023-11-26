@@ -15,4 +15,5 @@ public class CursorResult<T> {
 
     private List<T> alarmResponse;
     private Boolean hasNext;
+    private Long cursorId;
 }
