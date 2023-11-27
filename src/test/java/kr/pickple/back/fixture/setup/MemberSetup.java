@@ -1,15 +1,14 @@
 package kr.pickple.back.fixture.setup;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.repository.MemberRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class MemberSetup {
@@ -28,7 +27,6 @@ public class MemberSetup {
                 addressDepth1,
                 addressDepth2
         );
-
         return memberRepository.save(member);
     }
 

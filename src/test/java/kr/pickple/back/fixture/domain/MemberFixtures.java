@@ -1,15 +1,15 @@
 package kr.pickple.back.fixture.domain;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.IntStream;
-
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberStatus;
 import kr.pickple.back.position.domain.Position;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class MemberFixtures {
 
