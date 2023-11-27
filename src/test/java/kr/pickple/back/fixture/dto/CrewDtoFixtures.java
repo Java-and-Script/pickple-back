@@ -1,6 +1,8 @@
 package kr.pickple.back.fixture.dto;
 
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
+import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 
 public class CrewDtoFixtures {
 
@@ -11,6 +13,14 @@ public class CrewDtoFixtures {
                 .maxMemberCount(15)
                 .addressDepth1("서울시")
                 .addressDepth2("영등포구")
+                .build();
+    }
+
+    public static CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest(
+            final RegistrationStatus status
+    ) {
+        return CrewMemberUpdateStatusRequest.builder()
+                .status(status)
                 .build();
     }
 }
