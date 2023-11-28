@@ -1,6 +1,21 @@
 package kr.pickple.back.crew.domain;
 
-import jakarta.persistence.*;
+import static kr.pickple.back.crew.domain.CrewStatus.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+
+import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -14,15 +29,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
-
-import java.text.MessageFormat;
-import java.util.List;
-
-import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
-import static kr.pickple.back.crew.domain.CrewStatus.OPEN;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_CAPACITY_LIMIT_REACHED;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_STATUS_IS_CLOSED;
 
 @Getter
 @Entity
@@ -99,22 +105,15 @@ public class Crew extends BaseEntity {
             final AddressDepth2 addressDepth2
     ) {
         this.name = name;
-        this.content = getDefaultIfContentIsBlank(content);
+        this.content = content;
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.maxMemberCount = maxMemberCount;
         this.leader = leader;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+
         updateStatusIfCrewMemberFull();
-    }
-
-    private String getDefaultIfContentIsBlank(final String content) {
-        if (StringUtils.hasText(content)) {
-            return content;
-        }
-
-        return MessageFormat.format("안녕하세요. {0}입니다.", name);
     }
 
     public List<Member> getMembersByStatus(final RegistrationStatus status) {
