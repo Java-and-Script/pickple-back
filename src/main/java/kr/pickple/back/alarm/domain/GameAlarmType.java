@@ -17,6 +17,7 @@ import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_TYPE_NOT_
 @Getter
 @RequiredArgsConstructor
 public enum GameAlarmType {
+
     HOST_WAITING("게스트 모집 참여 수락을 기다리고 있어요"),
     GUEST_ACCEPT("게스트 참여가 수락되었어요"),
     GUEST_DENIED("게스트 참여가 거절되었어요"),

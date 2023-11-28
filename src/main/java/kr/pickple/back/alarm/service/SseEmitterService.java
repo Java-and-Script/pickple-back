@@ -18,7 +18,7 @@ public class SseEmitterService {
     private final SseEmitterRepository sseEmitterRepository;
 
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
-        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
+        final SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
         emitter.onTimeout(() -> {
             sseEmitterRepository.deleteById(loggedInMemberId);
