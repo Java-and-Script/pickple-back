@@ -1,6 +1,6 @@
 
 ### 해당 사용자 크루 관련 알람 상태 변경
-POST http://localhost:8080/crew-alarm/{crewAlarmId}
+PATCH http://localhost:8080/crew-alarms/{crewAlarmId}
 Authorization:
 Content-Type: application/json
 
