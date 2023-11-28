@@ -27,7 +27,7 @@ import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
-import kr.pickple.back.member.dto.response.MemberRegistrationStatusResponse;
+import kr.pickple.back.member.dto.response.RegistrationStatusResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -117,7 +117,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/games/{gameId}/registration-status")
-    public ResponseEntity<MemberRegistrationStatusResponse> findMemberRegistationStatusForGame(
+    public ResponseEntity<RegistrationStatusResponse> findMemberRegistationStatusForGame(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long gameId
@@ -127,7 +127,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/crews/{crewId}/registration-status")
-    public ResponseEntity<MemberRegistrationStatusResponse> findMemberRegistationStatusForCrew(
+    public ResponseEntity<RegistrationStatusResponse> findMemberRegistationStatusForCrew(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long crewId
