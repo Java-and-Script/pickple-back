@@ -17,6 +17,7 @@ import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberRegistrationStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,6 +55,17 @@ public class CrewMember extends BaseEntity {
 
     public Boolean equalsStatus(final RegistrationStatus status) {
         return this.status == status;
+    }
+
+    public Boolean equalsCrew(final Crew crew) {
+        return this.crew.equals(crew);
+    }
+
+    public MemberRegistrationStatus getMemberRegistrationStatus() {
+        return switch (this.status) {
+            case WAITING -> MemberRegistrationStatus.WAITING;
+            case CONFIRMED -> MemberRegistrationStatus.CONFIRMED;
+        };
     }
 
     public void confirmRegistration() {
