@@ -16,10 +16,12 @@ public class MemberCrews {
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<CrewMember> memberCrews = new ArrayList<>();
 
-    public Boolean isRegisteredByMember(final Crew crew) {
+    public MemberRegistrationStatus findRegistationStatus(final Crew crew) {
         return memberCrews.stream()
-                .map(CrewMember::getCrew)
-                .anyMatch(crew::equals);
+                .filter(memberCrew -> memberCrew.equalsCrew(crew))
+                .findFirst()
+                .map(CrewMember::getMemberRegistrationStatus)
+                .orElse(MemberRegistrationStatus.NONE);
     }
 
     public List<Crew> getCrewsByStatus(final RegistrationStatus status) {

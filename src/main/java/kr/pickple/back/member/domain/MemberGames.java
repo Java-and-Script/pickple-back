@@ -16,10 +16,12 @@ public class MemberGames {
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GameMember> memberGames = new ArrayList<>();
 
-    public Boolean isRegisteredByMember(final Game game) {
+    public MemberRegistrationStatus findRegistationStatus(final Game game) {
         return memberGames.stream()
-                .map(GameMember::getGame)
-                .anyMatch(game::equals);
+                .filter(memberGame -> memberGame.equalsGame(game))
+                .findFirst()
+                .map(GameMember::getMemberRegistrationStatus)
+                .orElse(MemberRegistrationStatus.NONE);
     }
 
     public List<Game> getGamesByStatus(final RegistrationStatus status) {
