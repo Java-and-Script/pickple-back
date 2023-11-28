@@ -36,6 +36,6 @@ public enum MemberRegistrationStatus {
             return memberRegistrationStatusMap.get(description);
         }
 
-        throw new MemberException(MEMBER_STATUS_NOT_FOUND, description);
+        throw new MemberException(MEMBER_REGISTRATION_STATUS_NOT_FOUND, description);
     }
 }

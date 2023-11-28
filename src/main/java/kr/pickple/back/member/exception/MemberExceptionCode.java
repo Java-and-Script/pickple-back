@@ -1,9 +1,10 @@
 package kr.pickple.back.member.exception;
 
+import org.springframework.http.HttpStatus;
+
 import kr.pickple.back.common.exception.ExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -16,7 +17,8 @@ public enum MemberExceptionCode implements ExceptionCode {
             "회원 가입 시, 사용자의 OAuth ID와 Provider의 정보가 유효하지 않음"),
     MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE(HttpStatus.BAD_REQUEST, "MEM-005", "매너 스코어 변경 포인트가 범위를 벗어남"),
     MEMBER_POSITIONS_IS_DUPLICATED(HttpStatus.BAD_REQUEST, "MEM-006", "사용자의 포지션 목록에 중복이 존재함"),
-    MEMBER_MISMATCH(HttpStatus.FORBIDDEN, "MEM-007", "로그인 된 사용자와 찾는 리소스 사용자가 달라 접근이 불가함");
+    MEMBER_MISMATCH(HttpStatus.FORBIDDEN, "MEM-007", "로그인 된 사용자와 찾는 리소스 사용자가 달라 접근이 불가함"),
+    MEMBER_REGISTRATION_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "MEM-008", "사용자 신청 상태는 없음, 대기, 확정만 가능");
 
     private final HttpStatus status;
     private final String code;
