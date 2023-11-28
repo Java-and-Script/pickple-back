@@ -127,12 +127,12 @@ public class Member extends BaseEntity {
         memberPositions.updateMemberPositions(this, positions);
     }
 
-    public Boolean isRegisteredByMember(final Crew crew) {
-        return memberCrews.isRegisteredByMember(crew);
+    public MemberRegistrationStatus findRegistationStatus(final Crew crew) {
+        return memberCrews.findRegistationStatus(crew);
     }
 
-    public Boolean isRegisteredByMember(final Game game) {
-        return memberGames.isRegisteredByMember(game);
+    public MemberRegistrationStatus findRegistationStatus(final Game game) {
+        return memberGames.findRegistationStatus(game);
     }
 
     public List<Crew> getCrewsByStatus(RegistrationStatus status) {
