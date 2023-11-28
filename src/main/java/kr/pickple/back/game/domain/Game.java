@@ -1,6 +1,25 @@
 package kr.pickple.back.game.domain;
 
-import jakarta.persistence.*;
+import static kr.pickple.back.game.domain.GameStatus.*;
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+import org.locationtech.jts.geom.Point;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -15,17 +34,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.springframework.util.StringUtils;
-
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-
-import static kr.pickple.back.game.domain.GameStatus.CLOSED;
-import static kr.pickple.back.game.domain.GameStatus.OPEN;
-import static kr.pickple.back.game.exception.GameExceptionCode.GAME_CAPACITY_LIMIT_REACHED;
-import static kr.pickple.back.game.exception.GameExceptionCode.GAME_STATUS_IS_CLOSED;
 
 @Entity
 @Getter
@@ -122,7 +130,7 @@ public class Game extends BaseEntity {
             final AddressDepth2 addressDepth2,
             final List<Position> positions
     ) {
-        this.content = getDefaultIfContentIsBlank(content);
+        this.content = content;
         this.playDate = playDate;
         this.playStartTime = playStartTime;
         this.playEndTime = playEndTime;
@@ -135,15 +143,8 @@ public class Game extends BaseEntity {
         this.point = point;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+
         updateGamePositions(positions);
-    }
-
-    private String getDefaultIfContentIsBlank(final String content) {
-        if (StringUtils.hasText(content)) {
-            return content;
-        }
-
-        return "즐거운 농구 경기해요!";
     }
 
     private void updateGamePositions(final List<Position> positions) {
