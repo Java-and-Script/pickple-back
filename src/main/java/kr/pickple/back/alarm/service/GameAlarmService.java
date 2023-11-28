@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static kr.pickple.back.alarm.domain.GameAlarmType.*;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
@@ -117,25 +117,21 @@ public class GameAlarmService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
-        final List<GameAlarm> gameAlarms;
-
-        if (cursorId == null) {
-            gameAlarms = gameAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
-                    loggedInMemberId,
-                    PageRequest.of(0, size)
-            );
-        } else {
-            gameAlarms = gameAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
-                    loggedInMemberId,
-                    cursorId,
-                    PageRequest.of(0, size)
-            );
-        }
+    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Optional<Long> optionalCursorId, final Integer size) {
+        final List<GameAlarm> gameAlarms = optionalCursorId
+                .map(cursorId -> gameAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+                        loggedInMemberId,
+                        cursorId,
+                        PageRequest.of(0, size)
+                ))
+                .orElseGet(() -> gameAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
+                        loggedInMemberId,
+                        PageRequest.of(0, size)
+                ));
 
         return gameAlarms.stream()
                 .map(GameAlarmResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean checkUnreadGameAlarm(final Long memberId) {

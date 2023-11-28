@@ -16,6 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
@@ -31,11 +32,12 @@ public class AlarmService {
         return sseEmitterService.subscribeToSse(loggedInMemberId);
     }
 
-    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final int size) {
+    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final Integer size) {
         final List<AlarmResponse> alarms = new ArrayList<>();
+        final int checkSizeForNextPage = size + 1;
 
-        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, cursorId, size + 1);
-        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, cursorId, size + 1);
+        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, Optional.ofNullable(cursorId), checkSizeForNextPage);
+        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, Optional.ofNullable(cursorId), checkSizeForNextPage);
 
         alarms.addAll(crewAlarms);
         alarms.addAll(gameAlarms);
@@ -46,7 +48,7 @@ public class AlarmService {
 
         if (alarms.size() > size) {
             hasNext = true;
-            AlarmResponse lastAlarm = alarms.remove(size);
+            AlarmResponse lastAlarm = alarms.remove(size.intValue());
             nextCursorId = lastAlarm.getAlarmId();
         }
 

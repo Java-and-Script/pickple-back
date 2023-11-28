@@ -49,11 +49,12 @@ public class AlarmController {
     @GetMapping
     public ResponseEntity<CursorResult<AlarmResponse>> findAllAlarms(
             @Login final Long loggedInMemberId,
-            @RequestParam(value = "cursorId", required = false) Long cursorId,
-            @RequestParam(value = "size", defaultValue = "6") int size
+            @RequestParam(required = false) Long cursorId,
+            @RequestParam(defaultValue = "6") Integer size
     ) {
         final CursorResult<AlarmResponse> result = alarmService.findAllAlarms(
                 loggedInMemberId, cursorId, size);
+
         return ResponseEntity.ok(result);
     }
 

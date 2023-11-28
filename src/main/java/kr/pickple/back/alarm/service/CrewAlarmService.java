@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 import static kr.pickple.back.alarm.domain.CrewAlarmType.*;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
@@ -119,25 +119,21 @@ public class CrewAlarmService {
         }
     }
 
-    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Long cursorId, final int size) {
-        final List<CrewAlarm> crewAlarms;
-
-        if (cursorId == null) {
-            crewAlarms = crewAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
-                    loggedInMemberId,
-                    PageRequest.of(0, size)
-            );
-        } else {
-            crewAlarms = crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
-                    loggedInMemberId,
-                    cursorId,
-                    PageRequest.of(0, size)
-            );
-        }
+    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Optional<Long> optionalCursorId, final Integer size) {
+        final List<CrewAlarm> crewAlarms = optionalCursorId
+                .map(cursorId -> crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
+                        loggedInMemberId,
+                        cursorId,
+                        PageRequest.of(0, size)
+                ))
+                .orElseGet(() -> crewAlarmRepository.findByMemberIdOrderByCreatedAtDesc(
+                        loggedInMemberId,
+                        PageRequest.of(0, size)
+                ));
 
         return crewAlarms.stream()
                 .map(CrewAlarmResponse::from)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     public boolean checkUnreadCrewAlarm(final Long memberId) {
