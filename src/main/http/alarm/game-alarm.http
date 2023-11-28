@@ -1,6 +1,6 @@
 
 ### 게임 관련 알람 상태 수정
-POST http://localhost:8080/game-alarm/{gameAlarmId}
+PATCH http://localhost:8080/game-alarms/{gameAlarmId}
 Authorization:
 Content-Type: application/json
 
