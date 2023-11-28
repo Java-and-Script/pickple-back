@@ -221,6 +221,7 @@ public class GameService {
                     .build());
 
             deleteGameMember(gameMember);
+
             return;
         }
 
