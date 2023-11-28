@@ -32,7 +32,7 @@ public interface GameAlarmRepository extends JpaRepository<GameAlarm, Long> {
             "ORDER BY ga.createdAt DESC")
     List<GameAlarm> findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
             @Param("memberId") final Long loggedInMemberId,
-            @Param("cursorId") final Long cursorId,
+            final Long cursorId,
             final PageRequest of
     );
 }

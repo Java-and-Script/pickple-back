@@ -23,7 +23,7 @@ public interface CrewAlarmRepository extends JpaRepository<CrewAlarm, Long> {
             "ORDER BY ca.createdAt DESC")
     List<CrewAlarm> findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
             @Param("memberId") final Long loggedInMemberId,
-            @Param("cursorId") final Long cursorId,
+            final Long cursorId,
             final PageRequest of
     );
 
