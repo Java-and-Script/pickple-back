@@ -15,6 +15,7 @@ public interface SseEmitterRepository {
     Map<Long, Object> findAllEventCacheStartWithByMemberId(final Long memberId);
 
     Map<Long,SseEmitter> findAllEmittersStartWithByMemberId(final Long memberId);
+
     void deleteById(final Long emitterId);
 
     void deleteAllEventCacheStartWithId(final Long memberId);
