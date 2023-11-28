@@ -26,9 +26,8 @@ import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
-import kr.pickple.back.member.dto.response.MemberCrewRegistrationStatusResponse;
-import kr.pickple.back.member.dto.response.MemberGameRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
+import kr.pickple.back.member.dto.response.MemberRegistrationStatusResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -118,23 +117,23 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/games/{gameId}/registration-status")
-    public ResponseEntity<MemberGameRegistrationStatusResponse> isMemberRegisteredGame(
+    public ResponseEntity<MemberRegistrationStatusResponse> findMemberRegistationStatusForGame(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long gameId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.isMemberRegisteredGame(loggedInMemberId, memberId, gameId));
+                .body(memberService.findMemberRegistationStatusForGame(loggedInMemberId, memberId, gameId));
     }
 
     @GetMapping("/{memberId}/crews/{crewId}/registration-status")
-    public ResponseEntity<MemberCrewRegistrationStatusResponse> isMemberRegisteredCrew(
+    public ResponseEntity<MemberRegistrationStatusResponse> findMemberRegistationStatusForCrew(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long crewId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.isMemberRegisteredCrew(loggedInMemberId, memberId, crewId));
+                .body(memberService.findMemberRegistationStatusForCrew(loggedInMemberId, memberId, crewId));
     }
 
 }
