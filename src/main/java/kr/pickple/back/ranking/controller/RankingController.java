@@ -22,6 +22,7 @@ public class RankingController {
 
     @GetMapping("/crews")
     public ResponseEntity<List<CrewRankingResponse>> findCrewRanking() {
-        return ResponseEntity.status(OK).body(rankingService.findCrewRanking());
+        return ResponseEntity.status(OK)
+                .body(rankingService.findCrewRanking());
     }
 }
