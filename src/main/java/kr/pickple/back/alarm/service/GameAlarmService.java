@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alarm.domain.GameAlarmType.*;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
 import static kr.pickple.back.game.exception.GameExceptionCode.GAME_IS_NOT_HOST;
@@ -140,7 +139,7 @@ public class GameAlarmService {
     }
 
     public boolean checkUnreadGameAlarm(final Long memberId) {
-        final boolean existsUnreadGameAlarm = gameAlarmRepository.existsByMemberIdAndIsRead(memberId, FALSE);
+        final boolean existsUnreadGameAlarm = gameAlarmRepository.existsByMemberIdAndIsRead(memberId, false);
 
         return existsUnreadGameAlarm;
     }

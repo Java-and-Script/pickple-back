@@ -1,7 +1,6 @@
 package kr.pickple.back.alarm.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import kr.pickple.back.alarm.domain.AlarmStatus;
 import kr.pickple.back.alarm.domain.GameAlarm;
 import kr.pickple.back.alarm.domain.GameAlarmType;
 import kr.pickple.back.game.domain.Game;
@@ -26,7 +25,7 @@ public class GameAlarmResponse implements AlarmResponse {
     private final LocalDate playDate;
     private final LocalTime playStartTime;
     private final Integer playTimeMinutes;
-    private final AlarmStatus isRead;
+    private final Boolean isRead;
     private final GameAlarmType gameAlarmMessage;
 
     public static GameAlarmResponse from(final GameAlarm gameAlarm) {

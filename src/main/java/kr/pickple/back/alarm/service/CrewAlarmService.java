@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 import static kr.pickple.back.alarm.domain.CrewAlarmType.*;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADER;
@@ -142,7 +141,7 @@ public class CrewAlarmService {
     }
 
     public boolean checkUnreadCrewAlarm(final Long memberId) {
-        final boolean existsUnreadCrewAlarm = crewAlarmRepository.existsByMemberIdAndIsRead(memberId, FALSE);
+        final boolean existsUnreadCrewAlarm = crewAlarmRepository.existsByMemberIdAndIsRead(memberId, false);
 
         return existsUnreadCrewAlarm;
     }
