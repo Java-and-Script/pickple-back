@@ -2,7 +2,6 @@ package kr.pickple.back.alarm.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.alarm.util.AlarmStatusConverter;
 import kr.pickple.back.alarm.util.GameAlarmTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.domain.Game;
@@ -11,8 +10,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import static kr.pickple.back.alarm.domain.AlarmStatus.FALSE;
 
 @Entity
 @Getter
@@ -24,9 +21,7 @@ public class GameAlarm extends BaseEntity {
     private Long id;
 
     @NotNull
-    @Column(length = 10)
-    @Convert(converter = AlarmStatusConverter.class)
-    private AlarmStatus isRead = FALSE;
+    private Boolean isRead = false;
 
     @NotNull
     @Column(length = 30)
@@ -52,7 +47,7 @@ public class GameAlarm extends BaseEntity {
         this.member = member;
     }
 
-    public void updateStatus(final AlarmStatus status) {
+    public void updateStatus(final Boolean status) {
         this.isRead = status;
     }
 }

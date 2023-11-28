@@ -1,7 +1,6 @@
 package kr.pickple.back.alarm.dto.response;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import kr.pickple.back.alarm.domain.AlarmStatus;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.domain.CrewAlarmType;
 import kr.pickple.back.crew.domain.Crew;
@@ -22,7 +21,7 @@ public class CrewAlarmResponse implements AlarmResponse {
     private final String crewName;
     private final String crewProfileImageUrl;
     private final LocalDateTime createdAt;
-    private final AlarmStatus isRead;
+    private final Boolean isRead;
     private final CrewAlarmType crewAlarmMessage;
 
     public static CrewAlarmResponse from(final CrewAlarm crewAlarm) {
