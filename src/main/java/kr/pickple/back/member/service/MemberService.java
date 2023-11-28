@@ -207,7 +207,7 @@ public class MemberService {
         final Member member = findMemberById(memberId);
         final Game game = findGameById(gameId);
 
-        return RegistrationStatusResponse.from(member.findRegistationStatus(game));
+        return RegistrationStatusResponse.from(member.findRegistrationStatus(game));
     }
 
     public RegistrationStatusResponse findMemberRegistationStatusForCrew(
@@ -220,6 +220,6 @@ public class MemberService {
         final Member member = findMemberById(memberId);
         final Crew crew = findCrewById(crewId);
 
-        return RegistrationStatusResponse.from(member.findRegistationStatus(crew));
+        return RegistrationStatusResponse.from(member.findRegistrationStatus(crew));
     }
 }

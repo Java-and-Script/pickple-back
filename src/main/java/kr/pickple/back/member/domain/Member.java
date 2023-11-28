@@ -56,7 +56,7 @@ public class Member extends BaseEntity {
     private String nickname;
 
     @Column(length = 1000)
-    private String introduction = MessageFormat.format("안녕하세요. {0}입니다.", nickname);
+    private String introduction;
 
     @NotNull
     @Column(length = 300)
@@ -120,6 +120,8 @@ public class Member extends BaseEntity {
         this.oauthProvider = oauthProvider;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
+
+        setDefaultIntroduction(nickname);
         updateMemberPositions(positions);
     }
 
@@ -127,12 +129,16 @@ public class Member extends BaseEntity {
         memberPositions.updateMemberPositions(this, positions);
     }
 
-    public RegistrationStatus findRegistationStatus(final Crew crew) {
-        return memberCrews.findRegistationStatus(crew);
+    private void setDefaultIntroduction(final String nickname) {
+        this.introduction = MessageFormat.format("안녕하세요. {0}입니다.", nickname);
     }
 
-    public RegistrationStatus findRegistationStatus(final Game game) {
-        return memberGames.findRegistationStatus(game);
+    public RegistrationStatus findRegistrationStatus(final Crew crew) {
+        return memberCrews.findRegistrationStatus(crew);
+    }
+
+    public RegistrationStatus findRegistrationStatus(final Game game) {
+        return memberGames.findRegistrationStatus(game);
     }
 
     public List<Crew> getCrewsByStatus(RegistrationStatus status) {
