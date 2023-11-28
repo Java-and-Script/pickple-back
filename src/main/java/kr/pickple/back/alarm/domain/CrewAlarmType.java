@@ -18,7 +18,7 @@ import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_TYPE_NOT_
 @RequiredArgsConstructor
 public enum CrewAlarmType {
 
-    CREW_LEADER_WAITING("가입 수락을 기다리고 있어요"),
+    CREW_LEADER_WAITING("크루 가입 수락을 기다리고 있어요"),
     CREW_ACCEPT("크루 가입이 수락되었어요"),
     CREW_DENIED("크루 가입이 거절되었어요"),
     ;

@@ -24,11 +24,6 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     }
 
     @Override
-    public SseEmitter findEmitterById(final Long emitterId) {
-        return emitters.get(emitterId);
-    }
-
-    @Override
     public void saveEventCache(final String eventCacheId, final Object event) {
         fallbackEmitters.put(Long.parseLong(eventCacheId), event);
     }
@@ -55,5 +50,12 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     @Override
     public void deleteAllEventCacheStartWithId(final Long memberId) {
         fallbackEmitters.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
+    }
+
+    @Override
+    public Map<Long, SseEmitter> findAllEmittersStartWithByMemberId(Long memberId) {
+        return emitters.entrySet().stream()
+                .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }

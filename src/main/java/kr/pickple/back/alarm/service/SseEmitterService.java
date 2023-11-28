@@ -14,23 +14,26 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SseEmitterService {
 
+    private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60;
     private final SseEmitterRepository sseEmitterRepository;
 
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
-        SseEmitter emitter = sseEmitterRepository.findEmitterById(loggedInMemberId);
+        SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
-        if (emitter == null) {
-            emitter = new SseEmitter(Long.MAX_VALUE);
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("AlarmSseConnect")
-                        .data("사용자에 대한 알람 SSE 연결이 정상적으로 처리되었습니다."));
-            } catch (IOException e) {
-                sseEmitterRepository.deleteById(loggedInMemberId);
-                emitter.completeWithError(e);
-            }
-            sseEmitterRepository.save(String.valueOf(loggedInMemberId), emitter);
+        emitter.onTimeout(() -> {
+            sseEmitterRepository.deleteById(loggedInMemberId);
+        });
+
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("AlarmSseConnect")
+                    .data("사용자에 대한 알람 SSE 연결이 정상적으로 처리되었습니다."));
+        } catch (IOException e) {
+            sseEmitterRepository.deleteById(loggedInMemberId);
+            emitter.completeWithError(e);
         }
+        sseEmitterRepository.save(String.valueOf(loggedInMemberId), emitter);
+        sseEmitterRepository.findAllEmittersStartWithByMemberId(loggedInMemberId);
         return emitter;
     }
 
