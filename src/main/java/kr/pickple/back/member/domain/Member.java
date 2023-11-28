@@ -127,11 +127,11 @@ public class Member extends BaseEntity {
         memberPositions.updateMemberPositions(this, positions);
     }
 
-    public MemberRegistrationStatus findRegistationStatus(final Crew crew) {
+    public RegistrationStatus findRegistationStatus(final Crew crew) {
         return memberCrews.findRegistationStatus(crew);
     }
 
-    public MemberRegistrationStatus findRegistationStatus(final Game game) {
+    public RegistrationStatus findRegistationStatus(final Game game) {
         return memberGames.findRegistationStatus(game);
     }
 
