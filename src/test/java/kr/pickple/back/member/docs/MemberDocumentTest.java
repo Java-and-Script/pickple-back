@@ -3,6 +3,7 @@ package kr.pickple.back.member.docs;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
 import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static com.epages.restdocs.apispec.Schema.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static org.springframework.http.HttpHeaders.*;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -29,7 +30,7 @@ import kr.pickple.back.member.dto.request.MemberCreateRequest;
 class MemberDocumentTest extends IntegrationMemberTest {
 
     @Test
-    @DisplayName("회원을 생성할 수 있다.")
+    @DisplayName("회원 생성")
     void createMember_ReturnAuthenticatedMemberResponse() throws Exception {
         // given
         final MemberCreateRequest memberCreateRequest = MemberDtoFixtures.memberCreateRequestBuild();
@@ -58,8 +59,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
                                         .requestSchema(schema("MemberCreateRequest"))
                                         .responseSchema(schema("MemberProfileResponse"))
                                         .requestHeaders(
-                                                headerWithName("Authorization")
-                                                        .type(SimpleType.STRING)
+                                                headerWithName("Authorization").type(SimpleType.STRING)
                                                         .description("Register Token"))
                                         .requestFields(
                                                 fieldWithPath("nickname").type(JsonFieldType.STRING).description("닉네임"),
@@ -120,7 +120,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
                                 ResourceSnippetParameters.builder()
                                         .tag("Member")
                                         .summary("회원 프로필 조회")
-                                        .description("회원 프로필을 조회한다")
+                                        .description("회원 프로필을 조회한다.")
                                         .responseSchema(schema("MemberProfileResponse"))
                                         .pathParameters(
                                                 parameterWithName("memberId").description("회원 ID")
@@ -191,7 +191,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     }
 
     @Test
-    @DisplayName("회원이 가입한 크루 목록을 조회할 수 있다.")
+    @DisplayName("회원이 가입한 크루 목록 조회")
     void findAllCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
         final Member member = memberSetup.save();
@@ -202,7 +202,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
         // when
         final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/crews", member.getId())
                         .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
-                        .queryParam("status", "확정")
+                        .queryParam("status", CONFIRMED.getDescription())
                 )
                 .andExpect(status().isOk());
 
@@ -214,10 +214,11 @@ class MemberDocumentTest extends IntegrationMemberTest {
                                 ResourceSnippetParameters.builder()
                                         .tag("Member")
                                         .summary("회원이 가입한 크루 목록 조회")
-                                        .description("회원이 가입한 크루 목록을 조회 할 수 있다.")
+                                        .description("회원이 가입한 크루 목록을 조회한다.")
                                         .responseSchema(schema("CrewProfile"))
                                         .requestHeaders(
-                                                headerWithName("Authorization").description("AccessToken")
+                                                headerWithName(AUTHORIZATION).type(SimpleType.STRING)
+                                                        .description("Access Token")
                                         )
                                         .pathParameters(
                                                 parameterWithName("memberId").description("회원 ID")
@@ -294,7 +295,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     }
 
     @Test
-    @DisplayName("회원이 만든 크루 목록을 조회할 수 있다.")
+    @DisplayName("회원이 만든 크루 목록 조회")
     void findCreatedCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
         final Member member = memberSetup.save();
@@ -316,10 +317,11 @@ class MemberDocumentTest extends IntegrationMemberTest {
                                 ResourceSnippetParameters.builder()
                                         .tag("Member")
                                         .summary("회원이 만든 크루 목록 조회")
-                                        .description("회원이 만든 크루 목록을 조회 할 수 있다.")
+                                        .description("회원이 만든 크루 목록을 조회한다.")
                                         .responseSchema(schema("CrewProfile"))
                                         .requestHeaders(
-                                                headerWithName("Authorization").description("AccessToken")
+                                                headerWithName(AUTHORIZATION).type(SimpleType.STRING)
+                                                        .description("Access Token")
                                         )
                                         .pathParameters(
                                                 parameterWithName("memberId").description("회원 ID")
@@ -385,6 +387,230 @@ class MemberDocumentTest extends IntegrationMemberTest {
                                                         .description("크루원 주 활동지역 주소2"),
                                                 subsectionWithPath("[].members[].positions[]").type(JsonFieldType.ARRAY)
                                                         .description("크루원 주 포지션 목록")
+                                        )
+                                        .build()
+                        )
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("회원이 참여 확정된 게스트 모집글 목록 조회")
+    void findAllMemberGames_ReturnGameResponses() throws Exception {
+        // given
+        final Member host = memberSetup.save();
+        gameSetup.save(host);
+
+        final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(host.getId()));
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/games", host.getId())
+                        .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
+                        .queryParam("status", CONFIRMED.getDescription())
+                )
+                .andExpect(status().isOk());
+
+        // then
+        resultActions.andDo(document("find-all-member-games",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Member")
+                                        .summary("회원이 참여 확정된 게스트 모집글 목록 조회")
+                                        .description("회원이 참여 확정된 게스트 모집글 목록을 조회한다.")
+                                        .responseSchema(schema("GameResponse"))
+                                        .requestHeaders(
+                                                headerWithName(AUTHORIZATION).type(SimpleType.STRING)
+                                                        .description("Access Token")
+                                        )
+                                        .pathParameters(
+                                                parameterWithName("memberId").description("회원 ID")
+                                        )
+                                        .queryParameters(
+                                                parameterWithName("status").description("참여 상태")
+                                        )
+                                        .responseFields(
+                                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("게스트 모집글 ID"),
+                                                fieldWithPath("[].content").type(JsonFieldType.STRING)
+                                                        .description("게스트 모집글 내용"),
+                                                fieldWithPath("[].playDate").type(JsonFieldType.STRING).description("경기 날짜"),
+                                                fieldWithPath("[].playStartTime").type(JsonFieldType.STRING)
+                                                        .description("경기 시작 시간"),
+                                                fieldWithPath("[].playEndTime").type(JsonFieldType.STRING)
+                                                        .description("경기 종료 시간"),
+                                                fieldWithPath("[].playTimeMinutes").type(JsonFieldType.NUMBER)
+                                                        .description("경기 진행 분"),
+                                                fieldWithPath("[].mainAddress").type(JsonFieldType.STRING)
+                                                        .description("메인 주소(도/시, 구, 동, 번지)"),
+                                                fieldWithPath("[].detailAddress").type(JsonFieldType.STRING)
+                                                        .description("상세 주소(층, 호수)"),
+                                                fieldWithPath("[].latitude").type(JsonFieldType.VARIES).description("위도"),
+                                                fieldWithPath("[].longitude").type(JsonFieldType.VARIES).description("경도"),
+                                                fieldWithPath("[].status").type(JsonFieldType.STRING).description("게스트 모집 상태"),
+                                                fieldWithPath("[].viewCount").type(JsonFieldType.NUMBER).description("조회 수"),
+                                                fieldWithPath("[].cost").type(JsonFieldType.NUMBER).description("비용"),
+                                                fieldWithPath("[].memberCount").type(JsonFieldType.NUMBER).description("인원 수"),
+                                                fieldWithPath("[].maxMemberCount").type(JsonFieldType.NUMBER)
+                                                        .description("인원 제한"),
+                                                fieldWithPath("[].host").type(JsonFieldType.OBJECT).description("호스트 정보"),
+                                                fieldWithPath("[].host.id").type(JsonFieldType.NUMBER)
+                                                        .description("호스트.사용자 ID"),
+                                                fieldWithPath("[].host.email").type(JsonFieldType.STRING)
+                                                        .description("호스트.이메일"),
+                                                fieldWithPath("[].host.nickname").type(JsonFieldType.STRING)
+                                                        .description("호스트.닉네임"),
+                                                fieldWithPath("[].host.introduction").type(JsonFieldType.VARIES)
+                                                        .description("호스트.자기소개"),
+                                                fieldWithPath("[].host.profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("호스트.프로필 이미지 경로"),
+                                                fieldWithPath("[].host.mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("호스트.매너 스코어"),
+                                                fieldWithPath("[].host.mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("호스트.매너 스코어 반영 횟수"),
+                                                fieldWithPath("[].host.addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("호스트.주소1(도,시)"),
+                                                fieldWithPath("[].host.addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("호스트.주소2(구)"),
+                                                fieldWithPath("[].host.positions").type(JsonFieldType.ARRAY)
+                                                        .description("호스트.포지션 목록"),
+                                                fieldWithPath("[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("주소1(도,시)"),
+                                                fieldWithPath("[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("주소2(구)"),
+                                                fieldWithPath("[].positions").type(JsonFieldType.ARRAY).description("포지션 목록"),
+                                                fieldWithPath("[].members[]").type(JsonFieldType.ARRAY)
+                                                        .description("게스트 모집글에 참여 신청한 사용자 목록"),
+                                                fieldWithPath("[].members[].id").type(JsonFieldType.NUMBER)
+                                                        .description("회원 ID"),
+                                                fieldWithPath("[].members[].email").type(JsonFieldType.STRING)
+                                                        .description("이메일"),
+                                                fieldWithPath("[].members[].nickname").type(JsonFieldType.STRING)
+                                                        .description("닉네임"),
+                                                fieldWithPath("[].members[].introduction").type(JsonFieldType.VARIES)
+                                                        .description("자기 소개"),
+                                                fieldWithPath("[].members[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("프로필 이미지 경로"),
+                                                fieldWithPath("[].members[].mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("매너 스코어"),
+                                                fieldWithPath("[].members[].mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("매너 스코어 반영 개수"),
+                                                fieldWithPath("[].members[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("주소1(도,시)"),
+                                                fieldWithPath("[].members[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("주소2(구)"),
+                                                fieldWithPath("[].members[].positions").type(JsonFieldType.ARRAY)
+                                                        .description("주 포지션 목록")
+                                        )
+                                        .build()
+                        )
+                )
+        );
+    }
+
+    @Test
+    @DisplayName("회원이 만든 게스트 모집글 목록 조회")
+    void findAllCreatedGames_ReturnGameResponses() throws Exception {
+        // given
+        final Member host = memberSetup.save();
+        gameSetup.save(host);
+
+        final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(host.getId()));
+
+        // when
+        final ResultActions resultActions = mockMvc.perform(get("/members/{memberId}/created-games", host.getId())
+                        .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
+                )
+                .andExpect(status().isOk());
+
+        // then
+        resultActions.andDo(document("find-all-created-games",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        resource(
+                                ResourceSnippetParameters.builder()
+                                        .tag("Member")
+                                        .summary("회원이 만든 게스트 모집글 목록 조회")
+                                        .description("회원이 만든 게스트 모집글 목록을 조회한다.")
+                                        .responseSchema(schema("GameResponse"))
+                                        .requestHeaders(
+                                                headerWithName(AUTHORIZATION).type(SimpleType.STRING)
+                                                        .description("Access Token")
+                                        )
+                                        .pathParameters(
+                                                parameterWithName("memberId").description("회원 ID")
+                                        )
+                                        .responseFields(
+                                                fieldWithPath("[].id").type(JsonFieldType.NUMBER).description("게스트 모집글 ID"),
+                                                fieldWithPath("[].content").type(JsonFieldType.STRING)
+                                                        .description("게스트 모집글 내용"),
+                                                fieldWithPath("[].playDate").type(JsonFieldType.STRING).description("경기 날짜"),
+                                                fieldWithPath("[].playStartTime").type(JsonFieldType.STRING)
+                                                        .description("경기 시작 시간"),
+                                                fieldWithPath("[].playEndTime").type(JsonFieldType.STRING)
+                                                        .description("경기 종료 시간"),
+                                                fieldWithPath("[].playTimeMinutes").type(JsonFieldType.NUMBER)
+                                                        .description("경기 진행 분"),
+                                                fieldWithPath("[].mainAddress").type(JsonFieldType.STRING)
+                                                        .description("메인 주소(도/시, 구, 동, 번지)"),
+                                                fieldWithPath("[].detailAddress").type(JsonFieldType.STRING)
+                                                        .description("상세 주소(층, 호수)"),
+                                                fieldWithPath("[].latitude").type(JsonFieldType.VARIES).description("위도"),
+                                                fieldWithPath("[].longitude").type(JsonFieldType.VARIES).description("경도"),
+                                                fieldWithPath("[].status").type(JsonFieldType.STRING).description("게스트 모집 상태"),
+                                                fieldWithPath("[].viewCount").type(JsonFieldType.NUMBER).description("조회 수"),
+                                                fieldWithPath("[].cost").type(JsonFieldType.NUMBER).description("비용"),
+                                                fieldWithPath("[].memberCount").type(JsonFieldType.NUMBER).description("인원 수"),
+                                                fieldWithPath("[].maxMemberCount").type(JsonFieldType.NUMBER)
+                                                        .description("인원 제한"),
+                                                fieldWithPath("[].host").type(JsonFieldType.OBJECT).description("호스트 정보"),
+                                                fieldWithPath("[].host.id").type(JsonFieldType.NUMBER)
+                                                        .description("호스트.사용자 ID"),
+                                                fieldWithPath("[].host.email").type(JsonFieldType.STRING)
+                                                        .description("호스트.이메일"),
+                                                fieldWithPath("[].host.nickname").type(JsonFieldType.STRING)
+                                                        .description("호스트.닉네임"),
+                                                fieldWithPath("[].host.introduction").type(JsonFieldType.VARIES)
+                                                        .description("호스트.자기소개"),
+                                                fieldWithPath("[].host.profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("호스트.프로필 이미지 경로"),
+                                                fieldWithPath("[].host.mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("호스트.매너 스코어"),
+                                                fieldWithPath("[].host.mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("호스트.매너 스코어 반영 횟수"),
+                                                fieldWithPath("[].host.addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("호스트.주소1(도,시)"),
+                                                fieldWithPath("[].host.addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("호스트.주소2(구)"),
+                                                fieldWithPath("[].host.positions").type(JsonFieldType.ARRAY)
+                                                        .description("호스트.포지션 목록"),
+                                                fieldWithPath("[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("주소1(도,시)"),
+                                                fieldWithPath("[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("주소2(구)"),
+                                                fieldWithPath("[].positions").type(JsonFieldType.ARRAY).description("포지션 목록"),
+                                                fieldWithPath("[].members[]").type(JsonFieldType.ARRAY)
+                                                        .description("게스트 모집글에 참여 신청한 사용자 목록"),
+                                                fieldWithPath("[].members[].id").type(JsonFieldType.NUMBER)
+                                                        .description("회원 ID"),
+                                                fieldWithPath("[].members[].email").type(JsonFieldType.STRING)
+                                                        .description("이메일"),
+                                                fieldWithPath("[].members[].nickname").type(JsonFieldType.STRING)
+                                                        .description("닉네임"),
+                                                fieldWithPath("[].members[].introduction").type(JsonFieldType.VARIES)
+                                                        .description("자기 소개"),
+                                                fieldWithPath("[].members[].profileImageUrl").type(JsonFieldType.STRING)
+                                                        .description("프로필 이미지 경로"),
+                                                fieldWithPath("[].members[].mannerScore").type(JsonFieldType.NUMBER)
+                                                        .description("매너 스코어"),
+                                                fieldWithPath("[].members[].mannerScoreCount").type(JsonFieldType.NUMBER)
+                                                        .description("매너 스코어 반영 개수"),
+                                                fieldWithPath("[].members[].addressDepth1").type(JsonFieldType.STRING)
+                                                        .description("주소1(도,시)"),
+                                                fieldWithPath("[].members[].addressDepth2").type(JsonFieldType.STRING)
+                                                        .description("주소2(구)"),
+                                                fieldWithPath("[].members[].positions").type(JsonFieldType.ARRAY)
+                                                        .description("주 포지션 목록")
                                         )
                                         .build()
                         )

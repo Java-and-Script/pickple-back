@@ -44,7 +44,7 @@ public class GameSetup {
         game.makeNewCrewChatRoom(savedChatRoom);
 
         final GameMember gameHost = game.getGameMembers().get(0);
-        //TODO: 나중에 "사용자가 만든 게스트 모집글 조회" 등에 대한 테스트를 만들 때, host.addMemberGame(gameHost) 추가해야함 (11.19 김영주)
+        host.addMemberGame(gameHost);
         gameHost.updateStatus(CONFIRMED);
 
         return gameRepository.save(game);

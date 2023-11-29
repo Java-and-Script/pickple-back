@@ -26,6 +26,7 @@ import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
 import kr.pickple.back.position.domain.Position;
@@ -178,5 +179,9 @@ public class Member extends BaseEntity {
 
     public void addMemberCrew(final CrewMember memberCrew) {
         memberCrews.addMemberCrew(memberCrew);
+    }
+
+    public void addMemberGame(final GameMember memberGame) {
+        memberGames.addMemberGame(memberGame);
     }
 }
