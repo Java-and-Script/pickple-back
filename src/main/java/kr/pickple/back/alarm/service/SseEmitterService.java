@@ -8,6 +8,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -53,15 +54,18 @@ public class SseEmitterService {
     }
 
     public <T> void sendAlarm(final Long memberId, final T responseDto) {
-        final SseEmitter emitter = subscribeToSse(memberId);
+        final Optional<SseEmitter> optionalEmitter = sseEmitterRepository.findById(memberId);
 
-        try {
-            emitter.send(SseEmitter.event().name("AlarmEvent").data(responseDto));
-            sseEmitterRepository.deleteEventCache(String.valueOf(memberId));
-        } catch (Exception e) {
-            sseEmitterRepository.saveEventCache(String.valueOf(memberId), responseDto);
-            sseEmitterRepository.deleteById(memberId);
-            log.error("알람 전송 중 오류가 발생했습니다. memberId: {}", memberId, e);
-        }
+        optionalEmitter.ifPresentOrElse(emitter -> {
+            try {
+                emitter.send(SseEmitter.event().name("AlarmEvent").data(responseDto));
+                sseEmitterRepository.deleteEventCache(String.valueOf(memberId));
+            } catch (Exception e) {
+                sseEmitterRepository.saveEventCache(String.valueOf(memberId), responseDto);
+                log.error("알람 전송 중 오류가 발생했습니다. memberId: {}", memberId, e);
+            }
+        }, () -> {
+            log.error("해당 memberId에 대한 SseEmitter를 찾을 수 없습니다. memberId: {}", memberId);
+        });
     }
 }
