@@ -1,0 +1,13 @@
+### Oauth 로그인 페이지 리다이렉트
+GET http://localhost:8080/auth/kakao
+
+### Oauth 로그인 후 서버 로그인 과정
+GET http://localhost:8080/auth/login/kakao?authCode={authCode}
+
+### AccessToken 갱신
+POST http://localhost:8080/auth/refresh
+Authorization:
+
+### 로그아웃
+DELETE http://localhost:8080/auth/logout
+Authorization:
