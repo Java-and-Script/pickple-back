@@ -13,6 +13,9 @@
 
 |개발(Dev)
 |`https://dev.pickple.kr`
+
+|운영(Prod)
+|`https://prod.pickple.kr`
 |===
 
 include::auth.adoc[]
