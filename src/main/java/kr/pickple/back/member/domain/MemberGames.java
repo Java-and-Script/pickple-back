@@ -37,4 +37,8 @@ public class MemberGames {
                 .filter(game -> game.isHost(member))
                 .toList();
     }
+
+    public void addMemberGame(final GameMember memberGame) {
+        memberGames.add(memberGame);
+    }
 }

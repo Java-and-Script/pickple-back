@@ -8,7 +8,7 @@
 
 ---
 
-=== 4.4. 게스트 모집글 상세 조회
+=== 4.3. 게스트 모집글 상세 조회
 operation::find-game[snippets='http-request,http-response']
 
 ---

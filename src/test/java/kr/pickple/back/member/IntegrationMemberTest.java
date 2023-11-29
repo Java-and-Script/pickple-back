@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.fixture.setup.CrewSetup;
+import kr.pickple.back.fixture.setup.GameSetup;
 import kr.pickple.back.fixture.setup.MemberSetup;
 
 @SpringBootTest
@@ -25,6 +26,9 @@ public abstract class IntegrationMemberTest {
 
     @Autowired
     protected CrewSetup crewSetup;
+
+    @Autowired
+    protected GameSetup gameSetup;
 
     @Autowired
     protected ObjectMapper objectMapper;
