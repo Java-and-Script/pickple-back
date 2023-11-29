@@ -2,6 +2,8 @@ package kr.pickple.back.ranking.service;
 
 import java.util.List;
 
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,7 +18,16 @@ public class RankingService {
 
     private final RankingJdbcRepository rankingJdbcRepository;
 
+    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "ranking", key = "'crew'")
     public List<CrewRankingResponse> findCrewRanking() {
-        return rankingJdbcRepository.getCrewRankings();
+        return putCrewRankingCache();
+    }
+
+    @CachePut(cacheManager = "caffeineCacheManager", cacheNames = "ranking", key = "'crew'")
+    public List<CrewRankingResponse> putCrewRankingCache() {
+        List<CrewRankingResponse> crewRankings = rankingJdbcRepository.getCrewRankings();
+        System.out.println(crewRankings.size() + "개의 크루 랭킹 갱신");
+
+        return crewRankings;
     }
 }
