@@ -34,7 +34,7 @@ public class AlarmService {
 
     public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final Integer size) {
         final List<AlarmResponse> alarms = new ArrayList<>();
-        final int checkSizeForNextPage = size + 1;
+        final Integer checkSizeForNextPage = size + 1;
 
         final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, Optional.ofNullable(cursorId), checkSizeForNextPage);
         final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, Optional.ofNullable(cursorId), checkSizeForNextPage);
@@ -46,10 +46,10 @@ public class AlarmService {
         Boolean hasNext = alarms.size() > size;
         Long nextCursorId = null;
 
-        if (alarms.size() > size) {
-            hasNext = true;
+        if (hasNext) {
             AlarmResponse lastAlarm = alarms.remove(size.intValue());
             nextCursorId = lastAlarm.getAlarmId();
+            hasNext = alarms.size() > size;
         }
 
         return CursorResult.<AlarmResponse>builder()
