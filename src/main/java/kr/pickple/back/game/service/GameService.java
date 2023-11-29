@@ -1,5 +1,21 @@
 package kr.pickple.back.game.service;
 
+import static kr.pickple.back.chat.domain.RoomType.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.text.MessageFormat;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+import org.locationtech.jts.geom.Point;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
@@ -28,22 +44,6 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.locationtech.jts.geom.Point;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.text.MessageFormat;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
-import static kr.pickple.back.chat.domain.RoomType.GAME;
-import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
-import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
-import static kr.pickple.back.game.exception.GameExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -155,6 +155,7 @@ public class GameService {
         );
 
         return games.stream()
+                .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
     }
