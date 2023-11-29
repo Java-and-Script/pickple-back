@@ -17,3 +17,8 @@ operation::oauth-login-registration[snippets='http-request,http-response']
 
 === 1.4. Access Token 갱신
 operation::oauth-access-token-refresh[snippets='http-request,http-response']
+
+---
+
+=== 1.5. 로그아웃
+operation::auth-logout[snippets='http-request,http-response']
