@@ -187,6 +187,10 @@ public class Game extends BaseEntity {
         return status == CLOSED;
     }
 
+    public Boolean isNotEndedGame() {
+        return status != ENDED;
+    }
+
     private Boolean isFullGame() {
         return memberCount.equals(maxMemberCount);
     }
