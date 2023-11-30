@@ -12,7 +12,9 @@ import java.util.List;
 import org.locationtech.jts.geom.Point;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -148,10 +150,20 @@ public class GameService {
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
         final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(address);
 
+        final PageRequest pageRequest = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(
+                        Sort.Order.asc("playDate"),
+                        Sort.Order.asc("playStartTime"),
+                        Sort.Order.asc("id")
+                )
+        );
+
         final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2(
                 mainAddressResponse.getAddressDepth1(),
                 mainAddressResponse.getAddressDepth2(),
-                pageable
+                pageRequest
         );
 
         return games.stream()
