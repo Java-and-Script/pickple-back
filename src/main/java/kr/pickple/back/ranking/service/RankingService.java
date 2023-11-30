@@ -25,8 +25,7 @@ public class RankingService {
 
     @CachePut(cacheManager = "caffeineCacheManager", cacheNames = "ranking", key = "'crew'")
     public List<CrewRankingResponse> putCrewRankingCache() {
-        List<CrewRankingResponse> crewRankings = rankingJdbcRepository.getCrewRankings();
-        System.out.println(crewRankings.size() + "개의 크루 랭킹 갱신");
+        final List<CrewRankingResponse> crewRankings = rankingJdbcRepository.getCrewRankings();
 
         return crewRankings;
     }
