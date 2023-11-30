@@ -154,16 +154,16 @@ public class Member extends BaseEntity {
         return memberCrews.getCreatedCrewsCountByMember(this);
     }
 
-    public List<Game> getGamesByStatus(final RegistrationStatus status) {
-        return memberGames.getGamesByStatus(status);
+    public List<GameMember> getMemberGamesByStatus(final RegistrationStatus status) {
+        return memberGames.getMemberGamesByStatus(status);
     }
 
     public List<Crew> getCreatedCrews() {
         return memberCrews.getCreatedCrewsByMember(this);
     }
 
-    public List<Game> getCreatedGames() {
-        return memberGames.getCreatedGamesByMember(this);
+    public List<GameMember> getCreatedMemberGames() {
+        return memberGames.getCreatedMemberGames(this);
     }
 
     public List<Position> getPositions() {

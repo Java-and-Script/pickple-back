@@ -34,17 +34,19 @@ public class MemberGames {
                 .orElse(FALSE);
     }
 
-    public List<Game> getGamesByStatus(final RegistrationStatus status) {
+    public List<GameMember> getMemberGamesByStatus(final RegistrationStatus status) {
         return memberGames.stream()
                 .filter(memberGame -> memberGame.equalsStatus(status))
-                .map(GameMember::getGame)
                 .toList();
     }
 
-    public List<Game> getCreatedGamesByMember(final Member member) {
+    public List<GameMember> getCreatedMemberGames(final Member member) {
         return memberGames.stream()
-                .map(GameMember::getGame)
-                .filter(game -> game.isHost(member))
+                .filter(gameMember -> {
+                    final Game game = gameMember.getGame();
+
+                    return game.isHost(member);
+                })
                 .toList();
     }
 
