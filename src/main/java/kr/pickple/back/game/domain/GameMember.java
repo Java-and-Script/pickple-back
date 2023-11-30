@@ -83,6 +83,10 @@ public class GameMember extends BaseEntity {
         return isReview;
     }
 
+    public void updateReviewDone() {
+        this.isReview = TRUE;
+    }
+
     private RegistrationStatus getRegistrationStatus(final Member member, final Game game) {
         final Member host = game.getHost();
 

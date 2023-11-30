@@ -301,6 +301,8 @@ public class GameService {
             validateIsSelfReview(loggedInMember, reviewedMember);
             reviewedMember.updateMannerScore(review.getMannerScore());
         });
+
+        gameMember.updateReviewDone();
     }
 
     private void validateIsSelfReview(final Member loggedInMember, final Member reviewedMember) {
