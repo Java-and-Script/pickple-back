@@ -1,17 +1,6 @@
 package kr.pickple.back.game.domain;
 
-import static java.lang.Boolean.*;
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
@@ -23,6 +12,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
+
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameMember extends BaseEntity {
