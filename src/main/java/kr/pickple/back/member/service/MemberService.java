@@ -25,7 +25,7 @@ import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.dto.response.GameResponse;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
@@ -33,6 +33,7 @@ import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
+import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
@@ -142,7 +143,7 @@ public class MemberService {
                 .toList();
     }
 
-    public List<GameResponse> findAllMemberGames(
+    public List<MemberGameResponse> findAllMemberGames(
             final Long loggedInMemberId,
             final Long memberId,
             final RegistrationStatus memberStatus
@@ -150,18 +151,18 @@ public class MemberService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = findMemberById(memberId);
-        final List<Game> games = member.getGamesByStatus(memberStatus);
+        final List<GameMember> memberGames = member.getMemberGamesByStatus(memberStatus);
 
-        return convertToGameResponses(games, memberStatus);
+        return convertToMemberGameResponses(memberGames, memberStatus);
     }
 
-    public List<GameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
+    public List<MemberGameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = findMemberById(memberId);
-        final List<Game> games = member.getCreatedGames();
+        final List<GameMember> memberGames = member.getCreatedMemberGames();
 
-        return convertToGameResponses(games, CONFIRMED);
+        return convertToMemberGameResponses(memberGames, CONFIRMED);
     }
 
     private void validateSelfMemberAccess(Long loggedInMemberId, Long memberId) {
@@ -185,9 +186,15 @@ public class MemberService {
                 .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
     }
 
-    private List<GameResponse> convertToGameResponses(final List<Game> games, final RegistrationStatus memberStatus) {
-        return games.stream()
-                .map(game -> GameResponse.of(game, getMemberResponsesByGame(game, memberStatus)))
+    private List<MemberGameResponse> convertToMemberGameResponses(
+            final List<GameMember> memberGames,
+            final RegistrationStatus memberStatus
+    ) {
+        return memberGames.stream()
+                .map(memberGame -> MemberGameResponse.of(
+                        memberGame,
+                        getMemberResponsesByGame(memberGame.getGame(), memberStatus)
+                ))
                 .toList();
     }
 
@@ -209,9 +216,9 @@ public class MemberService {
         final Game game = findGameById(gameId);
 
         final RegistrationStatus memberRegistrationStatus = member.findGameRegistrationStatus(game);
-        final Boolean isReview = member.isAlreadyReviewDoneInGame(game);
+        final Boolean isReviewDone = member.isAlreadyReviewDoneInGame(game);
 
-        return GameMemberRegistrationStatusResponse.of(memberRegistrationStatus, isReview);
+        return GameMemberRegistrationStatusResponse.of(memberRegistrationStatus, isReviewDone);
     }
 
     public CrewMemberRegistrationStatusResponse findMemberRegistrationStatusForCrew(

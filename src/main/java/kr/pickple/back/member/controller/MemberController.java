@@ -23,12 +23,12 @@ import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.config.resolver.SignUp;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
-import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
-import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
-import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
+import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
+import kr.pickple.back.member.dto.response.MemberGameResponse;
+import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +99,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/games")
-    public ResponseEntity<List<GameResponse>> findAllMemberGames(
+    public ResponseEntity<List<MemberGameResponse>> findAllMemberGames(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @RequestParam final RegistrationStatus status
@@ -109,7 +109,7 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/created-games")
-    public ResponseEntity<List<GameResponse>> findAllCreatedGames(
+    public ResponseEntity<List<MemberGameResponse>> findAllCreatedGames(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId
     ) {
