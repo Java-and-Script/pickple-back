@@ -1,4 +1,4 @@
-package kr.pickple.back.crew.service;
+package kr.pickple.back.crew;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pickple.back.auth.domain.token.JwtProvider;
@@ -13,7 +13,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @SpringBootTest
 @AutoConfigureMockMvc
 @AutoConfigureRestDocs
-public class IntegrationCrewTest {
+public abstract class IntegrationCrewTest {
 
     @Autowired
     protected MockMvc mockMvc;

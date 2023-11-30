@@ -5,7 +5,7 @@ import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
-import kr.pickple.back.crew.service.IntegrationCrewTest;
+import kr.pickple.back.crew.IntegrationCrewTest;
 import kr.pickple.back.fixture.dto.CrewDtoFixtures;
 import kr.pickple.back.fixture.setup.AddressSetup;
 import kr.pickple.back.member.domain.Member;
