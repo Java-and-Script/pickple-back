@@ -26,8 +26,9 @@ import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
+import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
-import kr.pickple.back.member.dto.response.RegistrationStatusResponse;
+import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -117,23 +118,23 @@ public class MemberController {
     }
 
     @GetMapping("/{memberId}/games/{gameId}/registration-status")
-    public ResponseEntity<RegistrationStatusResponse> findMemberRegistationStatusForGame(
+    public ResponseEntity<GameMemberRegistrationStatusResponse> findMemberRegistrationStatusForGame(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long gameId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findMemberRegistationStatusForGame(loggedInMemberId, memberId, gameId));
+                .body(memberService.findMemberRegistrationStatusForGame(loggedInMemberId, memberId, gameId));
     }
 
     @GetMapping("/{memberId}/crews/{crewId}/registration-status")
-    public ResponseEntity<RegistrationStatusResponse> findMemberRegistationStatusForCrew(
+    public ResponseEntity<CrewMemberRegistrationStatusResponse> findMemberRegistrationStatusForCrew(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long crewId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findMemberRegistationStatusForCrew(loggedInMemberId, memberId, crewId));
+                .body(memberService.findMemberRegistrationStatusForCrew(loggedInMemberId, memberId, crewId));
     }
 
 }

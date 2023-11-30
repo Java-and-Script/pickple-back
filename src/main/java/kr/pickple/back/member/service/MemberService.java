@@ -31,9 +31,10 @@ import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
+import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
+import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
-import kr.pickple.back.member.dto.response.RegistrationStatusResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -197,7 +198,7 @@ public class MemberService {
                 .toList();
     }
 
-    public RegistrationStatusResponse findMemberRegistationStatusForGame(
+    public GameMemberRegistrationStatusResponse findMemberRegistrationStatusForGame(
             final Long loggedInMemberId,
             final Long memberId,
             final Long gameId
@@ -207,10 +208,13 @@ public class MemberService {
         final Member member = findMemberById(memberId);
         final Game game = findGameById(gameId);
 
-        return RegistrationStatusResponse.from(member.findRegistrationStatus(game));
+        final RegistrationStatus memberRegistrationStatus = member.findGameRegistrationStatus(game);
+        final Boolean isReview = member.isAlreadyReviewDoneInGame(game);
+
+        return GameMemberRegistrationStatusResponse.of(memberRegistrationStatus, isReview);
     }
 
-    public RegistrationStatusResponse findMemberRegistationStatusForCrew(
+    public CrewMemberRegistrationStatusResponse findMemberRegistrationStatusForCrew(
             final Long loggedInMemberId,
             final Long memberId,
             final Long crewId
@@ -220,6 +224,6 @@ public class MemberService {
         final Member member = findMemberById(memberId);
         final Crew crew = findCrewById(crewId);
 
-        return RegistrationStatusResponse.from(member.findRegistrationStatus(crew));
+        return CrewMemberRegistrationStatusResponse.from(member.findCrewRegistrationStatus(crew));
     }
 }

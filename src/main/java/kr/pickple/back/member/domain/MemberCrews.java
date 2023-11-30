@@ -16,7 +16,7 @@ public class MemberCrews {
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<CrewMember> memberCrews = new ArrayList<>();
 
-    public RegistrationStatus findRegistrationStatus(final Crew crew) {
+    public RegistrationStatus findCrewRegistrationStatus(final Crew crew) {
         return memberCrews.stream()
                 .filter(memberCrew -> memberCrew.equalsCrew(crew))
                 .findFirst()

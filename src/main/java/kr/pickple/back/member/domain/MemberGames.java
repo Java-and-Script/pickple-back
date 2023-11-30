@@ -1,5 +1,7 @@
 package kr.pickple.back.member.domain;
 
+import static java.lang.Boolean.*;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,12 +18,20 @@ public class MemberGames {
     @OneToMany(mappedBy = "member", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<GameMember> memberGames = new ArrayList<>();
 
-    public RegistrationStatus findRegistrationStatus(final Game game) {
+    public RegistrationStatus findGameRegistrationStatus(final Game game) {
         return memberGames.stream()
                 .filter(memberGame -> memberGame.equalsGame(game))
                 .findFirst()
                 .map(GameMember::getStatus)
                 .orElse(RegistrationStatus.NONE);
+    }
+
+    public Boolean isAlreadyReviewDoneInGame(final Game game) {
+        return memberGames.stream()
+                .filter(memberGame -> memberGame.equalsGame(game))
+                .findFirst()
+                .map(GameMember::isAlreadyReviewDone)
+                .orElse(FALSE);
     }
 
     public List<Game> getGamesByStatus(final RegistrationStatus status) {

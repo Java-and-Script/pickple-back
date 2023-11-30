@@ -134,12 +134,16 @@ public class Member extends BaseEntity {
         this.introduction = MessageFormat.format("안녕하세요. {0}입니다.", nickname);
     }
 
-    public RegistrationStatus findRegistrationStatus(final Crew crew) {
-        return memberCrews.findRegistrationStatus(crew);
+    public RegistrationStatus findCrewRegistrationStatus(final Crew crew) {
+        return memberCrews.findCrewRegistrationStatus(crew);
     }
 
-    public RegistrationStatus findRegistrationStatus(final Game game) {
-        return memberGames.findRegistrationStatus(game);
+    public RegistrationStatus findGameRegistrationStatus(final Game game) {
+        return memberGames.findGameRegistrationStatus(game);
+    }
+
+    public Boolean isAlreadyReviewDoneInGame(final Game game) {
+        return memberGames.isAlreadyReviewDoneInGame(game);
     }
 
     public List<Crew> getCrewsByStatus(RegistrationStatus status) {
