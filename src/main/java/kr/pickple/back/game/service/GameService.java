@@ -312,6 +312,7 @@ public class GameService {
         final List<Game> games = gameRepository.findGamesWithInDistance(latitude, longitude, distance);
 
         return games.stream()
+                .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
     }
@@ -323,6 +324,7 @@ public class GameService {
         );
 
         return games.stream()
+                .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
     }
