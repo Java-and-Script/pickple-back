@@ -1,5 +1,17 @@
 package kr.pickple.back.alarm.service;
 
+import static kr.pickple.back.alarm.domain.GameAlarmType.*;
+import static kr.pickple.back.alarm.exception.AlarmExceptionCode.*;
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.alarm.domain.GameAlarm;
 import kr.pickple.back.alarm.dto.request.GameAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.dto.response.GameAlarmResponse;
@@ -15,18 +27,6 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-
-import static kr.pickple.back.alarm.domain.GameAlarmType.*;
-import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
-import static kr.pickple.back.game.exception.GameExceptionCode.GAME_IS_NOT_HOST;
-import static kr.pickple.back.game.exception.GameExceptionCode.GAME_NOT_FOUND;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -102,7 +102,7 @@ public class GameAlarmService {
         final Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
 
         if (!game.isHost(gameJoinRequestNotificationEvent.getMemberId())) {
-            throw new GameException(GAME_IS_NOT_HOST, gameId, game.getHost());
+            throw new GameException(GAME_MEMBER_IS_NOT_HOST, gameId, game.getHost());
         }
     }
 
@@ -117,7 +117,11 @@ public class GameAlarmService {
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    public List<GameAlarmResponse> findByMemberId(final Long loggedInMemberId, final Optional<Long> optionalCursorId, final Integer size) {
+    public List<GameAlarmResponse> findByMemberId(
+            final Long loggedInMemberId,
+            final Optional<Long> optionalCursorId,
+            final Integer size
+    ) {
         final List<GameAlarm> gameAlarms = optionalCursorId
                 .map(cursorId -> gameAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
                         loggedInMemberId,
