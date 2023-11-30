@@ -284,6 +284,11 @@ public class GameService {
                         CONFIRMED
                 )
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, loggedInMemberId));
+
+        if (gameMember.isAlreadyReviewDone()) {
+            throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
+        }
+
         final Game game = gameMember.getGame();
         final Member loggedInMember = gameMember.getMember();
 

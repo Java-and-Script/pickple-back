@@ -1,5 +1,6 @@
 package kr.pickple.back.game.domain;
 
+import static java.lang.Boolean.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 
 import jakarta.persistence.Column;
@@ -35,6 +36,9 @@ public class GameMember extends BaseEntity {
     @Convert(converter = RegistrationStatusAttributeConverter.class)
     @Column(length = 10)
     private RegistrationStatus status = WAITING;
+
+    @NotNull
+    private Boolean isReview = FALSE;
 
     @Getter
     @NotNull
@@ -73,6 +77,10 @@ public class GameMember extends BaseEntity {
 
     public ChatRoom getCrewChatRoom() {
         return game.getChatRoom();
+    }
+
+    public Boolean isAlreadyReviewDone() {
+        return isReview;
     }
 
     private RegistrationStatus getRegistrationStatus(final Member member, final Game game) {
