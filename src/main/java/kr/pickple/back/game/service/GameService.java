@@ -278,7 +278,12 @@ public class GameService {
             final Long gameId,
             final List<MannerScoreReview> mannerScoreReviews
     ) {
-        final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, loggedInMemberId);
+        final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
+                        loggedInMemberId,
+                        gameId,
+                        CONFIRMED
+                )
+                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, loggedInMemberId));
         final Game game = gameMember.getGame();
         final Member loggedInMember = gameMember.getMember();
 
