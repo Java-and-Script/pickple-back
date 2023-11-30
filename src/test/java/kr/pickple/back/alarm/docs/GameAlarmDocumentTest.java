@@ -19,10 +19,10 @@ import org.springframework.test.web.servlet.ResultActions;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.patch;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class GameAlarmDocumentTest extends IntegrationGameAlarmTest {
@@ -43,7 +43,7 @@ public class GameAlarmDocumentTest extends IntegrationGameAlarmTest {
         final GameAlarmUpdateStatusRequest request = new GameAlarmUpdateStatusRequest(true);
 
         //when
-        final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/{gameAlarmId}" + gameAlarm.getId())
+        final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/{gameAlarmId}", gameAlarm.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));

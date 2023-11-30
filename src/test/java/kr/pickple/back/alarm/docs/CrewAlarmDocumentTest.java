@@ -45,7 +45,7 @@ public class CrewAlarmDocumentTest extends IntegrationCrewAlarmTest {
         final CrewAlarmUpdateStatusRequest request = new CrewAlarmUpdateStatusRequest(true);
 
         //when
-        final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/{gameAlarmId}", crewAlarm.getId())
+        final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/{crewAlarmId}", crewAlarm.getId())
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)));
@@ -53,20 +53,20 @@ public class CrewAlarmDocumentTest extends IntegrationCrewAlarmTest {
         //then
         resultActions
                 .andExpect(status().isNoContent())
-                .andDo(document("update-game-alarm-status",
+                .andDo(document("update-crew-alarm-status",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         resource(
                                 ResourceSnippetParameters.builder()
-                                        .tag("game Alarm")
-                                        .summary("사용자의 게임 알람에 대하여 읽음 여부 수정")
-                                        .description("사용자가 보낸 게임 알람의 읽음 상태를 변경한다.")
+                                        .tag("crew Alarm")
+                                        .summary("사용자의 크루 알람에 대하여 읽음 여부 수정")
+                                        .description("사용자가 보낸 크루 알람의 읽음 상태를 변경한다.")
                                         .requestFields(
                                                 fieldWithPath("isRead").type(JsonFieldType.BOOLEAN)
                                                         .description("읽음 상태")
                                         )
                                         .pathParameters(
-                                                parameterWithName("gameAlarmId").description("게임 알람 ID")
+                                                parameterWithName("crewAlarmId").description("크루 알람 ID")
                                         )
                                         .requestHeaders(
                                                 headerWithName(HttpHeaders.AUTHORIZATION).description("Bearer 토큰")
