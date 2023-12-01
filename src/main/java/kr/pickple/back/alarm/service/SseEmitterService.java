@@ -1,5 +1,6 @@
 package kr.pickple.back.alarm.service;
 
+import kr.pickple.back.alarm.repository.RedisEventCacheRepository;
 import kr.pickple.back.alarm.repository.SseEmitterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ public class SseEmitterService {
 
     private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60;
     private final SseEmitterRepository sseEmitterRepository;
+    private final RedisEventCacheRepository redisEventCacheRepository;
 
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
         final SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
@@ -39,7 +41,7 @@ public class SseEmitterService {
     }
 
     public void sendCachedEventToUser(final Long memberId, final SseEmitter emitter) {
-        Map<Long, Object> fallbackEmitters = sseEmitterRepository.findAllEventCacheStartWithByMemberId(memberId);
+        Map<Object, Object> fallbackEmitters = redisEventCacheRepository.findAllEventCacheByMemberId(memberId);
 
         if (fallbackEmitters != null && !fallbackEmitters.isEmpty()) {
             fallbackEmitters.values().forEach(event -> {
@@ -48,8 +50,8 @@ public class SseEmitterService {
                 } catch (IOException e) {
                     log.error("알람 전송 중 오류가 발생했습니다.", e);
                 }
-                sseEmitterRepository.deleteAllEventCacheStartWithId(memberId);
             });
+            redisEventCacheRepository.deleteAllEventCacheStartWithId(memberId);
         }
     }
 
@@ -59,9 +61,9 @@ public class SseEmitterService {
         optionalEmitter.ifPresentOrElse(emitter -> {
             try {
                 emitter.send(SseEmitter.event().name("AlarmEvent").data(responseDto));
-                sseEmitterRepository.deleteEventCache(String.valueOf(memberId));
+                redisEventCacheRepository.deleteEventCache(String.valueOf(memberId));
             } catch (Exception e) {
-                sseEmitterRepository.saveEventCache(String.valueOf(memberId), responseDto);
+                redisEventCacheRepository.saveEventCache(String.valueOf(memberId), responseDto);
                 log.error("알람 전송 중 오류가 발생했습니다. memberId: {}", memberId, e);
             }
         }, () -> {
