@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public class SseEmitterLocalRepository implements SseEmitterRepository {
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
-    private final Map<Long, Object> fallbackEmitters = new ConcurrentHashMap<>();
 
     @Override
     public SseEmitter save(final String emitterId, final SseEmitter sseEmitter) {
@@ -35,7 +34,7 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     }
 
     @Override
-    public Map<Long, SseEmitter> findAllEmittersStartWithByMemberId(Long memberId) {
+    public Map<Long, SseEmitter> findAllEmittersStartWithByMemberId(final Long memberId) {
         return emitters.entrySet().stream()
                 .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));

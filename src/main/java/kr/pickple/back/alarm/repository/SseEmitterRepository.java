@@ -14,5 +14,4 @@ public interface SseEmitterRepository {
     Map<Long,SseEmitter> findAllEmittersStartWithByMemberId(final Long memberId);
 
     void deleteById(final Long emitterId);
-
 }

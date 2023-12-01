@@ -10,11 +10,17 @@ import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 @RequiredArgsConstructor
 public class RedisAlarmSubscriber implements MessageListener {
 
     private final SseEmitterService sseEmitterService;
+    private final Map<Character, Class<? extends AlarmResponse>> alarmTypeMap = Map.of(
+            'C', CrewAlarmResponse.class,
+            'G', GameAlarmResponse.class
+    );
 
     public void onMessage(final Message message, final byte[] pattern) {
         final String receivedMessage = message.toString();
@@ -29,18 +35,13 @@ public class RedisAlarmSubscriber implements MessageListener {
 
     private AlarmResponse convertStringToAlarmResponse(final String actualMessage) {
         final ObjectMapper mapper = new ObjectMapper();
+        final Class<? extends AlarmResponse> alarmResponseType = alarmTypeMap.get(actualMessage.charAt(0));
 
-        if (actualMessage.charAt(0) == 'C') {
+        if (alarmResponseType != null) {
             try {
-                return mapper.readValue(actualMessage.substring(1), CrewAlarmResponse.class);
+                return mapper.readValue(actualMessage.substring(1), alarmResponseType);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException("CrewAlarmResponse로 변환 중 오류가 발생했습니다.", e);
-            }
-        } else if (actualMessage.charAt(0) == 'G') {
-            try {
-                return mapper.readValue(actualMessage.substring(1), GameAlarmResponse.class);
-            } catch (JsonProcessingException e) {
-                throw new RuntimeException("GameAlarmResponse로 변환 중 오류가 발생했습니다.", e);
+                throw new RuntimeException(alarmResponseType.getSimpleName() + "로 변환 중 오류가 발생했습니다.", e);
             }
         }
         throw new IllegalArgumentException("알 수 없는 AlarmResponse 타입입니다: " + actualMessage);
