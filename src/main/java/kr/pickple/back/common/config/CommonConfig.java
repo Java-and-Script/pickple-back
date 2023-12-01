@@ -14,3 +14,5 @@ import kr.pickple.back.common.config.property.S3Properties;
 public class CommonConfig {
 
 }
+
+
