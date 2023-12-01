@@ -1,9 +1,9 @@
 package kr.pickple.back.alarm.controller;
 
+import kr.pickple.back.alarm.IntegrationCrewAlarmTest;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.dto.request.CrewAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.repository.CrewAlarmRepository;
-import kr.pickple.back.alarm.IntegrationCrewAlarmTest;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.fixture.domain.CrewAlarmFixtures;
 import kr.pickple.back.member.domain.Member;
@@ -35,7 +35,7 @@ public class CrewAlarmControllerTest extends IntegrationCrewAlarmTest {
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final Crew crew = crewSetup.saveWithConfirmedMembers(1);
         final CrewAlarm crewAlarm = crewAlarmRepository.save(CrewAlarmFixtures.crewAlarmBuild(member, crew));
-        final CrewAlarmUpdateStatusRequest request = new CrewAlarmUpdateStatusRequest(true);
+        final CrewAlarmUpdateStatusRequest request = CrewAlarmUpdateStatusRequest.from(true);
 
         //when
         final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/" + crewAlarm.getId())
