@@ -147,6 +147,10 @@ public class Game extends BaseEntity {
         updateGamePositions(positions);
     }
 
+    public void updateGameStatus(final GameStatus gameStatus) {
+        this.status = gameStatus;
+    }
+
     private void updateGamePositions(final List<Position> positions) {
         gamePositions.updateGamePositions(this, positions);
     }
