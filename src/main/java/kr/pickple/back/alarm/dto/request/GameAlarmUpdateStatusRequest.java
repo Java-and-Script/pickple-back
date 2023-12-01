@@ -7,10 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameAlarmUpdateStatusRequest {
 
     @NotNull(message = "게임 알림 읽음 여부는 필수입니다.")
     private Boolean isRead;
+
+    public static GameAlarmUpdateStatusRequest from(Boolean isRead) {
+        return new GameAlarmUpdateStatusRequest(isRead);
+    }
 }

@@ -42,7 +42,7 @@ public class CrewAlarmDocumentTest extends IntegrationCrewAlarmTest {
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final Crew crew = crewSetup.saveWithConfirmedMembers(1);
         final CrewAlarm crewAlarm = crewAlarmRepository.save(CrewAlarmFixtures.crewAlarmBuild(member, crew));
-        final CrewAlarmUpdateStatusRequest request = new CrewAlarmUpdateStatusRequest(true);
+        final CrewAlarmUpdateStatusRequest request = CrewAlarmUpdateStatusRequest.from(true);
 
         //when
         final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/{crewAlarmId}", crewAlarm.getId())

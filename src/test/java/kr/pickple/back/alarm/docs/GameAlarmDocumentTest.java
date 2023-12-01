@@ -40,7 +40,7 @@ public class GameAlarmDocumentTest extends IntegrationGameAlarmTest {
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final Game game = gameSetup.saveWithConfirmedMembers(1);
         final GameAlarm gameAlarm = gameAlarmRepository.save(GameAlarmFixtures.gameAlarmBuild(member, game));
-        final GameAlarmUpdateStatusRequest request = new GameAlarmUpdateStatusRequest(true);
+        final GameAlarmUpdateStatusRequest request = GameAlarmUpdateStatusRequest.from(true);
 
         //when
         final ResultActions resultActions = mockMvc.perform(patch(BASE_URL + "/{gameAlarmId}", gameAlarm.getId())

@@ -26,7 +26,6 @@ public class GameMember extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
     @NotNull
     @Convert(converter = RegistrationStatusAttributeConverter.class)
     @Column(length = 10)
@@ -35,13 +34,11 @@ public class GameMember extends BaseEntity {
     @NotNull
     private Boolean isReview = FALSE;
 
-    @Getter
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @Getter
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
