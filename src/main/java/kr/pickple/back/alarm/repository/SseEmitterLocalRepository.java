@@ -25,37 +25,13 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     }
 
     @Override
-    public void saveEventCache(final String eventCacheId, final Object event) {
-        fallbackEmitters.put(Long.parseLong(eventCacheId), event);
-    }
-
-    @Override
     public Optional<SseEmitter> findById(final Long emitterId) {
         return Optional.ofNullable(emitters.get(emitterId));
     }
 
     @Override
-    public void deleteEventCache(final String eventCacheId) {
-        fallbackEmitters.remove(Long.parseLong(eventCacheId));
-    }
-
-    @Override
-    public Map<Long, Object> findAllEventCacheStartWithByMemberId(final Long memberId) {
-        final Map<Long, Object> result = fallbackEmitters.entrySet().stream()
-                .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-        return result;
-    }
-
-    @Override
     public void deleteById(final Long emitterId) {
         emitters.remove(emitterId);
-    }
-
-    @Override
-    public void deleteAllEventCacheStartWithId(final Long memberId) {
-        fallbackEmitters.entrySet().removeIf(entry -> entry.getKey().toString().startsWith(memberId.toString()));
     }
 
     @Override
