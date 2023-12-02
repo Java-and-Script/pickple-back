@@ -1,12 +1,13 @@
 package kr.pickple.back.alarm.docs;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import kr.pickple.back.alarm.IntegrationCrewAlarmTest;
+import kr.pickple.back.alarm.IntegrationAlarmTest;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.dto.request.CrewAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.repository.CrewAlarmRepository;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.fixture.domain.CrewAlarmFixtures;
+import kr.pickple.back.fixture.setup.CrewSetup;
 import kr.pickple.back.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,9 +28,12 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-public class CrewAlarmDocumentTest extends IntegrationCrewAlarmTest {
+public class CrewAlarmDocumentTest extends IntegrationAlarmTest {
 
     private static final String BASE_URL = "/crew-alarms";
+
+    @Autowired
+    protected CrewSetup crewSetup;
 
     @Autowired
     private CrewAlarmRepository crewAlarmRepository;
