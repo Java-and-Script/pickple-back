@@ -15,19 +15,19 @@ import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-@Component
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class BatchScheduler {
+public class GameBatchScheduler {
 
     private final JobLauncher jobLauncher;
-    private final Job job;
+    private final Job updateGameStatusJob;
 
     @Scheduled(cron = "0 0/30 * * * *")
-    public void runJob() {
+    public void runUpdateGameStatusJob() {
         try {
             jobLauncher.run(
-                    job,
+                    updateGameStatusJob,
                     new JobParametersBuilder()
                             .addString("dateTime", LocalDateTime.now().toString())
                             .toJobParameters()

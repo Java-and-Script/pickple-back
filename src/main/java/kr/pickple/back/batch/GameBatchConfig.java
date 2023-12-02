@@ -14,10 +14,13 @@ import lombok.RequiredArgsConstructor;
 
 @Configuration
 @RequiredArgsConstructor
-public class BatchConfig extends DefaultBatchConfiguration {
+public class GameBatchConfig extends DefaultBatchConfiguration {
+
+    private final GameEndedTasklet gameEndedTasklet;
+    private final GameClosedTasklet gameClosedTasklet;
 
     @Bean
-    public Job job(
+    public Job updateGameStatusJob(
             final JobRepository jobRepository,
             final Step updateGameStatusToClosedStep,
             final Step updateGameStatusToEndedStep
@@ -31,22 +34,20 @@ public class BatchConfig extends DefaultBatchConfiguration {
     @Bean
     public Step updateGameStatusToClosedStep(
             final JobRepository jobRepository,
-            final GameClosedTasklet gameClosedTasklet,
-            final PlatformTransactionManager transactionManager
+            final PlatformTransactionManager platformTransactionManager
     ) {
         return new StepBuilder("updateGameStatusToClosedStep", jobRepository)
-                .tasklet(gameClosedTasklet, transactionManager)
+                .tasklet(gameClosedTasklet, platformTransactionManager)
                 .build();
     }
 
     @Bean
     public Step updateGameStatusToEndedStep(
             final JobRepository jobRepository,
-            final GameEndedTasklet gameEndedTasklet,
-            final PlatformTransactionManager transactionManager
+            final PlatformTransactionManager platformTransactionManager
     ) {
         return new StepBuilder("updateGameStatusToEndedStep", jobRepository)
-                .tasklet(gameEndedTasklet, transactionManager)
+                .tasklet(gameEndedTasklet, platformTransactionManager)
                 .build();
     }
 }
