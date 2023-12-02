@@ -1,11 +1,12 @@
 package kr.pickple.back.alarm.docs;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import kr.pickple.back.alarm.IntegrationGameAlarmTest;
+import kr.pickple.back.alarm.IntegrationAlarmTest;
 import kr.pickple.back.alarm.domain.GameAlarm;
 import kr.pickple.back.alarm.dto.request.GameAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.repository.GameAlarmRepository;
 import kr.pickple.back.fixture.domain.GameAlarmFixtures;
+import kr.pickple.back.fixture.setup.GameSetup;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
@@ -25,9 +26,12 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWit
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class GameAlarmDocumentTest extends IntegrationGameAlarmTest {
+public class GameAlarmDocumentTest extends IntegrationAlarmTest {
 
     private static final String BASE_URL = "/game-alarms";
+
+    @Autowired
+    protected GameSetup gameSetup;
 
     @Autowired
     private GameAlarmRepository gameAlarmRepository;

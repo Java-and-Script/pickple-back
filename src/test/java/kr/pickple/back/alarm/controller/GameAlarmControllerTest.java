@@ -1,10 +1,11 @@
 package kr.pickple.back.alarm.controller;
 
+import kr.pickple.back.alarm.IntegrationAlarmTest;
 import kr.pickple.back.alarm.domain.GameAlarm;
 import kr.pickple.back.alarm.dto.request.GameAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.repository.GameAlarmRepository;
-import kr.pickple.back.alarm.IntegrationGameAlarmTest;
 import kr.pickple.back.fixture.domain.GameAlarmFixtures;
+import kr.pickple.back.fixture.setup.GameSetup;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import org.junit.jupiter.api.DisplayName;
@@ -20,9 +21,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-public class GameAlarmControllerTest extends IntegrationGameAlarmTest {
+public class GameAlarmControllerTest extends IntegrationAlarmTest {
 
     private static final String BASE_URL = "/game-alarms";
+
+    @Autowired
+    protected GameSetup gameSetup;
 
     @Autowired
     private GameAlarmRepository gameAlarmRepository;
