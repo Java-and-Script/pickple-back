@@ -32,6 +32,7 @@ import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
@@ -160,14 +161,14 @@ public class GameService {
                 )
         );
 
-        final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2(
+        final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2AndStatusNot(
                 mainAddressResponse.getAddressDepth1(),
                 mainAddressResponse.getAddressDepth2(),
+                GameStatus.ENDED,
                 pageRequest
         );
 
         return games.stream()
-                .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
     }
