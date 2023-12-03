@@ -4,6 +4,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.caffeine.CaffeineCache;
@@ -70,6 +73,18 @@ public class CacheConfig {
                 .fromConnectionFactory(redisConnectionFactory())
                 .cacheDefaults(redisCacheConfiguration)
                 .build();
+    }
+
+    @Bean
+    public RedissonClient redissonClient() {
+        Config redisConfig = new Config();
+        redisConfig.useSingleServer()
+                .setAddress(String.format("redis://%s:%d", redisProperties.getHost(), redisProperties.getPort()))
+                .setPassword(redisProperties.getPassword())
+                .setConnectionMinimumIdleSize(2)
+                .setConnectionPoolSize(4);
+
+        return Redisson.create(redisConfig);
     }
 
     @Bean
