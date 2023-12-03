@@ -62,4 +62,10 @@ public class ChatRoomMembers {
                 .map(ChatRoomMember::getMember)
                 .toList();
     }
+
+    List<Member> getAllMembers() {
+        return chatRoomMembers.stream()
+                .map(ChatRoomMember::getMember)
+                .toList();
+    }
 }

@@ -76,7 +76,7 @@ public class ChatRoomFindService {
     private ChatRoomDetailResponse getPersonalChatRoomDetailResponse(final Long memberId, final ChatRoom chatRoom) {
         final Member sender = findMemberById(memberId);
 
-        final Member receiver = chatRoom.getActiveMembersInRoom()
+        final Member receiver = chatRoom.getAllMembersInRoom()
                 .stream()
                 .filter(roomMember -> !roomMember.equals(sender))
                 .findFirst()

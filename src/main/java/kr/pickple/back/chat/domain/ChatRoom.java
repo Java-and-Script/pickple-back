@@ -128,6 +128,10 @@ public class ChatRoom extends BaseEntity {
         return chatRoomMembers.getActiveMembers();
     }
 
+    public List<Member> getAllMembersInRoom() {
+        return chatRoomMembers.getAllMembers();
+    }
+
     public ChatMessage getLastChatMessage() {
         return chatMessages.getLastChatMessage();
     }
