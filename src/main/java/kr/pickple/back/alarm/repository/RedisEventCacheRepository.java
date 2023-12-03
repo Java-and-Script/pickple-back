@@ -26,7 +26,8 @@ public class RedisEventCacheRepository {
     }
 
     public void deleteAllEventCacheStartWithId(final Long memberId) {
-        Set<String> keys = redisTemplate.keys("EventCache:" + String.valueOf(memberId) + "*");
+        final Set<String> keys = redisTemplate.keys("EventCache:" + String.valueOf(memberId) + "*");
+
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
         }
