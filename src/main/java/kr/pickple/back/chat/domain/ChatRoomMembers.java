@@ -56,8 +56,9 @@ public class ChatRoomMembers {
                 .anyMatch(chatRoomMember -> member.equals(chatRoomMember.getMember()));
     }
 
-    List<Member> getMembers() {
+    List<Member> getActiveMembers() {
         return chatRoomMembers.stream()
+                .filter(ChatRoomMember::isActive)
                 .map(ChatRoomMember::getMember)
                 .toList();
     }

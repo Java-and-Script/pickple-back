@@ -75,7 +75,7 @@ public class ChatRoomDetailResponse {
     }
 
     private static List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
-        return chatRoom.getMembersInRoom()
+        return chatRoom.getActiveMembersInRoom()
                 .stream()
                 .map(ChatMemberResponse::from)
                 .toList();
