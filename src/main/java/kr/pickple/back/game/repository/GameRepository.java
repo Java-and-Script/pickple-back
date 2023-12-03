@@ -17,9 +17,10 @@ import kr.pickple.back.game.domain.GameStatus;
 
 public interface GameRepository extends JpaRepository<Game, Long>, GameSearchRepository {
 
-    Page<Game> findByAddressDepth1AndAddressDepth2(
+    Page<Game> findByAddressDepth1AndAddressDepth2AndStatusNot(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
+            final GameStatus status,
             final Pageable pageable
     );
 
