@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_CONVERT_TYPE_NOT_FOUND;
 import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_TYPE_NOT_FOUND;
 
 @Service
@@ -44,7 +45,7 @@ public class RedisAlarmSubscriber implements MessageListener {
             try {
                 return mapper.readValue(actualMessage.substring(1), alarmResponseType);
             } catch (JsonProcessingException e) {
-                throw new RuntimeException(alarmResponseType.getSimpleName() + "로 변환 중 오류가 발생했습니다.", e);
+                throw new AlarmException(ALARM_CONVERT_TYPE_NOT_FOUND, alarmResponseType.getSimpleName());
             }
         }
         throw new AlarmException(ALARM_TYPE_NOT_FOUND, alarmResponseType);
