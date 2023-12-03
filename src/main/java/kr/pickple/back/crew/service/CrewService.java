@@ -1,10 +1,24 @@
 package kr.pickple.back.crew.service;
 
+import static kr.pickple.back.chat.domain.RoomType.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.text.MessageFormat;
+import java.util.List;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
+import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
@@ -17,24 +31,14 @@ import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-
-import static kr.pickple.back.chat.domain.RoomType.CREW;
-import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_CREATE_MAX_COUNT_EXCEEDED;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class CrewService {
 
+    private static final Integer CREW_IMAGE_START_NUMBER = 1;
+    private static final Integer CREW_IMAGE_END_NUMBER = 20;
     private static final Integer CREW_CREATE_MAX_SIZE = 3;
 
     private final S3Properties s3Properties;
@@ -57,11 +61,14 @@ public class CrewService {
                 crewCreateRequest.getAddressDepth2()
         );
 
+        final Integer crewImageRandomNumber = RandomUtil.getRandomNumber(CREW_IMAGE_START_NUMBER,
+                CREW_IMAGE_END_NUMBER);
+
         final Crew crew = crewCreateRequest.toEntity(
                 leader,
                 mainAddressResponse,
-                s3Properties.getProfile(),
-                s3Properties.getBackground()
+                MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
+                MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
         );
         crew.addCrewMember(leader);
 
