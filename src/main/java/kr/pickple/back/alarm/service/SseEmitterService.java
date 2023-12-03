@@ -13,7 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -80,17 +79,18 @@ public class SseEmitterService {
         final Map<Object, Object> eventCache = redisEventCacheRepository.findAllEventCacheByMemberId(memberId);
 
         if (eventCache.size() > MAX_ALARM_COUNT) {
-            final List<Object> sortedKeys = findOldestKeys(eventCache);
-            for (int i = 0; i < sortedKeys.size() - MAX_ALARM_COUNT; i++) {
+            final List<Object> sortedKeys = getSortedAlarmKeysByCreatedAt(eventCache);
+            final Integer exceedAlarmCount = sortedKeys.size() - MAX_ALARM_COUNT;
+            for (int i = 0; i < exceedAlarmCount; i++) {
                 redisEventCacheRepository.deleteEventCache((String) sortedKeys.get(i));
             }
         }
     }
 
-    private List<Object> findOldestKeys(final Map<Object, Object> eventCache) {
+    private List<Object> getSortedAlarmKeysByCreatedAt(final Map<Object, Object> eventCache) {
         return eventCache.entrySet().stream()
                 .sorted(Comparator.comparing(entry -> ((AlarmResponse) entry.getValue()).getCreatedAt()))
                 .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+                .toList();
     }
 }

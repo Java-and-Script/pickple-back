@@ -5,12 +5,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
 import kr.pickple.back.alarm.dto.response.GameAlarmResponse;
+import kr.pickple.back.alarm.exception.AlarmException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.connection.Message;
 import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
+
+import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_TYPE_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -44,6 +47,6 @@ public class RedisAlarmSubscriber implements MessageListener {
                 throw new RuntimeException(alarmResponseType.getSimpleName() + "로 변환 중 오류가 발생했습니다.", e);
             }
         }
-        throw new IllegalArgumentException("알 수 없는 AlarmResponse 타입입니다: " + actualMessage);
+        throw new AlarmException(ALARM_TYPE_NOT_FOUND, alarmResponseType);
     }
 }
