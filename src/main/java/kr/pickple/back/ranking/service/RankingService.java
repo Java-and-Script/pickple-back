@@ -18,12 +18,12 @@ public class RankingService {
 
     private final RankingJdbcRepository rankingJdbcRepository;
 
-    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "ranking", key = "'crew'")
+    @Cacheable(cacheManager = "redisCacheManager", cacheNames = "ranking", key = "'crew'")
     public List<CrewRankingResponse> findCrewRanking() {
         return putCrewRankingCache();
     }
 
-    @CachePut(cacheManager = "caffeineCacheManager", cacheNames = "ranking", key = "'crew'")
+    @CachePut(cacheManager = "redisCacheManager", cacheNames = "ranking", key = "'crew'")
     public List<CrewRankingResponse> putCrewRankingCache() {
         final List<CrewRankingResponse> crewRankings = rankingJdbcRepository.getCrewRankings();
 
