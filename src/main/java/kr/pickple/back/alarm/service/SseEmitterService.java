@@ -19,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SseEmitterService {
 
-    private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+    private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60 * 336;
     private static final Integer MAX_ALARM_COUNT = 10;
     private final SseEmitterRepository sseEmitterRepository;
     private final RedisEventCacheRepository redisEventCacheRepository;
