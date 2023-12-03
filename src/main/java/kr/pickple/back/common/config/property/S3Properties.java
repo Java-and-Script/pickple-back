@@ -9,6 +9,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "s3.default")
 public class S3Properties {
 
-    private final String profile;
-    private final String background;
+    private final String crewProfile;
+    private final String crewBackground;
 }
