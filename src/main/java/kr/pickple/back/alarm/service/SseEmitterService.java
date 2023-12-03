@@ -1,5 +1,6 @@
 package kr.pickple.back.alarm.service;
 
+import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.repository.RedisEventCacheRepository;
 import kr.pickple.back.alarm.repository.SseEmitterRepository;
 import lombok.RequiredArgsConstructor;
@@ -8,8 +9,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -17,6 +21,7 @@ import java.util.Optional;
 public class SseEmitterService {
 
     private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60;
+    private static final Integer MAX_ALARM_COUNT = 10;
     private final SseEmitterRepository sseEmitterRepository;
     private final RedisEventCacheRepository redisEventCacheRepository;
 
@@ -69,5 +74,23 @@ public class SseEmitterService {
         }, () -> {
             log.error("해당 memberId에 대한 SseEmitter를 찾을 수 없습니다. memberId: {}", memberId);
         });
+    }
+
+    public void limitAlarms(final Long memberId) {
+        final Map<Object, Object> eventCache = redisEventCacheRepository.findAllEventCacheByMemberId(memberId);
+
+        if (eventCache.size() > MAX_ALARM_COUNT) {
+            final List<Object> sortedKeys = findOldestKeys(eventCache);
+            for (int i = 0; i < sortedKeys.size() - MAX_ALARM_COUNT; i++) {
+                redisEventCacheRepository.deleteEventCache((String) sortedKeys.get(i));
+            }
+        }
+    }
+
+    private List<Object> findOldestKeys(final Map<Object, Object> eventCache) {
+        return eventCache.entrySet().stream()
+                .sorted(Comparator.comparing(entry -> ((AlarmResponse) entry.getValue()).getCreatedAt()))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
     }
 }

@@ -1,23 +1,7 @@
 package kr.pickple.back.auth.controller;
 
-import static org.springframework.http.HttpHeaders.*;
-import static org.springframework.http.HttpStatus.*;
-
-import java.io.IOException;
-
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import jakarta.servlet.http.HttpServletResponse;
+import kr.pickple.back.alarm.service.SseEmitterService;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
@@ -25,6 +9,14 @@ import kr.pickple.back.auth.dto.response.AccessTokenResponse;
 import kr.pickple.back.auth.service.OauthService;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+
+import static org.springframework.http.HttpHeaders.SET_COOKIE;
+import static org.springframework.http.HttpStatus.*;
 
 @RequiredArgsConstructor
 @RestController
@@ -36,6 +28,7 @@ public class OauthController {
 
     private final OauthService oauthService;
     private final JwtProperties jwtProperties;
+    private final SseEmitterService sseEmitterService;
 
     @GetMapping("/{oauthProvider}")
     public void redirectAuthCodeRequestUrl(
@@ -101,6 +94,8 @@ public class OauthController {
                 .build();
 
         httpServletResponse.addHeader(SET_COOKIE, cookie.toString());
+        sseEmitterService.limitAlarms(loggedInMemberId);
+
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
