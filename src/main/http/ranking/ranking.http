@@ -1,0 +1,2 @@
+### 크루 랭킹 조회
+GET http://localhost:8080/ranking/crews

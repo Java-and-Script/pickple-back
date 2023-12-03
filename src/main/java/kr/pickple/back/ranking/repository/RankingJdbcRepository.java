@@ -26,8 +26,7 @@ public class RankingJdbcRepository {
                 crew_ranking.manner_score, 
                 crew_ranking.activity_score + crew_ranking.manner_score AS total_score, 
                 RANK() OVER (
-                    ORDER BY crew_ranking.manner_score + crew_ranking.activity_score DESC, 
-                    crew_ranking.name
+                    ORDER BY crew_ranking.manner_score + crew_ranking.activity_score DESC
                 ) AS ranking 
             FROM (
                 SELECT 
