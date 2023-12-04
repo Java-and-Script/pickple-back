@@ -83,6 +83,6 @@ public class ChatValidator {
     }
 
     private Boolean isGameNotOver(final Game game) {
-        return DateTimeUtil.isAfterThanNow(game.getPlayDate(), game.getPlayEndTime());
+        return DateTimeUtil.isAfterThanNow(game.getPlayEndDatetime());
     }
 }
