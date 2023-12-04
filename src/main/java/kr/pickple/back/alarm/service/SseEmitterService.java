@@ -19,12 +19,13 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class SseEmitterService {
 
-    private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60 * 336;
+    private static final long DEFAULT_TIMEOUT = 60L * 1000 * 60 * 6;
     private static final Integer MAX_ALARM_COUNT = 10;
     private final SseEmitterRepository sseEmitterRepository;
     private final RedisEventCacheRepository redisEventCacheRepository;
 
     public SseEmitter subscribeToSse(final Long loggedInMemberId) {
+        sseEmitterRepository.deleteById(loggedInMemberId);
         final SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
 
         emitter.onTimeout(() -> {
@@ -40,7 +41,8 @@ public class SseEmitterService {
             emitter.completeWithError(e);
         }
         sseEmitterRepository.save(String.valueOf(loggedInMemberId), emitter);
-        sseEmitterRepository.findAllEmittersStartWithByMemberId(loggedInMemberId);
+        sendCachedEventToUser(loggedInMemberId, emitter);
+
         return emitter;
     }
 
