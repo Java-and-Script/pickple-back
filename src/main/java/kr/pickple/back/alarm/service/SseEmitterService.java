@@ -75,8 +75,4 @@ public class SseEmitterService {
             log.error("해당 memberId에 대한 SseEmitter를 찾을 수 없습니다. memberId: {}", memberId);
         });
     }
-
-    public void unsubscribeFromSse(final Long loggedInMemberId) {
-        sseEmitterRepository.deleteById(loggedInMemberId);
-    }
 }

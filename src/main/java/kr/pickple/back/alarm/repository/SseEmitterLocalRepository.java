@@ -8,7 +8,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Log4j2
 @Repository
@@ -31,12 +30,5 @@ public class SseEmitterLocalRepository implements SseEmitterRepository {
     @Override
     public void deleteById(final Long emitterId) {
         emitters.remove(emitterId);
-    }
-
-    @Override
-    public Map<Long, SseEmitter> findAllEmittersStartWithByMemberId(final Long memberId) {
-        return emitters.entrySet().stream()
-                .filter(entry -> entry.getKey().toString().startsWith(memberId.toString()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 }
