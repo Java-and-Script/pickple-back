@@ -3,7 +3,6 @@ package kr.pickple.back.alarm.controller;
 import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
 import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.service.AlarmService;
-import kr.pickple.back.alarm.service.SseEmitterService;
 import kr.pickple.back.alarm.util.CursorResult;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +20,6 @@ import static org.springframework.http.HttpStatus.OK;
 public class AlarmController {
 
     private final AlarmService alarmService;
-    private final SseEmitterService sseEmitterService;
 
     @GetMapping(value = "/subscribe", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public ResponseEntity<SseEmitter> subscribeToSse(
