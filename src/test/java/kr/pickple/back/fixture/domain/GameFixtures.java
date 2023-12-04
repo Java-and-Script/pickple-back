@@ -31,7 +31,7 @@ public class GameFixtures {
 
         return Game.builder()
                 .content("하이하이 즐겜 한 판해요")
-                .playDate(LocalDate.of(2023, 11, 10))
+                .playDate(LocalDate.now().minusDays(1))
                 .playStartTime(LocalTime.of(11, 30))
                 .playEndTime(LocalTime.of(13, 0))
                 .playTimeMinutes(90)
