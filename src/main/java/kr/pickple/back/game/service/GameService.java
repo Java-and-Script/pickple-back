@@ -6,6 +6,7 @@ import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -52,6 +53,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class GameService {
+
+    private static final int REVIEW_POSSIBLE_DAYS = 7;
 
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
@@ -293,8 +296,8 @@ public class GameService {
         final Game game = gameMember.getGame();
         final Member loggedInMember = gameMember.getMember();
 
-        if (isGameNotOver(game)) {
-            throw new GameException(GAME_MEMBERS_CAN_REVIEW_AFTER_PLAYING, game.getPlayDate(), game.getPlayEndTime());
+        if (isNotReviewPeriod(game)) {
+            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(), game.getPlayEndTime());
         }
 
         mannerScoreReviews.forEach(review -> {
@@ -317,8 +320,18 @@ public class GameService {
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
     }
 
-    private Boolean isGameNotOver(final Game game) {
-        return DateTimeUtil.isAfterThanNow(game.getPlayDate(), game.getPlayEndTime());
+    private Boolean isNotReviewPeriod(final Game game) {
+        return isBeforeThanPlayEndTime(game) || isAfterReviewPossibleTime(game);
+    }
+
+    private Boolean isBeforeThanPlayEndTime(final Game game) {
+        return DateTimeUtil.isAfterThanNow(game.getPlayEndDatetime());
+    }
+
+    private Boolean isAfterReviewPossibleTime(final Game game) {
+        final LocalDateTime reviewDeadlineDatetime = game.getPlayEndDatetime().plusDays(REVIEW_POSSIBLE_DAYS);
+
+        return DateTimeUtil.isEqualOrAfter(reviewDeadlineDatetime, LocalDateTime.now());
     }
 
     private Member getReviewedMember(final Game game, final Long reviewedMemberId) {

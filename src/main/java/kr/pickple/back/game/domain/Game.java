@@ -4,6 +4,7 @@ import static kr.pickple.back.game.domain.GameStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -161,6 +162,10 @@ public class Game extends BaseEntity {
 
     public List<GameMember> getGameMembers() {
         return gameMembers.getGameMembers();
+    }
+
+    public LocalDateTime getPlayEndDatetime() {
+        return LocalDateTime.of(playDate, playEndTime);
     }
 
     public void addGameMember(final Member member) {
