@@ -1,7 +1,6 @@
 package kr.pickple.back.auth.controller;
 
 import jakarta.servlet.http.HttpServletResponse;
-import kr.pickple.back.alarm.service.SseEmitterService;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
@@ -28,7 +27,6 @@ public class OauthController {
 
     private final OauthService oauthService;
     private final JwtProperties jwtProperties;
-    private final SseEmitterService sseEmitterService;
 
     @GetMapping("/{oauthProvider}")
     public void redirectAuthCodeRequestUrl(
@@ -94,8 +92,6 @@ public class OauthController {
                 .build();
 
         httpServletResponse.addHeader(SET_COOKIE, cookie.toString());
-        sseEmitterService.limitAlarms(loggedInMemberId);
-
         return ResponseEntity.status(NO_CONTENT)
                 .build();
     }
