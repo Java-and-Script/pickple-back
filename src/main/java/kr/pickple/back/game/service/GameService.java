@@ -2,10 +2,12 @@ package kr.pickple.back.game.service;
 
 import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static kr.pickple.back.game.domain.GameStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.text.MessageFormat;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -25,6 +27,7 @@ import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
+import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.chat.service.ChatRoomService;
@@ -42,7 +45,6 @@ import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.map.repository.MapPolygonRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
@@ -63,8 +65,8 @@ public class GameService {
     private final AddressService addressService;
     private final ChatRoomService chatRoomService;
     private final ChatMessageService chatMessageService;
-    private final MapPolygonRepository mapPolygonRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final RedisRepository redisRepository;
 
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
@@ -81,8 +83,55 @@ public class GameService {
         game.makeNewCrewChatRoom(chatRoom);
 
         final Long savedGameId = gameRepository.save(game).getId();
+        saveGameStatusUpdateEventToRedis(game, savedGameId);
 
         return GameIdResponse.from(savedGameId);
+    }
+
+    private void saveGameStatusUpdateEventToRedis(final Game game, final Long savedGameId) {
+        final LocalDateTime gameCreatedDateTime = LocalDateTime.now();
+
+        // 경기를 생성한 시각과 경기 시작 시간의 차
+        final Long secondsOfBetweenCreatedAndPlay = getSecondsBetweenCreatedAndPlay(gameCreatedDateTime, game);
+
+        // 경기를 생성한 시각과 경기 종료 시간의 차
+        final Long secondsOfBetweenCreatedAndEnd = getSecondsBetweenCreatedAndEnd(gameCreatedDateTime, game);
+
+        final String closedGameStatusUpdateKey = makeGameStatusUpdateKey(CLOSED, savedGameId);
+        final String endedGameStatusUpdateKey = makeGameStatusUpdateKey(ENDED, savedGameId);
+
+        redisRepository.saveHash(closedGameStatusUpdateKey, "", "", secondsOfBetweenCreatedAndPlay);
+        redisRepository.saveHash(endedGameStatusUpdateKey, "", "", secondsOfBetweenCreatedAndEnd);
+    }
+
+    private Long getSecondsBetweenCreatedAndPlay(final LocalDateTime gameCreatedDateTime, final Game game) {
+        final LocalDateTime gamePlayDateTime = LocalDateTime.of(game.getPlayDate(), game.getPlayStartTime());
+
+        return getSecondsBetween(gameCreatedDateTime, gamePlayDateTime);
+    }
+
+    private Long getSecondsBetweenCreatedAndEnd(final LocalDateTime gameCreatedDateTime, final Game game) {
+        final LocalDateTime gameEndDateTime = game.getPlayEndDatetime();
+
+        return getSecondsBetween(gameCreatedDateTime, gameEndDateTime);
+    }
+
+    private static long getSecondsBetween(
+            final LocalDateTime gameCreatedDateTime,
+            final LocalDateTime gamePlayDateTime
+    ) {
+        return Duration.between(gameCreatedDateTime, gamePlayDateTime)
+                .getSeconds();
+    }
+
+    private String makeGameStatusUpdateKey(final GameStatus gameStatus, final Long id) {
+        return String.format("game:%s:%d", gameStatus.toString(), id);
+    }
+
+    @Transactional
+    public void updateGameStatus(final GameStatus gameStatus, final Long gameId) {
+        final Game game = findGameById(gameId);
+        game.updateGameStatus(gameStatus);
     }
 
     private String makeGameRoomName(final Game game) {
@@ -297,7 +346,8 @@ public class GameService {
         final Member loggedInMember = gameMember.getMember();
 
         if (isNotReviewPeriod(game)) {
-            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(), game.getPlayEndTime());
+            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(),
+                    game.getPlayEndTime());
         }
 
         mannerScoreReviews.forEach(review -> {
