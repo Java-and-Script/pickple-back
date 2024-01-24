@@ -1,5 +1,7 @@
 package kr.pickple.back.game.repository;
 
+import static kr.pickple.back.game.exception.GameExceptionCode.*;
+
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +13,7 @@ import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameStatus;
+import kr.pickple.back.game.exception.GameException;
 
 public interface GameRepository extends JpaRepository<Game, Long>, GameSearchRepository {
 
@@ -22,4 +25,8 @@ public interface GameRepository extends JpaRepository<Game, Long>, GameSearchRep
     );
 
     Optional<Game> findByChatRoom(final ChatRoom chatRoom);
+
+    default Game getGameById(final Long gameId) {
+        return findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
+    }
 }

@@ -17,7 +17,7 @@ import kr.pickple.back.crew.exception.CrewException;
 public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     Boolean existsByName(final String name);
-
+    
     Page<Crew> findByAddressDepth1AndAddressDepth2(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
