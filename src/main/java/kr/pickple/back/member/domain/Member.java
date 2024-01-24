@@ -7,7 +7,6 @@ import java.util.List;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,14 +21,8 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewMember;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.util.MemberStatusConverter;
-import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -92,7 +85,7 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
-    @Embedded
+/*    @Embedded
     private MemberPositions memberPositions = new MemberPositions();
 
     @Embedded
@@ -100,6 +93,7 @@ public class Member extends BaseEntity {
 
     @Embedded
     private MemberGames memberGames = new MemberGames();
+*/
 
     @Builder
     private Member(
@@ -110,8 +104,8 @@ public class Member extends BaseEntity {
             final Long oauthId,
             final OauthProvider oauthProvider,
             final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2,
-            final List<Position> positions
+            final AddressDepth2 addressDepth2
+            /*     , final List<Position> positions*/
     ) {
         this.email = email;
         this.nickname = nickname;
@@ -123,16 +117,29 @@ public class Member extends BaseEntity {
         this.addressDepth2 = addressDepth2;
 
         setDefaultIntroduction(nickname);
-        updateMemberPositions(positions);
-    }
-
-    private void updateMemberPositions(final List<Position> positions) {
-        memberPositions.updateMemberPositions(this, positions);
+        /*        updateMemberPositions(positions);*/
     }
 
     private void setDefaultIntroduction(final String nickname) {
         this.introduction = MessageFormat.format("안녕하세요. {0}입니다.", nickname);
     }
+
+    public void updateMannerScore(final Integer mannerScorePoint) {
+        if (MANNER_SCORE_POINT_RANGE.contains(mannerScorePoint)) {
+            this.mannerScore += mannerScorePoint;
+            this.mannerScoreCount += 1;
+
+            return;
+        }
+
+        throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
+    }
+
+    /*
+    private void updateMemberPositions(final List<Position> positions) {
+        memberPositions.updateMemberPositions(this, positions);
+    }
+
 
     public RegistrationStatus findCrewRegistrationStatus(final Crew crew) {
         return memberCrews.findCrewRegistrationStatus(crew);
@@ -170,16 +177,6 @@ public class Member extends BaseEntity {
         return memberPositions.getPositions();
     }
 
-    public void updateMannerScore(final Integer mannerScorePoint) {
-        if (MANNER_SCORE_POINT_RANGE.contains(mannerScorePoint)) {
-            this.mannerScore += mannerScorePoint;
-            this.mannerScoreCount += 1;
-
-            return;
-        }
-
-        throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
-    }
 
     public void addMemberCrew(final CrewMember memberCrew) {
         memberCrews.addMemberCrew(memberCrew);
@@ -188,4 +185,5 @@ public class Member extends BaseEntity {
     public void addMemberGame(final GameMember memberGame) {
         memberGames.addMemberGame(memberGame);
     }
+    */
 }
