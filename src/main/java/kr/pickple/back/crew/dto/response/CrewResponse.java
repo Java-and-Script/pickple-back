@@ -1,5 +1,7 @@
 package kr.pickple.back.crew.dto.response;
 
+import java.util.List;
+
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewStatus;
 import kr.pickple.back.member.dto.response.MemberResponse;
@@ -43,5 +45,11 @@ public class CrewResponse {
                 .addressDepth1(crew.getAddressDepth1().getName())
                 .addressDepth2(crew.getAddressDepth2().getName())
                 .build();
+    }
+
+    public static List<CrewResponse> from(final List<Crew> crews) {
+        return crews.stream()
+                .map(CrewResponse::from)
+                .toList();
     }
 }

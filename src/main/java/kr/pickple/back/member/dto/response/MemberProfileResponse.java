@@ -4,6 +4,7 @@ import java.util.List;
 
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,11 @@ public class MemberProfileResponse {
     private List<Position> positions;
     private List<CrewResponse> crews;
 
-    public static MemberProfileResponse of(final Member member, final List<CrewResponse> crewResponses) {
+    public static MemberProfileResponse of(
+            final Member member,
+            final List<CrewResponse> crewResponses,
+            final List<Position> positions
+    ) {
         return MemberProfileResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
@@ -38,8 +43,14 @@ public class MemberProfileResponse {
                 .mannerScoreCount(member.getMannerScoreCount())
                 .addressDepth1(member.getAddressDepth1().getName())
                 .addressDepth2(member.getAddressDepth2().getName())
-                .positions(member.getPositions())
+                .positions(positions)
                 .crews(crewResponses)
                 .build();
+    }
+
+    public static List<Position> fromMemberPositionEntities(final List<MemberPosition> memberPositions) {
+        return memberPositions.stream()
+                .map(MemberPosition::getPosition)
+                .toList();
     }
 }

@@ -16,13 +16,19 @@ import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
 import kr.pickple.back.auth.domain.token.RefreshToken;
 import kr.pickple.back.auth.repository.RedisRepository;
+import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.response.CrewResponse;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,6 +40,8 @@ public class MemberService {
 
     private final AddressService addressService;
     private final MemberRepository memberRepository;
+    private final MemberPositionRepository memberPositionRepository;
+    private final CrewMemberRepository crewMemberRepository;
     private final RedisRepository redisRepository;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
@@ -52,6 +60,10 @@ public class MemberService {
 
         final Member member = memberCreateRequest.toEntity(mainAddressResponse);
         final Member savedMember = memberRepository.save(member);
+
+        final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember);
+
+        memberPositionRepository.saveAll(memberPositions); /* TODO: 벌크 연산으로 고치기 */
 
         final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(savedMember.getId()));
 
@@ -76,12 +88,16 @@ public class MemberService {
      */
     public MemberProfileResponse findMemberProfileById(final Long memberId) {
         final Member member = memberRepository.getMemberById(memberId);
-        final List<CrewResponse> crewResponses = member.getCrewsByStatus(CONFIRMED)
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(member.getId());
+        final List<Position> positions = MemberProfileResponse.fromMemberPositionEntities(memberPositions);
+
+        final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), CONFIRMED)
                 .stream()
-                .map(CrewResponse::from)
+                .map(CrewMember::getCrew)
                 .toList();
 
-        return MemberProfileResponse.of(member, crewResponses);
+        final List<CrewResponse> crewResponses = CrewResponse.from(crews);
+        return MemberProfileResponse.of(member, crewResponses, positions);
     }
 
     private void validateIsDuplicatedMemberInfo(final MemberCreateRequest memberCreateRequest) {
