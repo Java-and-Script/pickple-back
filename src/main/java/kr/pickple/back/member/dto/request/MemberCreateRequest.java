@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Positive;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.domain.MemberStatus;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
@@ -57,7 +58,15 @@ public class MemberCreateRequest {
                 .oauthProvider(oauthProvider)
                 .addressDepth1(mainAddressResponse.getAddressDepth1())
                 .addressDepth2(mainAddressResponse.getAddressDepth2())
-                .positions(positions)
                 .build();
+    }
+
+    public List<MemberPosition> toMemberPositionEntities(final Member member) {
+        return positions.stream()
+                .map(position -> MemberPosition.builder()
+                        .member(member)
+                        .position(position)
+                        .build()
+                ).toList();
     }
 }
