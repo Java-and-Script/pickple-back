@@ -6,6 +6,7 @@ import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.IntegrationCrewTest;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.fixture.dto.CrewDtoFixtures;
 import kr.pickple.back.fixture.setup.AddressSetup;
 import kr.pickple.back.member.domain.Member;
@@ -18,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -32,13 +33,16 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @Autowired
     private AddressSetup addressSetup;
 
+    @Autowired
+    private CrewMemberRepository crewMemberRepository;
+
     @Test
     @DisplayName("사용자는 해당 크루의 상세 정보를 조회할 수 있다.")
     void findCrewDetailsById_ReturnCrewResponse() throws Exception {
         //given
         final Crew crew = crewSetup.saveWithConfirmedMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
                 .get(1)
                 .getMember();
 
@@ -100,10 +104,10 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @DisplayName("크루장은 크루 모집글에 참여 신청한 사용자 정보 목록을 조회할 수 있다.")
     void findAllCrewMembers_WaitingStatus_ReturnCrewResponse() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithConfirmedMembers(2);
+        final Crew crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
-                .get(1)
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+                .get(0)
                 .getMember();
 
         final String subject = String.valueOf(crewLeader.getId());
@@ -112,7 +116,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
         //when
         final ResultActions resultActions = mockMvc.perform(
                 get(BASE_URL + "/{crewId}/members", crew.getId())
-                        .param("status", CONFIRMED.getDescription())
+                        .param("status", WAITING.getDescription())
                         .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
         );
 
@@ -140,8 +144,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
                 .andExpect(jsonPath("leader.addressDepth2").value(crewLeader.getAddressDepth2().getName()))
                 .andExpect(jsonPath("leader.positions[0]").value(crewLeader.getPositions().get(0).getAcronym()))
                 .andExpect(jsonPath("leader.positions[1]").value(crewLeader.getPositions().get(1).getAcronym()))
-                .andExpect(jsonPath("members[0].id").value(crewLeader.getId()))
-                .andExpect(jsonPath("members[1].id").value(crewMember.getId()))
+                .andExpect(jsonPath("members[0].id").value(crewMember.getId()))
                 .andDo(print());
     }
 
@@ -151,8 +154,8 @@ public class CrewControllerTest extends IntegrationCrewTest {
         //given
         final Crew crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
-                .get(1)
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+                .get(0)
                 .getMember();
 
         final String subject = String.valueOf(crewLeader.getId());
@@ -180,8 +183,8 @@ public class CrewControllerTest extends IntegrationCrewTest {
         //given
         final Crew crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
-                .get(1)
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+                .get(0)
                 .getMember();
 
         final String subject = String.valueOf(crewLeader.getId());
@@ -205,7 +208,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
                 .get(1)
                 .getMember();
 

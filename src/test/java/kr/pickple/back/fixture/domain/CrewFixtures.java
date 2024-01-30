@@ -10,6 +10,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.member.domain.Member;
 
 public class CrewFixtures {
@@ -28,6 +29,13 @@ public class CrewFixtures {
                 .leader(leader)
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
+                .build();
+    }
+
+    public static CrewMember crewMemberBuild(final Member member, final Crew crew) {
+        return CrewMember.builder()
+                .member(member)
+                .crew(crew)
                 .build();
     }
 

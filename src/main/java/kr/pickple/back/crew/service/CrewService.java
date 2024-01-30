@@ -81,12 +81,12 @@ public class CrewService {
                 .build();
 
         crewLeader.confirmRegistration();
-        crewMemberRepository.save(crewLeader);
 
         final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, crew.getName(), CREW);
         crew.makeNewCrewChatRoom(chatRoom);
 
         final Long crewId = crewRepository.save(crew).getId();
+        crewMemberRepository.save(crewLeader);
 
         return CrewIdResponse.from(crewId);
     }
