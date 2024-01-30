@@ -53,11 +53,11 @@ public class CrewController {
     }
 
     @PostMapping("/{crewId}/members")
-    public ResponseEntity<Void> applyForCrewMemberShip(
+    public ResponseEntity<Void> registerCrewMember(
             @Login final Long loggedInMemberId,
             @PathVariable final Long crewId
     ) {
-        crewMemberService.applyForCrewMemberShip(crewId, loggedInMemberId);
+        crewMemberService.registerCrewMember(crewId, loggedInMemberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -80,7 +80,12 @@ public class CrewController {
             @PathVariable final Long memberId,
             @Valid @RequestBody final CrewMemberUpdateStatusRequest crewMemberStatusUpdateRequest
     ) {
-        crewMemberService.crewMemberStatusUpdate(loggedInMemberId, crewId, memberId, crewMemberStatusUpdateRequest);
+        crewMemberService.updateCrewMemberRegistrationStatus(
+                loggedInMemberId,
+                crewId,
+                memberId,
+                crewMemberStatusUpdateRequest
+        );
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -105,6 +110,6 @@ public class CrewController {
             final Pageable pageable
     ) {
         return ResponseEntity.status(OK)
-                .body(crewService.findCrewByAddress(addressDepth1, addressDepth2, pageable));
+                .body(crewService.findCrewsByAddress(addressDepth1, addressDepth2, pageable));
     }
 }

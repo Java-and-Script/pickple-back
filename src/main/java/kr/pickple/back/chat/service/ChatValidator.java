@@ -1,6 +1,7 @@
 package kr.pickple.back.chat.service;
 
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 
 import java.util.Optional;
 
@@ -11,6 +12,7 @@ import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.repository.GameRepository;
@@ -21,9 +23,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChatValidator {
 
-    private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final CrewRepository crewRepository;
+    private final CrewMemberRepository crewMemberRepository;
     private final GameRepository gameRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
 
     public void validateIsSelfChat(Member receiver, Member sender) {
         if (sender.equals(receiver)) {
@@ -62,9 +65,12 @@ public class ChatValidator {
         }
 
         final Crew crew = optionalCrew.get();
+        validateIsMemberConfirmedCrewMember(crew.getId(), member.getId(), chatRoom.getId());
+    }
 
-        if (crew.isConfirmedCrewMember(member)) {
-            throw new ChatException(CHAT_CREW_CHATROOM_NOT_ALLOWED_TO_LEAVE, member.getId(), chatRoom.getId());
+    private void validateIsMemberConfirmedCrewMember(final Long crewId, final Long memberId, final Long chatRoomId) {
+        if (crewMemberRepository.existsByCrewIdAndMemberIdAndStatus(crewId, memberId, CONFIRMED)) {
+            throw new ChatException(CHAT_CREW_CHATROOM_NOT_ALLOWED_TO_LEAVE, crewId, memberId, chatRoomId);
         }
     }
 
