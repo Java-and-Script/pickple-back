@@ -1,16 +1,17 @@
 package kr.pickple.back.crew.docs;
 
-import com.epages.restdocs.apispec.ResourceSnippetParameters;
-import com.epages.restdocs.apispec.SimpleType;
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
-import kr.pickple.back.crew.IntegrationCrewTest;
-import kr.pickple.back.fixture.dto.CrewDtoFixtures;
-import kr.pickple.back.fixture.setup.AddressSetup;
-import kr.pickple.back.member.domain.Member;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.*;
+import static com.epages.restdocs.apispec.ResourceDocumentation.*;
+import static com.epages.restdocs.apispec.Schema.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static org.springframework.http.HttpHeaders.*;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.util.List;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,17 +20,20 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.epages.restdocs.apispec.ResourceSnippetParameters;
+import com.epages.restdocs.apispec.SimpleType;
 
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
-import static com.epages.restdocs.apispec.Schema.schema;
-import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
-import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import kr.pickple.back.address.domain.AddressDepth1;
+import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.auth.domain.token.AuthTokens;
+import kr.pickple.back.crew.IntegrationCrewTest;
+import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
+import kr.pickple.back.fixture.dto.CrewDtoFixtures;
+import kr.pickple.back.fixture.setup.AddressSetup;
+import kr.pickple.back.member.domain.Member;
 
 @Transactional
 public class CrewDocumentTest extends IntegrationCrewTest {
@@ -38,6 +42,9 @@ public class CrewDocumentTest extends IntegrationCrewTest {
 
     @Autowired
     private AddressSetup addressSetup;
+
+    @Autowired
+    private CrewMemberRepository crewMemberRepository;
 
     @Test
     @DisplayName("크루원 모집글 상세 정보 조회")
@@ -180,9 +187,6 @@ public class CrewDocumentTest extends IntegrationCrewTest {
         //given
         final Crew crew = crewSetup.saveWithConfirmedMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
-                .get(1)
-                .getMember();
 
         final String subject = String.valueOf(crewLeader.getId());
         final AuthTokens authTokens = jwtProvider.createLoginToken(subject);
@@ -285,8 +289,8 @@ public class CrewDocumentTest extends IntegrationCrewTest {
         //given
         final Crew crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
-                .get(1)
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+                .get(0)
                 .getMember();
 
         final String subject = String.valueOf(crewLeader.getId());
@@ -339,8 +343,8 @@ public class CrewDocumentTest extends IntegrationCrewTest {
         //given
         final Crew crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers()
-                .get(1)
+        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+                .get(0)
                 .getMember();
 
         final String subject = String.valueOf(crewLeader.getId());
@@ -383,8 +387,6 @@ public class CrewDocumentTest extends IntegrationCrewTest {
         final Crew crew = crewSetup.saveWithConfirmedMembers(2);
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
-        final Member crewLeader = crew.getLeader();
-        final Member crewMember = crew.getCrewMembers().get(1).getMember();
 
         //when
         final ResultActions resultActions = mockMvc.perform(

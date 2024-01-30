@@ -1,26 +1,31 @@
 package kr.pickple.back.fixture.setup;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.fixture.domain.CrewFixtures;
 import kr.pickple.back.member.domain.Member;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
 
 @Component
 public class CrewSetup {
 
     @Autowired
     private CrewRepository crewRepository;
+
+    @Autowired
+    private CrewMemberRepository crewMemberRepository;
 
     @Autowired
     private ChatRoomRepository chatRoomRepository;
@@ -38,37 +43,36 @@ public class CrewSetup {
         final Crew crew = CrewFixtures.crewBuild(addressDepth1, addressDepth2, leader);
         final ChatRoom savedChatRoom = chatRoomRepository.save(CrewFixtures.crewChatRoomBuild());
 
-        crew.addCrewMember(leader);
+        final CrewMember crewLeader = CrewFixtures.crewMemberBuild(leader, crew);
+        crewLeader.confirmRegistration();
+        leader.addMemberCrew(crewLeader);
+
         savedChatRoom.updateMaxMemberCount(crew.getMaxMemberCount());
         crew.makeNewCrewChatRoom(savedChatRoom);
 
-        final CrewMember crewLeader = crew.getCrewMembers().get(0);
-        leader.addMemberCrew(crewLeader);
-        crewLeader.updateStatus(CONFIRMED);
+        final Crew savedCrew = crewRepository.save(crew);
+        crewMemberRepository.save(crewLeader);
 
-        return crewRepository.save(crew);
+        return savedCrew;
     }
 
     public Crew saveWithWaitingMembers(final Integer memberCount) {
         final List<Member> members = memberSetup.save(memberCount);
         final Crew crew = save(members.get(0));
-        final List<Member> crewMembers = members.subList(1, members.size());
 
-        crewMembers.forEach(crew::addCrewMember);
+        members.subList(1, members.size())
+                .stream()
+                .map(member -> CrewFixtures.crewMemberBuild(member, crew))
+                .forEach(crewMemberRepository::save);
 
         return crew;
     }
 
     public Crew saveWithConfirmedMembers(final Integer memberCount) {
         final Crew crew = saveWithWaitingMembers(memberCount);
-        final Member crewLeader = crew.getLeader();
-        final List<CrewMember> crewMembers = crew.getCrewMembers();
 
-        crewMembers.forEach(crewMember -> {
-            if (!crewLeader.equals(crewMember.getMember())) {
-                crewMember.updateStatus(CONFIRMED);
-            }
-        });
+        crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+                .forEach(waitingCrewMember -> waitingCrewMember.updateStatus(CONFIRMED));
 
         return crew;
     }

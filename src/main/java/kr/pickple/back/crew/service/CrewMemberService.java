@@ -97,7 +97,7 @@ public class CrewMemberService {
             final Long memberId,
             final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
     ) {
-        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(crewId, memberId);
+        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
         final Crew crew = crewMember.getCrew();
 
         validateIsLeader(loggedInMemberId, crew);
@@ -132,7 +132,7 @@ public class CrewMemberService {
      */
     @Transactional
     public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
-        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(crewId, memberId);
+        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
         final Crew crew = crewMember.getCrew();
 
         if (crew.isLeader(loggedInMemberId)) {
