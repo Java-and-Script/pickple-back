@@ -3,11 +3,8 @@ package kr.pickple.back.crew.domain;
 import static kr.pickple.back.crew.domain.CrewStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,7 +18,6 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.util.CrewStatusConverter;
 import kr.pickple.back.member.domain.Member;
@@ -86,9 +82,6 @@ public class Crew extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
-    @Embedded
-    private CrewMembers crewMembers = new CrewMembers();
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
@@ -114,18 +107,6 @@ public class Crew extends BaseEntity {
         this.addressDepth2 = addressDepth2;
 
         updateStatusIfCrewMemberFull();
-    }
-
-    public List<Member> getMembersByStatus(final RegistrationStatus status) {
-        return crewMembers.getCrewMembers(status);
-    }
-
-    public List<CrewMember> getCrewMembers() {
-        return crewMembers.getCrewMembers();
-    }
-
-    public void addCrewMember(final Member member) {
-        crewMembers.addCrewMember(this, member);
     }
 
     public void increaseMemberCount() {
@@ -178,13 +159,5 @@ public class Crew extends BaseEntity {
     public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
         chatRoom.updateMaxMemberCount(maxMemberCount);
         this.chatRoom = chatRoom;
-    }
-
-    public Boolean isConfirmedCrewMember(final Member member) {
-        return crewMembers.isAlreadyConfirmed(member);
-    }
-
-    public List<Member> getCrewMembers(RegistrationStatus status) {
-        return crewMembers.getCrewMembers(status);
     }
 }

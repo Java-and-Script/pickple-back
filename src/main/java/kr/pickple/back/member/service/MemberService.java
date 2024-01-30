@@ -1,7 +1,6 @@
 package kr.pickple.back.member.service;
 
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
@@ -20,9 +19,10 @@ import kr.pickple.back.auth.domain.token.RefreshToken;
 import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.dto.response.CrewResponse;
-import kr.pickple.back.crew.exception.CrewException;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
@@ -47,11 +47,12 @@ public class MemberService {
 
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
 
-    private final AddressService addressService;
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
+    private final CrewMemberRepository crewMemberRepository;
     private final GameRepository gameRepository;
     private final RedisRepository redisRepository;
+    private final AddressService addressService;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
 
@@ -132,13 +133,14 @@ public class MemberService {
             final RegistrationStatus memberStatus
     ) {
         return crews.stream()
-                .map(crew -> CrewProfileResponse.of(crew, getMemberResponsesByCrew(crew, memberStatus)))
+                .map(crew -> CrewProfileResponse.of(crew, getMemberResponsesByCrew(crew.getId(), memberStatus)))
                 .toList();
     }
 
-    private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
-        return crew.getMembersByStatus(memberStatus)
+    private List<MemberResponse> getMemberResponsesByCrew(final Long crewId, final RegistrationStatus memberStatus) {
+        return crewMemberRepository.findAllByCrewIdAndStatus(crewId, memberStatus)
                 .stream()
+                .map(CrewMember::getMember)
                 .map(MemberResponse::from)
                 .toList();
     }
@@ -174,11 +176,6 @@ public class MemberService {
     private Member findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-    }
-
-    private Crew findCrewById(final Long crewId) {
-        return crewRepository.findById(crewId)
-                .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
     }
 
     private Game findGameById(final Long gameId) {
@@ -229,7 +226,7 @@ public class MemberService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = findMemberById(memberId);
-        final Crew crew = findCrewById(crewId);
+        final Crew crew = crewRepository.getCrewById(crewId);
 
         return CrewMemberRegistrationStatusResponse.from(member.findCrewRegistrationStatus(crew));
     }

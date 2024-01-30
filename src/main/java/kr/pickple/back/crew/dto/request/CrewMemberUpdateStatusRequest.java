@@ -2,7 +2,11 @@ package kr.pickple.back.crew.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder

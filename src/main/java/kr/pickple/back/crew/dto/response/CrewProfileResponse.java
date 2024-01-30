@@ -27,7 +27,7 @@ public class CrewProfileResponse {
     private String addressDepth2;
     private List<MemberResponse> members;
 
-    public static CrewProfileResponse of(final Crew crew, final List<MemberResponse> crewMemberList) {
+    public static CrewProfileResponse of(final Crew crew, final List<MemberResponse> memberResponses) {
         return CrewProfileResponse.builder()
                 .id(crew.getId())
                 .name(crew.getName())
@@ -42,7 +42,7 @@ public class CrewProfileResponse {
                 .leader(MemberResponse.from(crew.getLeader()))
                 .addressDepth1(crew.getAddressDepth1().getName())
                 .addressDepth2(crew.getAddressDepth2().getName())
-                .members(crewMemberList)
+                .members(memberResponses)
                 .build();
     }
 }
