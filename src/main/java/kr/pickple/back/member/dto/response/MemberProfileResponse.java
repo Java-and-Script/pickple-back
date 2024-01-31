@@ -4,7 +4,6 @@ import java.util.List;
 
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -46,11 +45,5 @@ public class MemberProfileResponse {
                 .positions(positions)
                 .crews(crewResponses)
                 .build();
-    }
-
-    public static List<Position> fromMemberPositionEntities(final List<MemberPosition> memberPositions) {
-        return memberPositions.stream()
-                .map(MemberPosition::getPosition)
-                .toList();
     }
 }

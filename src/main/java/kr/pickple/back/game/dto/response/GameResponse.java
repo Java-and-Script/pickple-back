@@ -39,7 +39,11 @@ public class GameResponse {
     private List<Position> positions;
     private List<MemberResponse> members;
 
-    public static GameResponse of(final Game game, final List<MemberResponse> memberResponses) {
+    public static GameResponse of(
+            final Game game,
+            final MemberResponse host,
+            final List<MemberResponse> memberResponses
+    ) {
         return GameResponse.builder()
                 .id(game.getId())
                 .content(game.getContent())
@@ -56,7 +60,7 @@ public class GameResponse {
                 .cost(game.getCost())
                 .memberCount(game.getMemberCount())
                 .maxMemberCount(game.getMaxMemberCount())
-                .host(MemberResponse.from(game.getHost()))
+                .host(host)
                 .addressDepth1(game.getAddressDepth1().getName())
                 .addressDepth2(game.getAddressDepth2().getName())
                 .positions(game.getPositions())

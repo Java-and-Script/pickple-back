@@ -25,7 +25,7 @@ public class MemberResponse {
     private String addressDepth2;
     private List<Position> positions;
 
-    public static MemberResponse from(final Member member) {
+    public static MemberResponse of(final Member member, final List<Position> positions) {
         return MemberResponse.builder()
                 .id(member.getId())
                 .email(member.getEmail())
@@ -36,7 +36,7 @@ public class MemberResponse {
                 .mannerScoreCount(member.getMannerScoreCount())
                 .addressDepth1(member.getAddressDepth1().getName())
                 .addressDepth2(member.getAddressDepth2().getName())
-                .positions(member.getPositions())
+                .positions(positions)
                 .build();
     }
 }

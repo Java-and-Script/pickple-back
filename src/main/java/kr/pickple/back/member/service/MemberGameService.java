@@ -1,4 +1,4 @@
-package kr.pickple.back.member.service_v2;
+package kr.pickple.back.member.service;
 
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
@@ -11,13 +11,17 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -27,6 +31,8 @@ public class MemberGameService {
 
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
+    private final GameMemberRepository gameMemberRepository;
+    private final MemberPositionRepository memberPositionRepository;
 
     /**
      * 사용자의 참여 확정 게스트 모집글 목록 조회
@@ -39,7 +45,8 @@ public class MemberGameService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = memberRepository.getMemberById(memberId);
-        final List<GameMember> memberGames = member.getMemberGamesByStatus(memberStatus);
+        final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
+                memberStatus);
 
         return convertToMemberGameResponses(memberGames, memberStatus);
     }
@@ -51,7 +58,7 @@ public class MemberGameService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = memberRepository.getMemberById(memberId);
-        final List<GameMember> memberGames = member.getCreatedMemberGames();
+        final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
         return convertToMemberGameResponses(memberGames, CONFIRMED);
     }
@@ -69,10 +76,10 @@ public class MemberGameService {
         final Member member = memberRepository.getMemberById(memberId);
         final Game game = gameRepository.getGameById(gameId);
 
-        final RegistrationStatus memberRegistrationStatus = member.findGameRegistrationStatus(game);
-        final Boolean isReviewDone = member.isAlreadyReviewDoneInGame(game);
+        final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId())
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, member.getId(), game.getId()));
 
-        return GameMemberRegistrationStatusResponse.of(memberRegistrationStatus, isReviewDone);
+        return GameMemberRegistrationStatusResponse.of(gameMember.getStatus(), gameMember.isAlreadyReviewDone());
     }
 
     private void validateSelfMemberAccess(Long loggedInMemberId, Long memberId) {
@@ -86,17 +93,32 @@ public class MemberGameService {
             final RegistrationStatus memberStatus
     ) {
         return memberGames.stream()
-                .map(memberGame -> MemberGameResponse.of(
-                        memberGame,
-                        getMemberResponsesByGame(memberGame.getGame(), memberStatus)
-                ))
+                .map(memberGame ->
+                        MemberGameResponse.of(
+                                memberGame,
+                                getMemberResponsesByGame(memberGame.getGame(), memberStatus),
+                                getHostResponseByMemberGame(memberGame))
+                )
                 .toList();
+    }
+
+    private MemberResponse getHostResponseByMemberGame(final GameMember memberGame) {
+        final Member host = memberGame.getMember();
+
+        return MemberResponse.of(host, getPositions(host));
     }
 
     private List<MemberResponse> getMemberResponsesByGame(final Game game, final RegistrationStatus memberStatus) {
         return game.getMembersByStatus(memberStatus)
                 .stream()
-                .map(MemberResponse::from)
+                .map(member -> MemberResponse.of(member, getPositions(member)))
                 .toList();
+    }
+
+    private List<Position> getPositions(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+                member.getId());
+
+        return Position.from(memberPositions);
     }
 }

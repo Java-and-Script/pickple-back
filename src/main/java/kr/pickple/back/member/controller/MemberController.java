@@ -30,6 +30,8 @@ import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.service.MemberCrewService;
+import kr.pickple.back.member.service.MemberGameService;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +41,8 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 
     private final MemberService memberService;
+    private final MemberCrewService memberCrewService;
+    private final MemberGameService memberGameService;
     private final JwtProperties jwtProperties;
 
     @PostMapping
@@ -86,7 +90,7 @@ public class MemberController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findAllCrewsByMemberId(loggedInMemberId, memberId, status));
+                .body(memberCrewService.findAllCrewsByMemberId(loggedInMemberId, memberId, status));
     }
 
     @GetMapping("/{memberId}/created-crews")
@@ -95,7 +99,7 @@ public class MemberController {
             @PathVariable final Long memberId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findCreatedCrewsByMemberId(loggedInMemberId, memberId));
+                .body(memberCrewService.findCreatedCrewsByMemberId(loggedInMemberId, memberId));
     }
 
     @GetMapping("/{memberId}/games")
@@ -105,7 +109,7 @@ public class MemberController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findAllMemberGames(loggedInMemberId, memberId, status));
+                .body(memberGameService.findAllMemberGames(loggedInMemberId, memberId, status));
     }
 
     @GetMapping("/{memberId}/created-games")
@@ -114,7 +118,7 @@ public class MemberController {
             @PathVariable final Long memberId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findAllCreatedGames(loggedInMemberId, memberId));
+                .body(memberGameService.findAllCreatedGames(loggedInMemberId, memberId));
     }
 
     @GetMapping("/{memberId}/games/{gameId}/registration-status")
@@ -124,7 +128,7 @@ public class MemberController {
             @PathVariable final Long gameId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findMemberRegistrationStatusForGame(loggedInMemberId, memberId, gameId));
+                .body(memberGameService.findMemberRegistrationStatusForGame(loggedInMemberId, memberId, gameId));
     }
 
     @GetMapping("/{memberId}/crews/{crewId}/registration-status")
@@ -134,7 +138,6 @@ public class MemberController {
             @PathVariable final Long crewId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberService.findMemberRegistrationStatusForCrew(loggedInMemberId, memberId, crewId));
+                .body(memberCrewService.findMemberRegistrationStatusForCrew(loggedInMemberId, memberId, crewId));
     }
-
 }
