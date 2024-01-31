@@ -1,5 +1,6 @@
 package kr.pickple.back.game.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,4 +17,8 @@ public interface GameMemberRepository extends JpaRepository<GameMember, Long> {
             final Long gameId,
             final RegistrationStatus status
     );
+
+    List<GameMember> findAllByMemberIdAndStatus(final Long id, final RegistrationStatus memberStatus);
+
+    List<GameMember> findAllByMemberId(final Long id);
 }

@@ -2,11 +2,13 @@ package kr.pickple.back.crew.repository;
 
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
@@ -25,6 +27,9 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
     );
 
     Optional<Crew> findByChatRoom(final ChatRoom chatRoom);
+
+    @Query("select c from Crew c left join CrewMember cm on c.leader.id = cm.member.id where cm.member.id = :id")
+    List<Crew> findCreatedAllByMemberId(final Long id);
 
     default Crew getCrewById(final Long crewId) {
         return findById(crewId).orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));

@@ -3,6 +3,7 @@ package kr.pickple.back.position.domain;
 import static kr.pickple.back.position.exception.PositionExceptionCode.*;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -11,6 +12,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.exception.PositionException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -44,5 +46,11 @@ public enum Position {
         }
 
         throw new PositionException(POSITION_NOT_FOUND, positionAcronym);
+    }
+
+    public static List<Position> from(final List<MemberPosition> memberPositions) {
+        return memberPositions.stream()
+                .map(MemberPosition::getPosition)
+                .toList();
     }
 }
