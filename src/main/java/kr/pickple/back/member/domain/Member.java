@@ -85,16 +85,6 @@ public class Member extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
-/*    @Embedded
-    private MemberPositions memberPositions = new MemberPositions();
-
-    @Embedded
-    private MemberCrews memberCrews = new MemberCrews();
-
-    @Embedded
-    private MemberGames memberGames = new MemberGames();
-*/
-
     @Builder
     private Member(
             final String email,
@@ -105,7 +95,6 @@ public class Member extends BaseEntity {
             final OauthProvider oauthProvider,
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2
-            /*     , final List<Position> positions*/
     ) {
         this.email = email;
         this.nickname = nickname;
@@ -117,7 +106,6 @@ public class Member extends BaseEntity {
         this.addressDepth2 = addressDepth2;
 
         setDefaultIntroduction(nickname);
-        /*        updateMemberPositions(positions);*/
     }
 
     private void setDefaultIntroduction(final String nickname) {
@@ -134,56 +122,4 @@ public class Member extends BaseEntity {
 
         throw new MemberException(MEMBER_UPDATING_MANNER_SCORE_POINT_OUT_OF_RANGE, mannerScorePoint);
     }
-
-    /*
-    private void updateMemberPositions(final List<Position> positions) {
-        memberPositions.updateMemberPositions(this, positions);
-    }
-
-
-    public RegistrationStatus findCrewRegistrationStatus(final Crew crew) {
-        return memberCrews.findCrewRegistrationStatus(crew);
-    }
-
-    public RegistrationStatus findGameRegistrationStatus(final Game game) {
-        return memberGames.findGameRegistrationStatus(game);
-    }
-
-    public Boolean isAlreadyReviewDoneInGame(final Game game) {
-        return memberGames.isAlreadyReviewDoneInGame(game);
-    }
-
-    public List<Crew> getCrewsByStatus(RegistrationStatus status) {
-        return memberCrews.getCrewsByStatus(status);
-    }
-
-    public Long getCreatedCrewsCount() {
-        return memberCrews.getCreatedCrewsCountByMember(this);
-    }
-
-    public List<GameMember> getMemberGamesByStatus(final RegistrationStatus status) {
-        return memberGames.getMemberGamesByStatus(status);
-    }
-
-    public List<Crew> getCreatedCrews() {
-        return memberCrews.getCreatedCrewsByMember(this);
-    }
-
-    public List<GameMember> getCreatedMemberGames() {
-        return memberGames.getCreatedMemberGames(this);
-    }
-
-    public List<Position> getPositions() {
-        return memberPositions.getPositions();
-    }
-
-
-    public void addMemberCrew(final CrewMember memberCrew) {
-        memberCrews.addMemberCrew(memberCrew);
-    }
-
-    public void addMemberGame(final GameMember memberGame) {
-        memberGames.addMemberGame(memberGame);
-    }
-    */
 }
