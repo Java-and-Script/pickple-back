@@ -28,6 +28,8 @@ import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.dto.response.GamesAndLocationResponse;
 import kr.pickple.back.game.service.GameFacadeService;
+import kr.pickple.back.game.service.GameMemberService;
+import kr.pickple.back.game.service.GameReviewMannerScoresService;
 import kr.pickple.back.game.service.GameService;
 import lombok.RequiredArgsConstructor;
 
@@ -37,6 +39,8 @@ import lombok.RequiredArgsConstructor;
 public class GameController {
 
     private final GameService gameService;
+    private final GameMemberService gameMemberService;
+    private final GameReviewMannerScoresService gameReviewMannerScoresService;
     private final GameFacadeService gameFacadeService;
 
     @PostMapping
@@ -71,7 +75,7 @@ public class GameController {
             @Login final Long loggedInMemberId,
             @PathVariable final Long gameId
     ) {
-        gameService.registerGameMember(gameId, loggedInMemberId);
+        gameMemberService.registerGameMember(gameId, loggedInMemberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -84,7 +88,7 @@ public class GameController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(gameService.findAllGameMembers(loggedInMemberId, gameId, status));
+                .body(gameMemberService.findAllGameMembers(loggedInMemberId, gameId, status));
     }
 
     @PatchMapping("/{gameId}/members/{memberId}")
@@ -94,7 +98,7 @@ public class GameController {
             @PathVariable final Long memberId,
             @Valid @RequestBody final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
     ) {
-        gameService.updateGameMemberRegistrationStatus(
+        gameMemberService.updateGameMemberRegistrationStatus(
                 loggedInMemberId,
                 gameId,
                 memberId,
@@ -111,7 +115,7 @@ public class GameController {
             @PathVariable final Long gameId,
             @PathVariable final Long memberId
     ) {
-        gameService.deleteGameMember(loggedInMemberId, gameId, memberId);
+        gameMemberService.deleteGameMember(loggedInMemberId, gameId, memberId);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
@@ -124,7 +128,7 @@ public class GameController {
             @Valid @RequestBody final MannerScoreReviewsRequest mannerScoreReviewsRequest
     ) {
         final List<MannerScoreReview> mannerScoreReviews = mannerScoreReviewsRequest.getMannerScoreReviews();
-        gameService.reviewMannerScores(loggedInMemberId, gameId, mannerScoreReviews);
+        gameReviewMannerScoresService.reviewMannerScores(loggedInMemberId, gameId, mannerScoreReviews);
 
         return ResponseEntity.status(NO_CONTENT)
                 .build();
