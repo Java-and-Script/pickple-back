@@ -19,7 +19,6 @@ import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GamePosition;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

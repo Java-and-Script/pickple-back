@@ -74,10 +74,6 @@ public class RankingJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public List<CrewRankingResponse> getCrewRankings() {
-        return jdbcTemplate.query(CREW_RANKING_SQL, crewRankingRowMapper());
-    }
-
     private static RowMapper<CrewRankingResponse> crewRankingRowMapper() {
         return (rs, rowNum) -> CrewRankingResponse.builder()
                 .id(rs.getLong("id"))
@@ -91,5 +87,9 @@ public class RankingJdbcRepository {
                 .totalScore(rs.getInt("total_score"))
                 .rank(rs.getInt("ranking"))
                 .build();
+    }
+
+    public List<CrewRankingResponse> getCrewRankings() {
+        return jdbcTemplate.query(CREW_RANKING_SQL, crewRankingRowMapper());
     }
 }

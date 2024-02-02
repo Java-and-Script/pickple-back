@@ -1,13 +1,14 @@
 package kr.pickple.back.alarm.handler;
 
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.event.TransactionalEventListener;
+
 import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
 import kr.pickple.back.alarm.service.GameAlarmService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.event.TransactionalEventListener;
 
 @Component
 @RequiredArgsConstructor

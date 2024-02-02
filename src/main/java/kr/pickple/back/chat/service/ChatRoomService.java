@@ -1,5 +1,13 @@
 package kr.pickple.back.chat.service;
 
+import static java.text.MessageFormat.*;
+import static kr.pickple.back.chat.domain.RoomType.*;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.ChatRoomMember;
 import kr.pickple.back.chat.domain.RoomType;
@@ -13,13 +21,6 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import static java.text.MessageFormat.format;
-import static kr.pickple.back.chat.domain.RoomType.PERSONAL;
-import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_ROOM_NOT_FOUND;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor

@@ -34,154 +34,154 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class CrewMemberService {
 
-	private final MemberRepository memberRepository;
-	private final CrewRepository crewRepository;
-	private final MemberPositionRepository memberPositionRepository;
-	private final CrewMemberRepository crewMemberRepository;
-	private final ChatMessageService chatMessageService;
-	private final ApplicationEventPublisher eventPublisher;
+    private final MemberRepository memberRepository;
+    private final CrewRepository crewRepository;
+    private final MemberPositionRepository memberPositionRepository;
+    private final CrewMemberRepository crewMemberRepository;
+    private final ChatMessageService chatMessageService;
+    private final ApplicationEventPublisher eventPublisher;
 
-	/**
-	 * 크루 가입 신청
-	 */
-	@Transactional
-	public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
-		final Crew crew = crewRepository.getCrewById(crewId);
-		final Member member = memberRepository.getMemberById(loggedInMemberId);
+    /**
+     * 크루 가입 신청
+     */
+    @Transactional
+    public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
+        final Crew crew = crewRepository.getCrewById(crewId);
+        final Member member = memberRepository.getMemberById(loggedInMemberId);
 
-		validateIsAlreadyRegisteredCrewMember(crewId, loggedInMemberId);
+        validateIsAlreadyRegisteredCrewMember(crewId, loggedInMemberId);
 
-		final CrewMember newCrewMember = CrewMember.builder()
-				.member(member)
-				.crew(crew)
-				.build();
+        final CrewMember newCrewMember = CrewMember.builder()
+                .member(member)
+                .crew(crew)
+                .build();
 
-		crewMemberRepository.save(newCrewMember);
+        crewMemberRepository.save(newCrewMember);
 
-		eventPublisher.publishEvent(CrewJoinRequestNotificationEvent.builder()
-				.crewId(crewId)
-				.memberId(crew.getLeader().getId())
-				.build());
-	}
+        eventPublisher.publishEvent(CrewJoinRequestNotificationEvent.builder()
+                .crewId(crewId)
+                .memberId(crew.getLeader().getId())
+                .build());
+    }
 
-	private void validateIsAlreadyRegisteredCrewMember(final Long crewId, final Long memberId) {
-		if (crewMemberRepository.existsByCrewIdAndMemberId(crewId, memberId)) {
-			throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, crewId, memberId);
-		}
-	}
+    private void validateIsAlreadyRegisteredCrewMember(final Long crewId, final Long memberId) {
+        if (crewMemberRepository.existsByCrewIdAndMemberId(crewId, memberId)) {
+            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, crewId, memberId);
+        }
+    }
 
-	/**
-	 * 크루에 가입 신청된 혹은 확정된 사용자 정보 목록 조회
-	 */
-	public CrewProfileResponse findAllCrewMembers(
-			final Long loggedInMemberId,
-			final Long crewId,
-			final RegistrationStatus status
-	) {
-		final Crew crew = crewRepository.getCrewById(crewId);
+    /**
+     * 크루에 가입 신청된 혹은 확정된 사용자 정보 목록 조회
+     */
+    public CrewProfileResponse findAllCrewMembers(
+            final Long loggedInMemberId,
+            final Long crewId,
+            final RegistrationStatus status
+    ) {
+        final Crew crew = crewRepository.getCrewById(crewId);
 
-		validateIsLeader(loggedInMemberId, crew);
+        validateIsLeader(loggedInMemberId, crew);
 
-		final List<MemberResponse> memberResponses = crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
-				.stream()
-				.map(CrewMember::getMember)
-				.map(member -> MemberResponse.of(member, getPositionsByMember(member)))
-				.toList();
+        final List<MemberResponse> memberResponses = crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
+                .stream()
+                .map(CrewMember::getMember)
+                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .toList();
 
-		return CrewProfileResponse.of(crew, memberResponses);
-	}
+        return CrewProfileResponse.of(crew, memberResponses);
+    }
 
-	private List<Position> getPositionsByMember(final Member member) {
-		final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-				member.getId());
+    private List<Position> getPositionsByMember(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+                member.getId());
 
-		return Position.fromMemberPositions(memberPositions);
-	}
+        return Position.fromMemberPositions(memberPositions);
+    }
 
-	/**
-	 * 크루 가입 신청 수락
-	 */
-	@Transactional
-	public void updateCrewMemberRegistrationStatus(
-			final Long loggedInMemberId,
-			final Long crewId,
-			final Long memberId,
-			final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
-	) {
-		final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-		final Crew crew = crewMember.getCrew();
+    /**
+     * 크루 가입 신청 수락
+     */
+    @Transactional
+    public void updateCrewMemberRegistrationStatus(
+            final Long loggedInMemberId,
+            final Long crewId,
+            final Long memberId,
+            final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
+    ) {
+        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
+        final Crew crew = crewMember.getCrew();
 
-		validateIsLeader(loggedInMemberId, crew);
+        validateIsLeader(loggedInMemberId, crew);
 
-		final RegistrationStatus updateStatus = crewMemberUpdateStatusRequest.getStatus();
-		enterCrewChatRoom(updateStatus, crewMember);
+        final RegistrationStatus updateStatus = crewMemberUpdateStatusRequest.getStatus();
+        enterCrewChatRoom(updateStatus, crewMember);
 
-		crewMember.updateStatus(updateStatus);
+        crewMember.updateStatus(updateStatus);
 
-		eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
-				.crewId(crewId)
-				.memberId(memberId)
-				.build());
-	}
+        eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
+                .crewId(crewId)
+                .memberId(memberId)
+                .build());
+    }
 
-	private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
-		if (!crew.isLeader(loggedInMemberId)) {
-			throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
-		}
-	}
+    private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
+        if (!crew.isLeader(loggedInMemberId)) {
+            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
+        }
+    }
 
-	private void enterCrewChatRoom(final RegistrationStatus updateStatus, final CrewMember crewMember) {
-		final RegistrationStatus nowStatus = crewMember.getStatus();
+    private void enterCrewChatRoom(final RegistrationStatus updateStatus, final CrewMember crewMember) {
+        final RegistrationStatus nowStatus = crewMember.getStatus();
 
-		if (nowStatus == WAITING && updateStatus == CONFIRMED) {
-			chatMessageService.enterRoomAndSaveEnteringMessages(crewMember.getCrewChatRoom(), crewMember.getMember());
-		}
-	}
+        if (nowStatus == WAITING && updateStatus == CONFIRMED) {
+            chatMessageService.enterRoomAndSaveEnteringMessages(crewMember.getCrewChatRoom(), crewMember.getMember());
+        }
+    }
 
-	/**
-	 * 크루원 가입 신청 거절/취소
-	 */
-	@Transactional
-	public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
-		final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-		final Crew crew = crewMember.getCrew();
+    /**
+     * 크루원 가입 신청 거절/취소
+     */
+    @Transactional
+    public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
+        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
+        final Crew crew = crewMember.getCrew();
 
-		if (crew.isLeader(loggedInMemberId)) {
-			validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
+        if (crew.isLeader(loggedInMemberId)) {
+            validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
 
-			eventPublisher.publishEvent(CrewMemberRejectedEvent.builder()
-					.crewId(crewId)
-					.memberId(memberId)
-					.build());
+            eventPublisher.publishEvent(CrewMemberRejectedEvent.builder()
+                    .crewId(crewId)
+                    .memberId(memberId)
+                    .build());
 
-			deleteCrewMember(crewMember);
+            deleteCrewMember(crewMember);
 
-			return;
-		}
+            return;
+        }
 
-		if (loggedInMemberId.equals(memberId)) {
-			cancelCrewMember(crewMember);
-			return;
-		}
+        if (loggedInMemberId.equals(memberId)) {
+            cancelCrewMember(crewMember);
+            return;
+        }
 
-		throw new CrewException(CREW_MEMBER_NOT_ALLOWED, loggedInMemberId);
-	}
+        throw new CrewException(CREW_MEMBER_NOT_ALLOWED, loggedInMemberId);
+    }
 
-	private void validateIsLeaderSelfDeleted(Long loggedInMemberId, Long memberId) {
-		if (loggedInMemberId.equals(memberId)) {
-			throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, loggedInMemberId);
-		}
-	}
+    private void validateIsLeaderSelfDeleted(Long loggedInMemberId, Long memberId) {
+        if (loggedInMemberId.equals(memberId)) {
+            throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, loggedInMemberId);
+        }
+    }
 
-	private void cancelCrewMember(final CrewMember crewMember) {
-		if (crewMember.getStatus() != WAITING) {
-			throw new CrewException(CREW_MEMBER_STATUS_IS_NOT_WAITING);
-		}
+    private void cancelCrewMember(final CrewMember crewMember) {
+        if (crewMember.getStatus() != WAITING) {
+            throw new CrewException(CREW_MEMBER_STATUS_IS_NOT_WAITING);
+        }
 
-		deleteCrewMember(crewMember);
-	}
+        deleteCrewMember(crewMember);
+    }
 
-	private void deleteCrewMember(final CrewMember crewMember) {
-		crewMemberRepository.delete(crewMember);
-	}
+    private void deleteCrewMember(final CrewMember crewMember) {
+        crewMemberRepository.delete(crewMember);
+    }
 }

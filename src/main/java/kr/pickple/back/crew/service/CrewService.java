@@ -39,119 +39,119 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class CrewService {
 
-	private static final Integer CREW_IMAGE_START_NUMBER = 1;
-	private static final Integer CREW_IMAGE_END_NUMBER = 20;
-	private static final Integer CREW_CREATE_MAX_SIZE = 3;
+    private static final Integer CREW_IMAGE_START_NUMBER = 1;
+    private static final Integer CREW_IMAGE_END_NUMBER = 20;
+    private static final Integer CREW_CREATE_MAX_SIZE = 3;
 
-	private final MemberRepository memberRepository;
-	private final CrewRepository crewRepository;
-	private final CrewMemberRepository crewMemberRepository;
-	private final MemberPositionRepository memberPositionRepository;
-	private final AddressService addressService;
-	private final ChatRoomService chatRoomService;
-	private final S3Properties s3Properties;
+    private final MemberRepository memberRepository;
+    private final CrewRepository crewRepository;
+    private final CrewMemberRepository crewMemberRepository;
+    private final MemberPositionRepository memberPositionRepository;
+    private final AddressService addressService;
+    private final ChatRoomService chatRoomService;
+    private final S3Properties s3Properties;
 
-	/**
-	 * 크루 생성
-	 */
-	@Transactional
-	public CrewIdResponse createCrew(final CrewCreateRequest crewCreateRequest, final Long loggedInMemberId) {
-		validateIsDuplicatedCrewInfo(crewCreateRequest.getName());
+    /**
+     * 크루 생성
+     */
+    @Transactional
+    public CrewIdResponse createCrew(final CrewCreateRequest crewCreateRequest, final Long loggedInMemberId) {
+        validateIsDuplicatedCrewInfo(crewCreateRequest.getName());
 
-		final Member leader = memberRepository.getMemberById(loggedInMemberId);
+        final Member leader = memberRepository.getMemberById(loggedInMemberId);
 
-		validateMemberCreatedCrewsCount(leader);
+        validateMemberCreatedCrewsCount(leader);
 
-		final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
-				crewCreateRequest.getAddressDepth1(),
-				crewCreateRequest.getAddressDepth2()
-		);
+        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
+                crewCreateRequest.getAddressDepth1(),
+                crewCreateRequest.getAddressDepth2()
+        );
 
-		final Integer crewImageRandomNumber = RandomUtil.getRandomNumber(
-				CREW_IMAGE_START_NUMBER,
-				CREW_IMAGE_END_NUMBER
-		);
+        final Integer crewImageRandomNumber = RandomUtil.getRandomNumber(
+                CREW_IMAGE_START_NUMBER,
+                CREW_IMAGE_END_NUMBER
+        );
 
-		final Crew crew = crewCreateRequest.toEntity(
-				leader,
-				mainAddressResponse,
-				MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
-				MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
-		);
+        final Crew crew = crewCreateRequest.toEntity(
+                leader,
+                mainAddressResponse,
+                MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
+                MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
+        );
 
-		final CrewMember crewLeader = CrewMember.builder()
-				.member(leader)
-				.crew(crew)
-				.build();
+        final CrewMember crewLeader = CrewMember.builder()
+                .member(leader)
+                .crew(crew)
+                .build();
 
-		crewLeader.confirmRegistration();
+        crewLeader.confirmRegistration();
 
-		final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, crew.getName(), CREW);
-		crew.makeNewCrewChatRoom(chatRoom);
+        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, crew.getName(), CREW);
+        crew.makeNewCrewChatRoom(chatRoom);
 
-		final Long crewId = crewRepository.save(crew).getId();
-		crewMemberRepository.save(crewLeader);
+        final Long crewId = crewRepository.save(crew).getId();
+        crewMemberRepository.save(crewLeader);
 
-		return CrewIdResponse.from(crewId);
-	}
+        return CrewIdResponse.from(crewId);
+    }
 
-	private void validateIsDuplicatedCrewInfo(final String name) {
-		if (crewRepository.existsByName(name)) {
-			throw new CrewException(CREW_IS_EXISTED, name);
-		}
-	}
+    private void validateIsDuplicatedCrewInfo(final String name) {
+        if (crewRepository.existsByName(name)) {
+            throw new CrewException(CREW_IS_EXISTED, name);
+        }
+    }
 
-	private void validateMemberCreatedCrewsCount(final Member leader) {
-		final Integer createdCrewsCount = crewRepository.countByLeaderId(leader.getId());
+    private void validateMemberCreatedCrewsCount(final Member leader) {
+        final Integer createdCrewsCount = crewRepository.countByLeaderId(leader.getId());
 
-		if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
-			throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
-		}
-	}
+        if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
+            throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
+        }
+    }
 
-	/**
-	 * 크루 상세 조회
-	 */
-	public CrewProfileResponse findCrewById(final Long crewId) {
-		final Crew crew = crewRepository.getCrewById(crewId);
+    /**
+     * 크루 상세 조회
+     */
+    public CrewProfileResponse findCrewById(final Long crewId) {
+        final Crew crew = crewRepository.getCrewById(crewId);
 
-		return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId));
-	}
+        return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId));
+    }
 
-	/**
-	 *  사용자 근처 크루 목록 조회
-	 */
-	public List<CrewProfileResponse> findCrewsByAddress(
-			final String addressDepth1,
-			final String addressDepth2,
-			final Pageable pageable
-	) {
-		final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1,
-				addressDepth2);
+    /**
+     *  사용자 근처 크루 목록 조회
+     */
+    public List<CrewProfileResponse> findCrewsByAddress(
+            final String addressDepth1,
+            final String addressDepth2,
+            final Pageable pageable
+    ) {
+        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1,
+                addressDepth2);
 
-		final Page<Crew> crews = crewRepository.findByAddressDepth1AndAddressDepth2(
-				mainAddressResponse.getAddressDepth1(),
-				mainAddressResponse.getAddressDepth2(),
-				pageable
-		);
+        final Page<Crew> crews = crewRepository.findByAddressDepth1AndAddressDepth2(
+                mainAddressResponse.getAddressDepth1(),
+                mainAddressResponse.getAddressDepth2(),
+                pageable
+        );
 
-		return crews.stream()
-				.map(crew -> CrewProfileResponse.of(crew, getConfirmedMemberResponses(crew.getId())))
-				.toList();
-	}
+        return crews.stream()
+                .map(crew -> CrewProfileResponse.of(crew, getConfirmedMemberResponses(crew.getId())))
+                .toList();
+    }
 
-	private List<MemberResponse> getConfirmedMemberResponses(final Long crewId) {
-		return crewMemberRepository.findAllByCrewIdAndStatus(crewId, CONFIRMED)
-				.stream()
-				.map(CrewMember::getMember)
-				.map(member -> MemberResponse.of(member, getPositionsByMember(member)))
-				.toList();
-	}
+    private List<MemberResponse> getConfirmedMemberResponses(final Long crewId) {
+        return crewMemberRepository.findAllByCrewIdAndStatus(crewId, CONFIRMED)
+                .stream()
+                .map(CrewMember::getMember)
+                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .toList();
+    }
 
-	private List<Position> getPositionsByMember(final Member member) {
-		final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-				member.getId());
+    private List<Position> getPositionsByMember(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+                member.getId());
 
-		return Position.fromMemberPositions(memberPositions);
-	}
+        return Position.fromMemberPositions(memberPositions);
+    }
 }

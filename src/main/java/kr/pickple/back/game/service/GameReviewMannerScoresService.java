@@ -23,76 +23,76 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class GameReviewMannerScoresService {
 
-	private static final int REVIEW_POSSIBLE_DAYS = 7;
+    private static final int REVIEW_POSSIBLE_DAYS = 7;
 
-	private final GameMemberRepository gameMemberRepository;
+    private final GameMemberRepository gameMemberRepository;
 
-	@Transactional
-	public void reviewMannerScores(
-			final Long loggedInMemberId,
-			final Long gameId,
-			final List<MannerScoreReview> mannerScoreReviews
-	) {
-		final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
-						loggedInMemberId,
-						gameId,
-						CONFIRMED
-				)
-				.orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, loggedInMemberId));
+    @Transactional
+    public void reviewMannerScores(
+            final Long loggedInMemberId,
+            final Long gameId,
+            final List<MannerScoreReview> mannerScoreReviews
+    ) {
+        final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
+                        loggedInMemberId,
+                        gameId,
+                        CONFIRMED
+                )
+                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, loggedInMemberId));
 
-		if (gameMember.isAlreadyReviewDone()) {
-			throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
-		}
+        if (gameMember.isAlreadyReviewDone()) {
+            throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
+        }
 
-		final Game game = gameMember.getGame();
-		final Member loggedInMember = gameMember.getMember();
+        final Game game = gameMember.getGame();
+        final Member loggedInMember = gameMember.getMember();
 
-		if (isNotReviewPeriod(game)) {
-			throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(),
-					game.getPlayEndTime());
-		}
+        if (isNotReviewPeriod(game)) {
+            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(),
+                    game.getPlayEndTime());
+        }
 
-		mannerScoreReviews.forEach(review -> {
-			final Member reviewedMember = getReviewedMember(game, review.getMemberId());
-			validateIsSelfReview(loggedInMember, reviewedMember);
-			reviewedMember.updateMannerScore(review.getMannerScore());
-		});
+        mannerScoreReviews.forEach(review -> {
+            final Member reviewedMember = getReviewedMember(game, review.getMemberId());
+            validateIsSelfReview(loggedInMember, reviewedMember);
+            reviewedMember.updateMannerScore(review.getMannerScore());
+        });
 
-		gameMember.updateReviewDone();
-	}
+        gameMember.updateReviewDone();
+    }
 
-	private void validateIsSelfReview(final Member loggedInMember, final Member reviewedMember) {
-		if (loggedInMember.equals(reviewedMember)) {
-			throw new GameException(GAME_MEMBER_CANNOT_REVIEW_SELF, loggedInMember.getId(), reviewedMember.getId());
-		}
-	}
+    private void validateIsSelfReview(final Member loggedInMember, final Member reviewedMember) {
+        if (loggedInMember.equals(reviewedMember)) {
+            throw new GameException(GAME_MEMBER_CANNOT_REVIEW_SELF, loggedInMember.getId(), reviewedMember.getId());
+        }
+    }
 
-	private Boolean isNotReviewPeriod(final Game game) {
-		return isBeforeThanPlayEndTime(game) || isAfterReviewPossibleTime(game);
-	}
+    private Boolean isNotReviewPeriod(final Game game) {
+        return isBeforeThanPlayEndTime(game) || isAfterReviewPossibleTime(game);
+    }
 
-	private Boolean isBeforeThanPlayEndTime(final Game game) {
-		return DateTimeUtil.isAfterThanNow(game.getPlayEndDatetime());
-	}
+    private Boolean isBeforeThanPlayEndTime(final Game game) {
+        return DateTimeUtil.isAfterThanNow(game.getPlayEndDatetime());
+    }
 
-	private Boolean isAfterReviewPossibleTime(final Game game) {
-		final LocalDateTime reviewDeadlineDatetime = game.getPlayEndDatetime().plusDays(REVIEW_POSSIBLE_DAYS);
+    private Boolean isAfterReviewPossibleTime(final Game game) {
+        final LocalDateTime reviewDeadlineDatetime = game.getPlayEndDatetime().plusDays(REVIEW_POSSIBLE_DAYS);
 
-		return DateTimeUtil.isEqualOrAfter(reviewDeadlineDatetime, LocalDateTime.now());
-	}
+        return DateTimeUtil.isEqualOrAfter(reviewDeadlineDatetime, LocalDateTime.now());
+    }
 
-	private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
-		return getConfirmedMembers(game)
-				.stream()
-				.filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
-				.findFirst()
-				.orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
-	}
+    private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
+        return getConfirmedMembers(game)
+                .stream()
+                .filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
+                .findFirst()
+                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
+    }
 
-	private List<Member> getConfirmedMembers(Game game) {
-		return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), CONFIRMED)
-				.stream()
-				.map(GameMember::getMember)
-				.toList();
-	}
+    private List<Member> getConfirmedMembers(Game game) {
+        return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), CONFIRMED)
+                .stream()
+                .map(GameMember::getMember)
+                .toList();
+    }
 }

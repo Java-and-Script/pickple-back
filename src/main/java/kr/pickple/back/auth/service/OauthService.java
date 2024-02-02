@@ -1,5 +1,13 @@
 package kr.pickple.back.auth.service;
 
+import static kr.pickple.back.auth.exception.AuthExceptionCode.*;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.TokenExtractor;
 import kr.pickple.back.auth.domain.oauth.OauthMember;
@@ -16,14 +24,6 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static kr.pickple.back.auth.exception.AuthExceptionCode.AUTH_FAIL_TO_VALIDATE_TOKEN;
-import static kr.pickple.back.auth.exception.AuthExceptionCode.AUTH_INVALID_REFRESH_TOKEN;
 
 @Service
 @RequiredArgsConstructor

@@ -1,5 +1,16 @@
 package kr.pickple.back.alarm.service;
 
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
 import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
@@ -9,20 +20,11 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
 public class AlarmService {
+
     private final GameAlarmService gameAlarmService;
     private final CrewAlarmService crewAlarmService;
     private final MemberRepository memberRepository;
@@ -32,12 +34,15 @@ public class AlarmService {
         return sseEmitterService.subscribeToSse(loggedInMemberId);
     }
 
-    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId, final Integer size) {
+    public CursorResult<AlarmResponse> findAllAlarms(final Long loggedInMemberId, final Long cursorId,
+            final Integer size) {
         final List<AlarmResponse> alarms = new ArrayList<>();
         final Integer checkSizeForNextPage = size + 1;
 
-        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId, Optional.ofNullable(cursorId), checkSizeForNextPage);
-        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId, Optional.ofNullable(cursorId), checkSizeForNextPage);
+        final List<CrewAlarmResponse> crewAlarms = crewAlarmService.findByMemberId(loggedInMemberId,
+                Optional.ofNullable(cursorId), checkSizeForNextPage);
+        final List<GameAlarmResponse> gameAlarms = gameAlarmService.findByMemberId(loggedInMemberId,
+                Optional.ofNullable(cursorId), checkSizeForNextPage);
 
         alarms.addAll(crewAlarms);
         alarms.addAll(gameAlarms);

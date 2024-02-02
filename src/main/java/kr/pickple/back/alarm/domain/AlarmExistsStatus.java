@@ -1,10 +1,6 @@
 package kr.pickple.back.alarm.domain;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonValue;
-import kr.pickple.back.crew.exception.CrewException;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import static kr.pickple.back.alarm.exception.AlarmExceptionCode.*;
 
 import java.util.Collections;
 import java.util.Map;
@@ -12,7 +8,12 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_EXISTS_STATUS_NOT_FOUND;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+
+import kr.pickple.back.crew.exception.CrewException;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
@@ -21,8 +22,9 @@ public enum AlarmExistsStatus {
     EXISTS("읽지 않은 알람이 있음", true),
     NOT_EXISTS("읽지 않은 알람이 없음", false);
 
-    private static final Map<String, AlarmExistsStatus> alarmExistsStatusMap = Collections.unmodifiableMap(Stream.of(values())
-            .collect(Collectors.toMap(AlarmExistsStatus::getDescription, Function.identity())));
+    private static final Map<String, AlarmExistsStatus> alarmExistsStatusMap = Collections.unmodifiableMap(
+            Stream.of(values())
+                    .collect(Collectors.toMap(AlarmExistsStatus::getDescription, Function.identity())));
 
     private final String description;
     private final Boolean booleanValue;

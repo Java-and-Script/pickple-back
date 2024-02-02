@@ -1,18 +1,22 @@
 package kr.pickple.back.alarm.controller;
 
+import static org.springframework.http.HttpStatus.*;
+
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
 import kr.pickple.back.alarm.dto.response.AlarmExistStatusResponse;
 import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.service.AlarmService;
 import kr.pickple.back.alarm.util.CursorResult;
 import kr.pickple.back.auth.config.resolver.Login;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import static org.springframework.http.HttpStatus.NO_CONTENT;
-import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @RequiredArgsConstructor

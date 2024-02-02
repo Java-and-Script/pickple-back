@@ -6,13 +6,11 @@ import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
 
 import org.locationtech.jts.geom.Point;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,11 +24,9 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

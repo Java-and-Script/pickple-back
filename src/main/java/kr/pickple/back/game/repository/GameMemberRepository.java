@@ -10,17 +10,17 @@ import kr.pickple.back.game.domain.GameMember;
 
 public interface GameMemberRepository extends JpaRepository<GameMember, Long> {
 
-	Optional<GameMember> findByMemberIdAndGameId(final Long memberId, final Long gameId);
+    Optional<GameMember> findByMemberIdAndGameId(final Long memberId, final Long gameId);
 
-	Optional<GameMember> findByMemberIdAndGameIdAndStatus(
-			final Long memberId,
-			final Long gameId,
-			final RegistrationStatus status
-	);
+    Optional<GameMember> findByMemberIdAndGameIdAndStatus(
+            final Long memberId,
+            final Long gameId,
+            final RegistrationStatus status
+    );
 
-	List<GameMember> findAllByMemberIdAndStatus(final Long memberId, final RegistrationStatus memberStatus);
+    List<GameMember> findAllByMemberIdAndStatus(final Long memberId, final RegistrationStatus memberStatus);
 
-	List<GameMember> findAllByMemberId(final Long memberId);
+    List<GameMember> findAllByMemberId(final Long memberId);
 
-	List<GameMember> findAllByGameIdAndStatus(final Long gameId, final RegistrationStatus status);
+    List<GameMember> findAllByGameIdAndStatus(final Long gameId, final RegistrationStatus status);
 }

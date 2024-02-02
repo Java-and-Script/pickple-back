@@ -1,5 +1,17 @@
 package kr.pickple.back.alarm.service;
 
+import static kr.pickple.back.alarm.domain.CrewAlarmType.*;
+import static kr.pickple.back.alarm.exception.AlarmExceptionCode.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.member.exception.MemberExceptionCode.*;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.dto.request.CrewAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
@@ -15,18 +27,6 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-
-import static kr.pickple.back.alarm.domain.CrewAlarmType.*;
-import static kr.pickple.back.alarm.exception.AlarmExceptionCode.ALARM_NOT_FOUND;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADER;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_NOT_FOUND;
-import static kr.pickple.back.member.exception.MemberExceptionCode.MEMBER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -119,7 +119,8 @@ public class CrewAlarmService {
         }
     }
 
-    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Optional<Long> optionalCursorId, final Integer size) {
+    public List<CrewAlarmResponse> findByMemberId(final Long loggedInMemberId, final Optional<Long> optionalCursorId,
+            final Integer size) {
         final List<CrewAlarm> crewAlarms = optionalCursorId
                 .map(cursorId -> crewAlarmRepository.findByMemberIdAndIdLessThanOrderByCreatedAtDesc(
                         loggedInMemberId,

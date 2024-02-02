@@ -1,9 +1,10 @@
 package kr.pickple.back.game.exception;
 
+import org.springframework.http.HttpStatus;
+
 import kr.pickple.back.common.exception.ExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
@@ -17,7 +18,8 @@ public enum GameExceptionCode implements ExceptionCode {
     GAME_SEARCH_CATEGORY_IS_INVALID(HttpStatus.BAD_REQUEST, "GAM-006", "게스트 모집글의 검색 카테고리 키워드가 유효하지 않음"),
     GAME_MEMBER_IS_NOT_HOST(HttpStatus.FORBIDDEN, "GAM-007", "해당 게스트 모집글의 호스트 권한이 필요함"),
     GAME_HOST_CANNOT_BE_DELETED(HttpStatus.BAD_REQUEST, "GAM-008", "호스트는 자신의 게스트 모집글에서 삭제될 수 없음"),
-    GAME_MEMBER_STATUS_IS_NOT_WAITING(HttpStatus.BAD_REQUEST, "GAM-009", "해당 게스트 모집글에 참여 신청 대기 상태가 아니라면, 참여 신청을 취소할 수 없음"),
+    GAME_MEMBER_STATUS_IS_NOT_WAITING(HttpStatus.BAD_REQUEST, "GAM-009",
+            "해당 게스트 모집글에 참여 신청 대기 상태가 아니라면, 참여 신청을 취소할 수 없음"),
     GAME_NOT_ALLOWED_TO_DELETE_GAME_MEMBER(HttpStatus.FORBIDDEN, "GAM-010", "해당 사용자의 게스트 모집글 참여 신청을 거절 혹은 취소할 권한이 필요함"),
     GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD(HttpStatus.BAD_REQUEST, "GAM-011", "리뷰 가능 기간이 아님 (경기 종료 후부터 7일)"),
     GAME_MEMBER_CANNOT_REVIEW_SELF(HttpStatus.BAD_REQUEST, "GAM-012", "자기 자신에게 리뷰를 남길 수 없음"),

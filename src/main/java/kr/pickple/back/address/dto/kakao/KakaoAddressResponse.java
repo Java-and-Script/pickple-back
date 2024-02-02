@@ -17,6 +17,12 @@ public class KakaoAddressResponse {
 
     private List<Document> documents;
 
+    public Point toPoint() {
+        final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
+
+        return geometryFactory.createPoint(new Coordinate(documents.get(0).x, documents.get(0).y));
+    }
+
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     static class Document {
@@ -24,11 +30,5 @@ public class KakaoAddressResponse {
         private String addressName;
         private Double x;
         private Double y;
-    }
-
-    public Point toPoint() {
-        final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
-        
-        return geometryFactory.createPoint(new Coordinate(documents.get(0).x, documents.get(0).y));
     }
 }

@@ -29,91 +29,91 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberGameService {
 
-	private final MemberRepository memberRepository;
-	private final GameRepository gameRepository;
-	private final GameMemberRepository gameMemberRepository;
-	private final MemberPositionRepository memberPositionRepository;
+    private final MemberRepository memberRepository;
+    private final GameRepository gameRepository;
+    private final GameMemberRepository gameMemberRepository;
+    private final MemberPositionRepository memberPositionRepository;
 
-	/**
-	 * 사용자의 참여 확정 게스트 모집글 목록 조회
-	 */
-	public List<MemberGameResponse> findAllMemberGames(
-			final Long loggedInMemberId,
-			final Long memberId,
-			final RegistrationStatus memberStatus
-	) {
-		validateSelfMemberAccess(loggedInMemberId, memberId);
+    /**
+     * 사용자의 참여 확정 게스트 모집글 목록 조회
+     */
+    public List<MemberGameResponse> findAllMemberGames(
+            final Long loggedInMemberId,
+            final Long memberId,
+            final RegistrationStatus memberStatus
+    ) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
 
-		final Member member = memberRepository.getMemberById(memberId);
-		final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
-				memberStatus);
+        final Member member = memberRepository.getMemberById(memberId);
+        final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
+                memberStatus);
 
-		return convertToMemberGameResponses(memberGames, memberStatus);
-	}
+        return convertToMemberGameResponses(memberGames, memberStatus);
+    }
 
-	/**
-	 * 사용자가 만든 게스트 모집글 목록 조회
-	 */
-	public List<MemberGameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
-		validateSelfMemberAccess(loggedInMemberId, memberId);
+    /**
+     * 사용자가 만든 게스트 모집글 목록 조회
+     */
+    public List<MemberGameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
 
-		final Member member = memberRepository.getMemberById(memberId);
-		final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
+        final Member member = memberRepository.getMemberById(memberId);
+        final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
-		return convertToMemberGameResponses(memberGames, CONFIRMED);
-	}
+        return convertToMemberGameResponses(memberGames, CONFIRMED);
+    }
 
-	/**
-	 * 회원의 게스트 모집 신청 여부 조회
-	 */
-	public GameMemberRegistrationStatusResponse findMemberRegistrationStatusForGame(
-			final Long loggedInMemberId,
-			final Long memberId,
-			final Long gameId
-	) {
-		validateSelfMemberAccess(loggedInMemberId, memberId);
+    /**
+     * 회원의 게스트 모집 신청 여부 조회
+     */
+    public GameMemberRegistrationStatusResponse findMemberRegistrationStatusForGame(
+            final Long loggedInMemberId,
+            final Long memberId,
+            final Long gameId
+    ) {
+        validateSelfMemberAccess(loggedInMemberId, memberId);
 
-		final Member member = memberRepository.getMemberById(memberId);
-		final Game game = gameRepository.getGameById(gameId);
+        final Member member = memberRepository.getMemberById(memberId);
+        final Game game = gameRepository.getGameById(gameId);
 
-		final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId())
-				.orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, member.getId(), game.getId()));
+        final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId())
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, member.getId(), game.getId()));
 
-		return GameMemberRegistrationStatusResponse.of(gameMember.getStatus(), gameMember.isAlreadyReviewDone());
-	}
+        return GameMemberRegistrationStatusResponse.of(gameMember.getStatus(), gameMember.isAlreadyReviewDone());
+    }
 
-	private void validateSelfMemberAccess(Long loggedInMemberId, Long memberId) {
-		if (!loggedInMemberId.equals(memberId)) {
-			throw new MemberException(MEMBER_MISMATCH, loggedInMemberId, memberId);
-		}
-	}
+    private void validateSelfMemberAccess(Long loggedInMemberId, Long memberId) {
+        if (!loggedInMemberId.equals(memberId)) {
+            throw new MemberException(MEMBER_MISMATCH, loggedInMemberId, memberId);
+        }
+    }
 
-	private List<MemberGameResponse> convertToMemberGameResponses(
-			final List<GameMember> memberGames,
-			final RegistrationStatus memberStatus
-	) {
-		return memberGames.stream()
-				.map(memberGame ->
-						MemberGameResponse.of(
-								memberGame,
-								getMemberResponsesByGame(memberGame.getGame(), memberStatus),
-								getPositionsByMember(memberGame.getMember())
-						)
-				)
-				.toList();
-	}
+    private List<MemberGameResponse> convertToMemberGameResponses(
+            final List<GameMember> memberGames,
+            final RegistrationStatus memberStatus
+    ) {
+        return memberGames.stream()
+                .map(memberGame ->
+                        MemberGameResponse.of(
+                                memberGame,
+                                getMemberResponsesByGame(memberGame.getGame(), memberStatus),
+                                getPositionsByMember(memberGame.getMember())
+                        )
+                )
+                .toList();
+    }
 
-	private List<MemberResponse> getMemberResponsesByGame(final Game game, final RegistrationStatus memberStatus) {
-		return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), memberStatus)
-				.stream()
-				.map(GameMember::getMember)
-				.map(member -> MemberResponse.of(member, getPositionsByMember(member)))
-				.toList();
-	}
+    private List<MemberResponse> getMemberResponsesByGame(final Game game, final RegistrationStatus memberStatus) {
+        return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), memberStatus)
+                .stream()
+                .map(GameMember::getMember)
+                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .toList();
+    }
 
-	private List<Position> getPositionsByMember(final Member member) {
-		final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(member.getId());
+    private List<Position> getPositionsByMember(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(member.getId());
 
-		return Position.fromMemberPositions(memberPositions);
-	}
+        return Position.fromMemberPositions(memberPositions);
+    }
 }

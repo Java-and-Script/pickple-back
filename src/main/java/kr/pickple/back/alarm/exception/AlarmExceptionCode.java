@@ -1,9 +1,10 @@
 package kr.pickple.back.alarm.exception;
 
+import org.springframework.http.HttpStatus;
+
 import kr.pickple.back.common.exception.ExceptionCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
