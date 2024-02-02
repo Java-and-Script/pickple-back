@@ -104,12 +104,6 @@ public class Game extends BaseEntity {
     @JoinColumn(name = "address_depth2_id")
     private AddressDepth2 addressDepth2;
 
-    @Embedded
-    private GamePositions gamePositions = new GamePositions();
-
-    @Embedded
-    private GameMembers gameMembers = new GameMembers();
-
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
     private ChatRoom chatRoom;
@@ -128,8 +122,7 @@ public class Game extends BaseEntity {
             final Member host,
             final Point point,
             final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2,
-            final List<Position> positions
+            final AddressDepth2 addressDepth2
     ) {
         this.content = content;
         this.playDate = playDate;
@@ -144,36 +137,14 @@ public class Game extends BaseEntity {
         this.point = point;
         this.addressDepth1 = addressDepth1;
         this.addressDepth2 = addressDepth2;
-
-        updateGamePositions(positions);
     }
 
     public void updateGameStatus(final GameStatus gameStatus) {
         status = gameStatus;
     }
 
-    private void updateGamePositions(final List<Position> positions) {
-        gamePositions.updateGamePositions(this, positions);
-    }
-
-    public List<Position> getPositions() {
-        return gamePositions.getPositions();
-    }
-
-    public List<Member> getMembersByStatus(final RegistrationStatus status) {
-        return gameMembers.getMembersByStatus(status);
-    }
-
-    public List<GameMember> getGameMembers() {
-        return gameMembers.getGameMembers();
-    }
-
     public LocalDateTime getPlayEndDatetime() {
         return LocalDateTime.of(playDate, playEndTime);
-    }
-
-    public void addGameMember(final Member member) {
-        gameMembers.addGameMember(this, member);
     }
 
     public void increaseMemberCount() {

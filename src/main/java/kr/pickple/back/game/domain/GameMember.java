@@ -51,6 +51,10 @@ public class GameMember extends BaseEntity {
         this.game = game;
     }
 
+    public void confirmRegistration() {
+        this.status = CONFIRMED;
+    }
+
     public void updateStatus(final RegistrationStatus status) {
         if (this.status == WAITING && status == CONFIRMED) {
             game.increaseMemberCount();

@@ -82,10 +82,17 @@ public class GameReviewMannerScoresService {
 	}
 
 	private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
-		return game.getMembersByStatus(CONFIRMED)
+		return getConfirmedMembers(game)
 				.stream()
 				.filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
 				.findFirst()
 				.orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
+	}
+
+	private List<Member> getConfirmedMembers(Game game) {
+		return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), CONFIRMED)
+				.stream()
+				.map(GameMember::getMember)
+				.toList();
 	}
 }

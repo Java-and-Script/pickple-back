@@ -11,11 +11,11 @@ import kr.pickple.back.member.exception.MemberException;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Boolean existsByEmailOrNicknameOrOauthId(final String email, final String nickname, final Long oauthId);
+	Boolean existsByEmailOrNicknameOrOauthId(final String email, final String nickname, final Long oauthId);
 
-    Optional<Member> findByOauthId(final Long oauthId);
+	Optional<Member> findByOauthId(final Long oauthId);
 
-    default Member getMemberById(final Long memberId) {
-        return findById(memberId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-    }
+	default Member getMemberById(final Long memberId) {
+		return findById(memberId).orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+	}
 }

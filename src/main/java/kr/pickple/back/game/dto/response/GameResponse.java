@@ -39,10 +39,7 @@ public class GameResponse {
     private List<Position> positions;
     private List<MemberResponse> members;
 
-    public static GameResponse of(
-            final Game game,
-            final List<MemberResponse> memberResponses
-    ) {
+    public static GameResponse of(final Game game, final List<MemberResponse> memberResponses, List<Position> positions) {
         return GameResponse.builder()
                 .id(game.getId())
                 .content(game.getContent())
@@ -62,7 +59,7 @@ public class GameResponse {
                 .host(getHostResponse(memberResponses, game.getHost().getId()))
                 .addressDepth1(game.getAddressDepth1().getName())
                 .addressDepth2(game.getAddressDepth2().getName())
-                .positions(game.getPositions())
+                .positions(positions)
                 .members(memberResponses)
                 .build();
     }

@@ -20,6 +20,8 @@ import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
+import kr.pickple.back.game.repository.GameMemberRepository;
+import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
@@ -37,92 +39,94 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberService {
 
-    private static final String REFRESH_TOKEN_KEY = "refresh_token";
+	private static final String REFRESH_TOKEN_KEY = "refresh_token";
 
-    private final MemberRepository memberRepository;
-    private final CrewMemberRepository crewMemberRepository;
-    private final MemberPositionRepository memberPositionRepository;
-    private final RedisRepository redisRepository;
-    private final AddressService addressService;
-    private final JwtProvider jwtProvider;
-    private final JwtProperties jwtProperties;
+	private final MemberRepository memberRepository;
+	private final CrewMemberRepository crewMemberRepository;
+	private final MemberPositionRepository memberPositionRepository;
+	private final RedisRepository redisRepository;
+	private final AddressService addressService;
+	private final JwtProvider jwtProvider;
+	private final JwtProperties jwtProperties;
+	private final GamePositionRepository gamePositionRepository;
+	private final GameMemberRepository gameMemberRepository;
 
-    /**
-     * 사용자 회원가입 (카카오)
-     */
-    @Transactional
-    public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
-        validateIsDuplicatedMemberInfo(memberCreateRequest);
+	/**
+	 * 사용자 회원가입 (카카오)
+	 */
+	@Transactional
+	public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
+		validateIsDuplicatedMemberInfo(memberCreateRequest);
 
-        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
-                memberCreateRequest.getAddressDepth1(),
-                memberCreateRequest.getAddressDepth2()
-        );
+		final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
+				memberCreateRequest.getAddressDepth1(),
+				memberCreateRequest.getAddressDepth2()
+		);
 
-        final Member member = memberCreateRequest.toEntity(mainAddressResponse);
-        final Member savedMember = memberRepository.save(member);
+		final Member member = memberCreateRequest.toEntity(mainAddressResponse);
+		final Member savedMember = memberRepository.save(member);
 
-        final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember);
+		final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember);
 
-        memberPositionRepository.saveAll(memberPositions); /* TODO: 벌크 연산으로 고치기 */
+		memberPositionRepository.saveAll(memberPositions); /* TODO: 벌크 연산으로 고치기 */
 
-        final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(savedMember.getId()));
+		final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(savedMember.getId()));
 
-        final RefreshToken refreshToken = RefreshToken.builder()
-                .token(loginTokens.getRefreshToken())
-                .memberId(savedMember.getId())
-                .createdAt(LocalDateTime.now())
-                .build();
+		final RefreshToken refreshToken = RefreshToken.builder()
+				.token(loginTokens.getRefreshToken())
+				.memberId(savedMember.getId())
+				.createdAt(LocalDateTime.now())
+				.build();
 
-        redisRepository.saveHash(
-                REFRESH_TOKEN_KEY,
-                refreshToken.getToken(),
-                refreshToken,
-                jwtProperties.getRefreshTokenExpirationTime()
-        );
+		redisRepository.saveHash(
+				REFRESH_TOKEN_KEY,
+				refreshToken.getToken(),
+				refreshToken,
+				jwtProperties.getRefreshTokenExpirationTime()
+		);
 
-        return AuthenticatedMemberResponse.of(savedMember, loginTokens);
-    }
+		return AuthenticatedMemberResponse.of(savedMember, loginTokens);
+	}
 
-    /**
-     * 사용자 프로필 조회
-     */
-    public MemberProfileResponse findMemberProfileById(final Long memberId) {
-        final Member member = memberRepository.getMemberById(memberId);
-        final List<Position> positions = getPositions(member);
+	private void validateIsDuplicatedMemberInfo(final MemberCreateRequest memberCreateRequest) {
+		final String email = memberCreateRequest.getEmail();
+		final String nickname = memberCreateRequest.getNickname();
+		final Long oauthId = memberCreateRequest.getOauthId();
 
-        final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), CONFIRMED)
-                .stream()
-                .map(CrewMember::getCrew)
-                .toList();
+		if (memberRepository.existsByEmailOrNicknameOrOauthId(email, nickname, oauthId)) {
+			throw new MemberException(MEMBER_IS_EXISTED, email, nickname, oauthId);
+		}
+	}
 
-        final List<CrewResponse> crewResponses = crews.stream()
-                .map(crew -> CrewResponse.from(crew, getLeaderResponse(crew)))
-                .toList();
+	/**
+	 * 사용자 프로필 조회
+	 */
+	public MemberProfileResponse findMemberProfileById(final Long memberId) {
+		final Member member = memberRepository.getMemberById(memberId);
+		final List<Position> positions = getPositionsByMember(member);
 
-        return MemberProfileResponse.of(member, crewResponses, positions);
-    }
+		final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), CONFIRMED)
+				.stream()
+				.map(CrewMember::getCrew)
+				.toList();
 
-    private MemberResponse getLeaderResponse(final Crew crew) {
-        final Member member = crew.getLeader();
+		final List<CrewResponse> crewResponses = crews.stream()
+				.map(crew -> CrewResponse.from(crew, getLeaderResponse(crew)))
+				.toList();
 
-        return MemberResponse.of(member, getPositions(member));
-    }
+		return MemberProfileResponse.of(member, crewResponses, positions);
+	}
 
-    private List<Position> getPositions(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-                member.getId());
+	private MemberResponse getLeaderResponse(final Crew crew) {
+		final Member member = crew.getLeader();
 
-        return Position.from(memberPositions);
-    }
+		return MemberResponse.of(member, getPositionsByMember(member));
+	}
 
-    private void validateIsDuplicatedMemberInfo(final MemberCreateRequest memberCreateRequest) {
-        final String email = memberCreateRequest.getEmail();
-        final String nickname = memberCreateRequest.getNickname();
-        final Long oauthId = memberCreateRequest.getOauthId();
+	private List<Position> getPositionsByMember(final Member member) {
+		final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+				member.getId());
 
-        if (memberRepository.existsByEmailOrNicknameOrOauthId(email, nickname, oauthId)) {
-            throw new MemberException(MEMBER_IS_EXISTED, email, nickname, oauthId);
-        }
-    }
+		return Position.fromMemberPositions(memberPositions);
+	}
 }

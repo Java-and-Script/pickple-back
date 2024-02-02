@@ -57,7 +57,7 @@ public class GameController {
             @PathVariable final Long gameId
     ) {
         return ResponseEntity.status(OK)
-                .body(gameService.findGameDetailsById(gameId));
+                .body(gameService.findGameById(gameId));
     }
 
     @GetMapping
