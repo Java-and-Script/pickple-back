@@ -27,8 +27,11 @@ import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
+import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -43,6 +46,7 @@ public class CrewService {
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
+    private final MemberPositionRepository memberPositionRepository;
     private final AddressService addressService;
     private final ChatRoomService chatRoomService;
     private final S3Properties s3Properties;
@@ -98,7 +102,7 @@ public class CrewService {
     }
 
     private void validateMemberCreatedCrewsCount(final Member leader) {
-        final Long createdCrewsCount = leader.getCreatedCrewsCount();
+        final Integer createdCrewsCount = crewRepository.countByLeaderId(leader.getId());
 
         if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
             throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
@@ -140,7 +144,14 @@ public class CrewService {
         return crewMemberRepository.findAllByCrewIdAndStatus(crewId, CONFIRMED)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(MemberResponse::from)
+                .map(member -> MemberResponse.of(member, getPositions(member)))
                 .toList();
+    }
+
+    private List<Position> getPositions(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+                member.getId());
+
+        return Position.from(memberPositions);
     }
 }

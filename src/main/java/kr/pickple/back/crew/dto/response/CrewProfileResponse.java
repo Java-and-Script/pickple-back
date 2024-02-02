@@ -29,7 +29,6 @@ public class CrewProfileResponse {
 
     public static CrewProfileResponse of(
             final Crew crew,
-            final MemberResponse leader,
             final List<MemberResponse> memberResponses
     ) {
         return CrewProfileResponse.builder()
@@ -43,10 +42,17 @@ public class CrewProfileResponse {
                 .status(crew.getStatus())
                 .likeCount(crew.getLikeCount())
                 .competitionPoint(crew.getCompetitionPoint())
-                .leader(leader)
+                .leader(getLeaderResponse(memberResponses, crew.getLeader().getId()))
                 .addressDepth1(crew.getAddressDepth1().getName())
                 .addressDepth2(crew.getAddressDepth2().getName())
                 .members(memberResponses)
                 .build();
+    }
+
+    private static MemberResponse getLeaderResponse(final List<MemberResponse> memberResponses, final Long leaderId) {
+        return memberResponses.stream()
+                .filter(memberResponse -> memberResponse.getId().equals(leaderId))
+                .findFirst()
+                .orElseThrow();
     }
 }
