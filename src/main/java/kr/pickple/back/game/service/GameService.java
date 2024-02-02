@@ -46,9 +46,12 @@ import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -60,6 +63,7 @@ public class GameService {
 
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
+    private final MemberPositionRepository memberPositionRepository;
     private final MemberRepository memberRepository;
     private final KakaoAddressSearchClient kakaoAddressSearchClient;
     private final AddressService addressService;
@@ -146,7 +150,7 @@ public class GameService {
         final Game game = findGameById(gameId);
         final List<MemberResponse> memberResponses = game.getMembersByStatus(CONFIRMED)
                 .stream()
-                .map(MemberResponse::from)
+                .map(member -> MemberResponse.of(member, getPositions(member)))
                 .toList();
 
         game.increaseViewCount();
@@ -228,7 +232,7 @@ public class GameService {
     private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
         return game.getMembersByStatus(status)
                 .stream()
-                .map(MemberResponse::from)
+                .map(member -> MemberResponse.of(member, getPositions(member)))
                 .toList();
     }
 
@@ -415,5 +419,12 @@ public class GameService {
                 .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
                 .toList();
+    }
+
+    private List<Position> getPositions(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+                member.getId());
+
+        return Position.from(memberPositions);
     }
 }

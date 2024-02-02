@@ -62,7 +62,7 @@ public class MemberCrewService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = memberRepository.getMemberById(memberId);
-        final List<Crew> crews = crewRepository.findCreatedAllByMemberId(member.getId());
+        final List<Crew> crews = crewRepository.findAllByLeaderId(member.getId());
 
         return convertToCrewProfileResponses(crews, CONFIRMED);
     }
@@ -87,25 +87,16 @@ public class MemberCrewService {
             final List<Crew> crews,
             final RegistrationStatus memberStatus
     ) {
+
         return crews.stream()
-                .map(crew -> CrewProfileResponse.of(
-                                crew,
-                                getLeaderResponse(crew),
-                                getMemberResponsesByCrew(crew, memberStatus)
-                        )
-                )
+                .map(crew -> CrewProfileResponse.of(crew, getMemberResponsesByCrew(crew, memberStatus)))
                 .toList();
     }
-
-    private MemberResponse getLeaderResponse(final Crew crew) {
-        final Member leader = crew.getLeader();
-
-        return MemberResponse.of(leader, getPositions(leader));
-    }
-
+    
     private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
-        return crew.getMembersByStatus(memberStatus)
+        return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
+                .map(CrewMember::getMember)
                 .map(member -> MemberResponse.of(member, getPositions(member)))
                 .toList();
     }

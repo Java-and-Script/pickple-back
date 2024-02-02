@@ -22,8 +22,11 @@ import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
+import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -33,6 +36,7 @@ public class CrewMemberService {
 
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
+    private final MemberPositionRepository memberPositionRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final ChatMessageService chatMessageService;
     private final ApplicationEventPublisher eventPublisher;
@@ -81,10 +85,17 @@ public class CrewMemberService {
         final List<MemberResponse> memberResponses = crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(MemberResponse::from)
+                .map(member -> MemberResponse.of(member, getPositions(member)))
                 .toList();
 
         return CrewProfileResponse.of(crew, memberResponses);
+    }
+
+    private List<Position> getPositions(final Member member) {
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+                member.getId());
+
+        return Position.from(memberPositions);
     }
 
     /**
