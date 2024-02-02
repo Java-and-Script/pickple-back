@@ -4,7 +4,6 @@ import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.game.domain.GameStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.text.MessageFormat;
 import java.time.Duration;
@@ -13,7 +12,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.locationtech.jts.geom.Point;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,31 +22,25 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
-import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
-import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
-import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
 import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.domain.GamePosition;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
-import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
-import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
+import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
-import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
 import kr.pickple.back.position.domain.Position;
@@ -66,25 +58,46 @@ public class GameService {
 	private final AddressService addressService;
 	private final ChatRoomService chatRoomService;
 	private final RedisRepository redisRepository;
+	private final GamePositionRepository gamePositionRepository;
+	private final GameMemberRepository gameMemberRepository;
 
+	/**
+	 * 게임 생성
+	 */
 	@Transactional
 	public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
-		final Member host = findMemberById(loggedInMemberId);
+		final Member host = memberRepository.getMemberById(loggedInMemberId);
 		final Point point = kakaoAddressSearchClient.fetchAddress(
 				gameCreateRequest.getMainAddress());
 		final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
 				gameCreateRequest.getMainAddress());
 
 		final Game game = gameCreateRequest.toEntity(host, mainAddressResponse, point);
-		game.addGameMember(host);
+
+		final GameMember gameHost = GameMember.builder()
+				.member(host)
+				.game(game)
+				.build();
+		gameHost.confirmRegistration();
 
 		final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(host, makeGameRoomName(game), GAME);
 		game.makeNewCrewChatRoom(chatRoom);
 
-		final Long savedGameId = gameRepository.save(game).getId();
+		final Game savedGame = gameRepository.save(game);
+		final List<GamePosition> gamePositions = gameCreateRequest.toGamePositionEntities(savedGame);
+		gamePositionRepository.saveAll(gamePositions);
+
+		final Long savedGameId = savedGame.getId();
 		saveGameStatusUpdateEventToRedis(game, savedGameId);
 
 		return GameIdResponse.from(savedGameId);
+	}
+
+	private String makeGameRoomName(final Game game) {
+		final String playDateFormat = game.getPlayDate().format(DateTimeFormatter.ofPattern("MM.dd"));
+		final String addressDepth2Name = game.getAddressDepth2().getName();
+
+		return MessageFormat.format("{0} {1}", playDateFormat, addressDepth2Name);
 	}
 
 	private void saveGameStatusUpdateEventToRedis(final Game game, final Long savedGameId) {
@@ -127,37 +140,29 @@ public class GameService {
 		return String.format("game:%s:%d", gameStatus.toString(), id);
 	}
 
+	/**
+	 * 게임 상태 업데이트
+	 */
 	@Transactional
 	public void updateGameStatus(final GameStatus gameStatus, final Long gameId) {
-		final Game game = findGameById(gameId);
+		final Game game = gameRepository.getGameById(gameId);
 		game.updateGameStatus(gameStatus);
 	}
 
-	private String makeGameRoomName(final Game game) {
-		final String playDateFormat = game.getPlayDate().format(DateTimeFormatter.ofPattern("MM.dd"));
-		final String addressDepth2Name = game.getAddressDepth2().getName();
-
-		return MessageFormat.format("{0} {1}", playDateFormat, addressDepth2Name);
-	}
-
+	/**
+	 * 게임 상세 조회
+	 */
 	@Transactional
-	public GameResponse findGameDetailsById(final Long gameId) {
-		final Game game = findGameById(gameId);
-		final List<MemberResponse> memberResponses = game.getMembersByStatus(CONFIRMED)
-				.stream()
-				.map(member -> MemberResponse.of(member, getPositions(member)))
-				.toList();
-
+	public GameResponse findGameById(final Long gameId) {
+		final Game game = gameRepository.getGameById(gameId);
 		game.increaseViewCount();
 
-		return GameResponse.of(game, memberResponses);
+		return GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game));
 	}
 
-	private Game findGameById(final Long gameId) {
-		return gameRepository.findById(gameId)
-				.orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
-	}
-
+	/**
+	 * 게임 카테고리별 조회
+	 */
 	public List<GameResponse> findGamesByCategory(
 			final Category category,
 			final String value,
@@ -170,6 +175,9 @@ public class GameService {
 		};
 	}
 
+	/**
+	 * 주소별 게스트 모집글 조회
+	 */
 	private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
 		final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(address);
 
@@ -191,22 +199,28 @@ public class GameService {
 		);
 
 		return games.stream()
-				.map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
+				.map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game)))
 				.toList();
 	}
 
-	private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
-		return game.getMembersByStatus(status)
-				.stream()
-				.map(member -> MemberResponse.of(member, getPositions(member)))
+	/**
+	 * 특정 지역의 게스트 모집글 조회
+	 */
+	public List<GameResponse> findGamesWithInAddress(final MainAddressResponse mainAddressResponse) {
+		final List<Game> games = gameRepository.findGamesWithInAddress(
+				mainAddressResponse.getAddressDepth1(),
+				mainAddressResponse.getAddressDepth2()
+		);
+
+		return games.stream()
+				.filter(Game::isNotEndedGame)
+				.map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game)))
 				.toList();
 	}
 
-	private Member findMemberById(final Long memberId) {
-		return memberRepository.findById(memberId)
-				.orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-	}
-
+	/**
+	 * 중심 좌표(위도, 경도)로 부터 특정 거리(M) 까지의 게스트 모집글 조회
+	 */
 	public List<GameResponse> findGamesWithInDistance(
 			final Double latitude,
 			final Double longitude,
@@ -216,26 +230,28 @@ public class GameService {
 
 		return games.stream()
 				.filter(Game::isNotEndedGame)
-				.map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
+				.map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game)))
 				.toList();
 	}
 
-	public List<GameResponse> findGamesWithInAddress(final MainAddressResponse mainAddressResponse) {
-		final List<Game> games = gameRepository.findGamesWithInAddress(
-				mainAddressResponse.getAddressDepth1(),
-				mainAddressResponse.getAddressDepth2()
-		);
-
-		return games.stream()
-				.filter(Game::isNotEndedGame)
-				.map(game -> GameResponse.of(game, getMemberResponses(game, CONFIRMED)))
+	private List<MemberResponse> getMemberResponsesByStatus(final Game game, final RegistrationStatus status) {
+		return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), status)
+				.stream()
+				.map(GameMember::getMember)
+				.map(member -> MemberResponse.of(member, getPositionsByMember(member)))
 				.toList();
 	}
 
-	private List<Position> getPositions(final Member member) {
+	private List<Position> getPositionsByMember(final Member member) {
 		final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
 				member.getId());
 
-		return Position.from(memberPositions);
+		return Position.fromMemberPositions(memberPositions);
+	}
+
+	private List<Position> getPositionsByGame(final Game game) {
+		final List<GamePosition> gamePositions = gamePositionRepository.findAllByGameId(game.getId());
+
+		return Position.fromGamePositions(gamePositions);
 	}
 }

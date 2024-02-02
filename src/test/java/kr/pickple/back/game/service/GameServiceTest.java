@@ -50,7 +50,7 @@ public class GameServiceTest {
         given(gameRepository.findById(anyLong())).willReturn(Optional.ofNullable(game));
 
         // when
-        final GameResponse gameResponse = gameService.findGameDetailsById(1L);
+        final GameResponse gameResponse = gameService.findGameById(1L);
 
         // then
         assertThat(gameResponse).isNotNull();

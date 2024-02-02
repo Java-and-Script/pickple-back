@@ -2,7 +2,6 @@ package kr.pickple.back.game.service;
 
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
 
@@ -17,15 +16,19 @@ import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.domain.GamePosition;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
+import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
-import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -35,16 +38,20 @@ public class GameMemberService {
 
 	private final GameRepository gameRepository;
 	private final MemberRepository memberRepository;
+	private final MemberPositionRepository memberPositionRepository;
 	private final ChatMessageService chatMessageService;
 	private final ApplicationEventPublisher eventPublisher;
 	private final GameMemberRepository gameMemberRepository;
+	private final GamePositionRepository gamePositionRepository;
 
 	@Transactional
 	public void registerGameMember(final Long gameId, final Long loggedInMemberId) {
-		final Game game = findGameById(gameId);
-		final Member member = findMemberById(loggedInMemberId);
+		final Game game = gameRepository.getGameById(gameId);
+		final Member member = memberRepository.getMemberById(loggedInMemberId);
 
-		game.addGameMember(member);
+		validateIsAlreadyRegisteredGameMember(game, member);
+		final GameMember gameMember = buildGameMember(game, member);
+		gameMemberRepository.save(gameMember);
 
 		eventPublisher.publishEvent(GameJoinRequestNotificationEvent.builder()
 				.gameId(gameId)
@@ -52,9 +59,21 @@ public class GameMemberService {
 				.build());
 	}
 
-	private Game findGameById(final Long gameId) {
-		return gameRepository.findById(gameId)
-				.orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
+	private void validateIsAlreadyRegisteredGameMember(final Game game, final Member member) {
+		if (isAlreadyRegistered(game, member)) {
+			throw new GameException(GAME_MEMBER_IS_EXISTED, member.getId());
+		}
+	}
+
+	private boolean isAlreadyRegistered(final Game game, final Member member) {
+		return gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId()).isPresent();
+	}
+
+	private GameMember buildGameMember(final Game game, final Member member) {
+		return GameMember.builder()
+				.member(member)
+				.game(game)
+				.build();
 	}
 
 	public GameResponse findAllGameMembers(
@@ -70,14 +89,28 @@ public class GameMemberService {
 			throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
 		}
 
-		return GameResponse.of(game, getMemberResponses(game, status));
+		return GameResponse.of(game, getMemberResponsesByStatus(game, status), getPositionsByGame(game));
 	}
 
-	private List<MemberResponse> getMemberResponses(final Game game, final RegistrationStatus status) {
-		return game.getMembersByStatus(status)
+	private List<MemberResponse> getMemberResponsesByStatus(final Game game, final RegistrationStatus status) {
+		return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), status)
 				.stream()
-				.map(MemberResponse::from)
+				.map(GameMember::getMember)
+				.map(member -> MemberResponse.of(member, getPositionsByMember(member)))
 				.toList();
+	}
+
+	private List<Position> getPositionsByMember(final Member member) {
+		final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
+				member.getId());
+
+		return Position.fromMemberPositions(memberPositions);
+	}
+
+	private List<Position> getPositionsByGame(final Game game) {
+		final List<GamePosition> gamePositions = gamePositionRepository.findAllByGameId(game.getId());
+
+		return Position.fromGamePositions(gamePositions);
 	}
 
 	private GameMember findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
@@ -109,7 +142,7 @@ public class GameMemberService {
 	}
 
 	private void validateIsHost(final Long loggedInMemberId, final Game game) {
-		final Member loggedInMember = findMemberById(loggedInMemberId);
+		final Member loggedInMember = memberRepository.getMemberById(loggedInMemberId);
 
 		if (!game.isHost(loggedInMember)) {
 			throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
@@ -129,7 +162,7 @@ public class GameMemberService {
 		final GameMember gameMember = findGameMemberByGameIdAndMemberId(gameId, memberId);
 		final Game game = gameMember.getGame();
 		final Member member = gameMember.getMember();
-		final Member loggedInMember = findMemberById(loggedInMemberId);
+		final Member loggedInMember = memberRepository.getMemberById(loggedInMemberId);
 
 		if (game.isHost(loggedInMember)) {
 			validateIsHostSelfDeleted(loggedInMember, member);
@@ -151,11 +184,6 @@ public class GameMemberService {
 		}
 
 		throw new GameException(GAME_NOT_ALLOWED_TO_DELETE_GAME_MEMBER, loggedInMemberId);
-	}
-
-	private Member findMemberById(final Long memberId) {
-		return memberRepository.findById(memberId)
-				.orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
 	}
 
 	private void validateIsHostSelfDeleted(final Member loggedInMember, final Member member) {

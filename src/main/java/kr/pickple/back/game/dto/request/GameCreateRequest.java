@@ -17,7 +17,9 @@ import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddressResponse;
 import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GamePosition;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -85,7 +87,15 @@ public class GameCreateRequest {
                 .point(point)
                 .addressDepth1(mainAddressResponse.getAddressDepth1())
                 .addressDepth2(mainAddressResponse.getAddressDepth2())
-                .positions(positions)
                 .build();
+    }
+
+    public List<GamePosition> toGamePositionEntities(final Game game) {
+        return positions.stream()
+                .map(position -> GamePosition.builder()
+                        .game(game)
+                        .position(position)
+                        .build()
+                ).toList();
     }
 }

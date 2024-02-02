@@ -18,57 +18,60 @@ import lombok.Getter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class MemberGameResponse {
 
-    private Long id;
-    private String content;
-    private LocalDate playDate;
-    private LocalTime playStartTime;
-    private LocalTime playEndTime;
-    private Integer playTimeMinutes;
-    private String mainAddress;
-    private String detailAddress;
-    private Double latitude;
-    private Double longitude;
-    private GameStatus status;
-    private Boolean isReviewDone;
-    private Integer viewCount;
-    private Integer cost;
-    private Integer memberCount;
-    private Integer maxMemberCount;
-    private MemberResponse host;
-    private String addressDepth1;
-    private String addressDepth2;
-    private List<Position> positions;
-    private List<MemberResponse> members;
+	private Long id;
+	private String content;
+	private LocalDate playDate;
+	private LocalTime playStartTime;
+	private LocalTime playEndTime;
+	private Integer playTimeMinutes;
+	private String mainAddress;
+	private String detailAddress;
+	private Double latitude;
+	private Double longitude;
+	private GameStatus status;
+	private Boolean isReviewDone;
+	private Integer viewCount;
+	private Integer cost;
+	private Integer memberCount;
+	private Integer maxMemberCount;
+	private MemberResponse host;
+	private String addressDepth1;
+	private String addressDepth2;
+	private List<Position> positions;
+	private List<MemberResponse> members;
 
-    public static MemberGameResponse of(
-            final GameMember gameMember,
-            final List<MemberResponse> memberResponses,
-            final MemberResponse host
-    ) {
-        final Game game = gameMember.getGame();
+	public static MemberGameResponse of(final GameMember gameMember, final List<MemberResponse> memberResponses, List<Position> positions) {
+		final Game game = gameMember.getGame();
 
-        return MemberGameResponse.builder()
-                .id(game.getId())
-                .content(game.getContent())
-                .playDate(game.getPlayDate())
-                .playStartTime(game.getPlayStartTime())
-                .playEndTime(game.getPlayEndTime())
-                .playTimeMinutes(game.getPlayTimeMinutes())
-                .mainAddress(game.getMainAddress())
-                .detailAddress(game.getDetailAddress())
-                .latitude(game.getPoint().getY())
-                .longitude(game.getPoint().getX())
-                .status(game.getStatus())
-                .isReviewDone(gameMember.isAlreadyReviewDone())
-                .viewCount(game.getViewCount())
-                .cost(game.getCost())
-                .memberCount(game.getMemberCount())
-                .maxMemberCount(game.getMaxMemberCount())
-                .host(host)
-                .addressDepth1(game.getAddressDepth1().getName())
-                .addressDepth2(game.getAddressDepth2().getName())
-                .positions(game.getPositions())
-                .members(memberResponses)
-                .build();
-    }
+		return MemberGameResponse.builder()
+				.id(game.getId())
+				.content(game.getContent())
+				.playDate(game.getPlayDate())
+				.playStartTime(game.getPlayStartTime())
+				.playEndTime(game.getPlayEndTime())
+				.playTimeMinutes(game.getPlayTimeMinutes())
+				.mainAddress(game.getMainAddress())
+				.detailAddress(game.getDetailAddress())
+				.latitude(game.getPoint().getY())
+				.longitude(game.getPoint().getX())
+				.status(game.getStatus())
+				.isReviewDone(gameMember.isAlreadyReviewDone())
+				.viewCount(game.getViewCount())
+				.cost(game.getCost())
+				.memberCount(game.getMemberCount())
+				.maxMemberCount(game.getMaxMemberCount())
+				.host(getHostResponse(memberResponses, game.getHost().getId()))
+				.addressDepth1(game.getAddressDepth1().getName())
+				.addressDepth2(game.getAddressDepth2().getName())
+				.positions(positions)
+				.members(memberResponses)
+				.build();
+	}
+
+	private static MemberResponse getHostResponse(final List<MemberResponse> memberResponses, final Long hostId) {
+		return memberResponses.stream()
+				.filter(memberResponse -> memberResponse.getId().equals(hostId))
+				.findFirst()
+				.orElseThrow();
+	}
 }
