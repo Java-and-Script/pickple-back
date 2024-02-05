@@ -55,12 +55,4 @@ public class ChatMessage extends BaseEntity {
         this.chatRoom = chatRoom;
         this.sender = sender;
     }
-
-    public void updateContent(final String content) {
-        this.content = content;
-    }
-
-    public Boolean isMatchedMessageType(final MessageType type) {
-        return this.type == type;
-    }
 }

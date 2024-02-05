@@ -1,8 +1,6 @@
 package kr.pickple.back.chat.service;
 
 import static kr.pickple.back.chat.domain.MessageType.*;
-import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
 
@@ -11,15 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.chat.domain.ChatMessage;
 import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.domain.ChatRoomMember;
 import kr.pickple.back.chat.domain.MessageType;
 import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
-import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
+import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
-import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -28,19 +25,22 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ChatMessageService {
 
-    private final ChatValidator chatValidator;
-
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
+    private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final MemberRepository memberRepository;
+    private final ChatValidator chatValidator;
 
+    /**
+     * 채팅방 입장
+     */
     @Transactional
     public ChatMessageResponse enterChatRoom(
             final Long roomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member member = findMemberById(chatMessageCreateRequest.getSenderId());
-        final ChatRoom chatRoom = findRoomById(roomId);
+        final Member member = memberRepository.getMemberById(chatMessageCreateRequest.getSenderId());
+        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
         final ChatMessage enteringMessage = enterRoomAndSaveEnteringMessages(chatRoom, member);
 
         return ChatMessageResponse.from(enteringMessage);
@@ -51,49 +51,73 @@ public class ChatMessageService {
         chatValidator.validateIsNotExistedRoomMember(chatRoom, member);
 
         final String content = MessageType.makeEnterMessage(member.getNickname());
-        final ChatMessage chatMessage = buildChatMessage(ENTER, content, chatRoom, member);
-        chatRoom.enterRoom(chatMessage);
+        final ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByMemberIdAndChatRoomId(member.getId(),
+                        chatRoom.getId())
+                .orElseGet(() -> buildChatRoomMember(chatRoom, member));
 
-        return chatMessageRepository.save(chatMessage);
+        chatRoomMember.activate();
+        chatRoomMemberRepository.save(chatRoomMember);
+        chatRoom.increaseMemberCount();
+
+        final ChatMessage enteringMessage = buildChatMessage(ENTER, content, chatRoom, member);
+
+        return chatMessageRepository.save(enteringMessage);
     }
 
+    private ChatRoomMember buildChatRoomMember(final ChatRoom chatRoom, final Member member) {
+        return ChatRoomMember.builder()
+                .chatRoom(chatRoom)
+                .member(member)
+                .build();
+    }
+
+    /**
+     * 채팅 메시지 전송
+     */
     @Transactional
     public ChatMessageResponse sendMessage(
             final Long roomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member sender = findMemberById(chatMessageCreateRequest.getSenderId());
-        final ChatRoom chatRoom = findRoomById(roomId);
+        final Member sender = memberRepository.getMemberById(chatMessageCreateRequest.getSenderId());
+        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
 
         chatValidator.validateIsExistedRoomMember(sender, chatRoom);
 
         final String content = chatMessageCreateRequest.getContent();
         final ChatMessage chatMessage = buildChatMessage(TALK, content, chatRoom, sender);
-        chatRoom.sendMessage(chatMessage);
         final ChatMessage sendingMessage = chatMessageRepository.save(chatMessage);
 
         return ChatMessageResponse.from(sendingMessage);
     }
 
+    /**
+     * 채팅방 퇴장
+     */
     @Transactional
     public ChatMessageResponse leaveChatRoom(
             final Long roomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member member = findMemberById(chatMessageCreateRequest.getSenderId());
-        final ChatRoom chatRoom = findRoomById(roomId);
+        final Member member = memberRepository.getMemberById(chatMessageCreateRequest.getSenderId());
+        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
 
         chatValidator.validateIsExistedRoomMember(member, chatRoom);
         chatValidator.validateChatRoomLeavingConditions(member, chatRoom);
 
         final String content = MessageType.makeLeaveMessage(member.getNickname());
-        final ChatMessage chatMessage = buildChatMessage(LEAVE, content, chatRoom, member);
-        chatRoom.leaveRoom(chatMessage);
-        final ChatMessage leavingMessage = chatMessageRepository.save(chatMessage);
+        final ChatRoomMember chatRoomMember = chatRoomMemberRepository.getByMemberIdAndChatRoomId(member.getId(),
+                chatRoom.getId());
 
-        if (chatRoom.isEmptyRoom()) {
+        chatRoomMember.deactivate();
+        chatRoom.decreaseMemberCount();
+
+        if (chatRoom.isEmpty()) {
             chatRoomRepository.delete(chatRoom);
         }
+
+        final ChatMessage chatMessage = buildChatMessage(LEAVE, content, chatRoom, member);
+        final ChatMessage leavingMessage = chatMessageRepository.save(chatMessage);
 
         return ChatMessageResponse.from(leavingMessage);
     }
@@ -112,35 +136,22 @@ public class ChatMessageService {
                 .build();
     }
 
+    /**
+     * 특정 채팅방의 모든 메시지 목록 조회
+     */
     public List<ChatMessageResponse> findAllMessagesInRoom(final Long loggedInMemberId, final Long roomId) {
-        final ChatRoom chatRoom = findRoomById(roomId);
-        final Member loggedInMember = findMemberById(loggedInMemberId);
+        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
+        final Member loggedInMember = memberRepository.getMemberById(loggedInMemberId);
 
         chatValidator.validateIsExistedRoomMember(loggedInMember, chatRoom);
 
-        final ChatMessage lastEnteringMessage = chatRoom.getLastEnteringChatMessageByMember(loggedInMember);
+        final ChatMessage lastEnteringMessage = chatMessageRepository.getLastEnteringChatMessageBySenderId(
+                loggedInMember.getId());
 
-        return chatRoom.getChatMessages()
+        return chatMessageRepository.findAllByChatRoomIdAndCreatedAtGreaterThanEqual(chatRoom.getId(),
+                        lastEnteringMessage.getCreatedAt())
                 .stream()
-                .filter(thisChatMessage -> isEqualOrAfterThanLastEnteringMessage(lastEnteringMessage, thisChatMessage))
                 .map(ChatMessageResponse::from)
                 .toList();
-    }
-
-    private Boolean isEqualOrAfterThanLastEnteringMessage(
-            final ChatMessage lastEnteringMessage,
-            final ChatMessage thisChatMessage
-    ) {
-        return DateTimeUtil.isEqualOrAfter(lastEnteringMessage.getCreatedAt(), thisChatMessage.getCreatedAt());
-    }
-
-    private ChatRoom findRoomById(final Long roomId) {
-        return chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND, roomId));
-    }
-
-    private Member findMemberById(final Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 }
