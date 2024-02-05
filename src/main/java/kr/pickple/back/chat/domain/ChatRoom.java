@@ -2,11 +2,8 @@ package kr.pickple.back.chat.domain;
 
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,7 +12,6 @@ import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.util.RoomTypeAttributeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -48,12 +44,6 @@ public class ChatRoom extends BaseEntity {
     @NotNull
     private Integer maxMemberCount = 2;
 
-    @Embedded
-    private ChatRoomMembers chatRoomMembers = new ChatRoomMembers();
-
-    @Embedded
-    private ChatMessages chatMessages = new ChatMessages();
-
     @Builder
     private ChatRoom(final String name, final RoomType type) {
         this.name = name;
@@ -73,19 +63,15 @@ public class ChatRoom extends BaseEntity {
     }
 
     public void decreaseMemberCount() {
-        if (isEmptyRoom()) {
+        if (isEmpty()) {
             throw new ChatException(CHAT_ROOM_IS_EMPTY, memberCount);
         }
 
         memberCount -= 1;
     }
 
-    public Boolean isEmptyRoom() {
+    public Boolean isEmpty() {
         return memberCount == 0;
-    }
-
-    public Boolean isEntered(final Member member) {
-        return chatRoomMembers.isMemberEnteredRoom(member);
     }
 
     public Boolean isMatchedRoomType(final RoomType type) {
@@ -98,45 +84,5 @@ public class ChatRoom extends BaseEntity {
         }
 
         this.maxMemberCount = maxMemberCount;
-    }
-
-    public void sendMessage(final ChatMessage chatMessage) {
-        chatMessages.addChatMessage(chatMessage);
-    }
-
-    public void enterRoom(final ChatMessage chatMessage) {
-        final Member newMember = chatMessage.getSender();
-        chatRoomMembers.activateChatRoomMember(this, newMember);
-
-        sendMessage(chatMessage);
-        increaseMemberCount();
-    }
-
-    public void leaveRoom(final ChatMessage chatMessage) {
-        final Member member = chatMessage.getSender();
-        chatRoomMembers.deactivateChatRoomMember(this, member);
-
-        sendMessage(chatMessage);
-        decreaseMemberCount();
-    }
-
-    public List<ChatMessage> getChatMessages() {
-        return chatMessages.getChatMessages();
-    }
-
-    public List<Member> getActiveMembersInRoom() {
-        return chatRoomMembers.getActiveMembers();
-    }
-
-    public List<Member> getAllMembersInRoom() {
-        return chatRoomMembers.getAllMembers();
-    }
-
-    public ChatMessage getLastChatMessage() {
-        return chatMessages.getLastChatMessage();
-    }
-
-    public ChatMessage getLastEnteringChatMessageByMember(final Member member) {
-        return chatMessages.getLastEnteringChatMessageByMember(member);
     }
 }

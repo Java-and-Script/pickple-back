@@ -47,7 +47,7 @@ public class ChatValidator {
     }
 
     private Boolean isExistedRoomMember(final ChatRoom chatRoom, final Member member) {
-        return chatRoomMemberRepository.existsByActiveTrueAndChatRoomAndMember(chatRoom, member);
+        return chatRoomMemberRepository.existsByActiveTrueAndChatRoomIdAndMemberId(chatRoom.getId(), member.getId());
     }
 
     public void validateChatRoomLeavingConditions(final Member member, final ChatRoom chatRoom) {

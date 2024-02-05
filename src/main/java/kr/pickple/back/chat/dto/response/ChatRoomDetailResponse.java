@@ -31,7 +31,11 @@ public class ChatRoomDetailResponse {
     private List<ChatMemberResponse> members;
     private LocalDateTime createdAt;
 
-    public static ChatRoomDetailResponse of(final ChatRoom chatRoom, final Member receiver) {
+    public static ChatRoomDetailResponse of(
+            final ChatRoom chatRoom,
+            final Member receiver,
+            final List<ChatMemberResponse> chatMemberResponses
+    ) {
         return ChatRoomDetailResponse.builder()
                 .id(chatRoom.getId())
                 .roomName(receiver.getNickname())
@@ -40,12 +44,16 @@ public class ChatRoomDetailResponse {
                 .domainId(receiver.getId())
                 .memberCount(chatRoom.getMemberCount())
                 .maxMemberCount(chatRoom.getMaxMemberCount())
-                .members(getChatMemberResponses(chatRoom))
+                .members(chatMemberResponses)
                 .createdAt(chatRoom.getCreatedAt())
                 .build();
     }
 
-    public static ChatRoomDetailResponse of(final ChatRoom chatRoom, final Game game) {
+    public static ChatRoomDetailResponse of(
+            final ChatRoom chatRoom,
+            final Game game,
+            final List<ChatMemberResponse> chatMemberResponses
+    ) {
         return ChatRoomDetailResponse.builder()
                 .id(chatRoom.getId())
                 .roomName(chatRoom.getName())
@@ -55,12 +63,16 @@ public class ChatRoomDetailResponse {
                 .maxMemberCount(chatRoom.getMaxMemberCount())
                 .playStartTime(game.getPlayStartTime())
                 .playTimeMinutes(game.getPlayTimeMinutes())
-                .members(getChatMemberResponses(chatRoom))
+                .members(chatMemberResponses)
                 .createdAt(chatRoom.getCreatedAt())
                 .build();
     }
 
-    public static ChatRoomDetailResponse of(final ChatRoom chatRoom, final Crew crew) {
+    public static ChatRoomDetailResponse of(
+            final ChatRoom chatRoom,
+            final Crew crew,
+            final List<ChatMemberResponse> chatMemberResponses
+    ) {
         return ChatRoomDetailResponse.builder()
                 .id(chatRoom.getId())
                 .roomName(chatRoom.getName())
@@ -69,15 +81,15 @@ public class ChatRoomDetailResponse {
                 .domainId(crew.getId())
                 .memberCount(chatRoom.getMemberCount())
                 .maxMemberCount(chatRoom.getMaxMemberCount())
-                .members(getChatMemberResponses(chatRoom))
+                .members(chatMemberResponses)
                 .createdAt(chatRoom.getCreatedAt())
                 .build();
     }
 
-    private static List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
-        return chatRoom.getActiveMembersInRoom()
-                .stream()
-                .map(ChatMemberResponse::from)
-                .toList();
-    }
+    // private static List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
+    //     return chatRoom.getActiveMembersInRoom()
+    //             .stream()
+    //             .map(ChatMemberResponse::from)
+    //             .toList();
+    // }
 }
