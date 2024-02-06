@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.TokenExtractor;
 import kr.pickple.back.auth.domain.oauth.OauthMember;
@@ -39,6 +41,7 @@ public class OauthService {
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
     private final RedisRepository redisRepository;
+    private final AddressReader addressReader;
 
     public String getAuthCodeRequestUrl(final OauthProvider oauthProvider) {
         return authCodeRequestUrlProviderComposite.provide(oauthProvider);
@@ -70,7 +73,9 @@ public class OauthService {
                     jwtProperties.getRefreshTokenExpirationTime()
             );
 
-            return AuthenticatedMemberResponse.of(loginMember, loginTokens);
+            final MainAddress mainAddress = addressReader.readMainAddress(loginMember);
+
+            return AuthenticatedMemberResponse.of(loginMember, loginTokens, mainAddress);
         }
 
         // 사용자가 회원 가입 시, 추가 정보(주 활동지역, 포지션)를 입력하는 경우
@@ -84,8 +89,7 @@ public class OauthService {
         final String accessToken = tokenExtractor.extractAccessToken(authorizationHeader);
 
         if (jwtProvider.isValidRefreshAndInvalidAccess(refreshToken, accessToken)) {
-            final RefreshToken validRefreshToken = redisRepository.findHash(REFRESH_TOKEN_KEY,
-                    refreshToken);
+            final RefreshToken validRefreshToken = redisRepository.findHash(REFRESH_TOKEN_KEY, refreshToken);
 
             if (validRefreshToken == null) {
                 throw new AuthException(AUTH_INVALID_REFRESH_TOKEN);

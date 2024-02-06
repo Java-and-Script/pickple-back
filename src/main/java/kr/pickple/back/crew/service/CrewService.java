@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddressResponse;
+import kr.pickple.back.address.dto.response.MainAddressId;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatRoomService;
@@ -62,7 +62,7 @@ public class CrewService {
 
         validateMemberCreatedCrewsCount(leader);
 
-        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
+        final MainAddressId mainAddressId = addressService.findMainAddressByNames(
                 crewCreateRequest.getAddressDepth1(),
                 crewCreateRequest.getAddressDepth2()
         );
@@ -74,7 +74,7 @@ public class CrewService {
 
         final Crew crew = crewCreateRequest.toEntity(
                 leader,
-                mainAddressResponse,
+                mainAddressId,
                 MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
                 MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
         );
@@ -126,12 +126,12 @@ public class CrewService {
             final String addressDepth2,
             final Pageable pageable
     ) {
-        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1,
+        final MainAddressId mainAddressId = addressService.findMainAddressByNames(addressDepth1,
                 addressDepth2);
 
         final Page<Crew> crews = crewRepository.findByAddressDepth1AndAddressDepth2(
-                mainAddressResponse.getAddressDepth1(),
-                mainAddressResponse.getAddressDepth2(),
+                mainAddressId.getAddressDepth1(),
+                mainAddressId.getAddressDepth2(),
                 pageable
         );
 

@@ -5,7 +5,7 @@ import java.util.List;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.address.dto.response.AllAddressResponse;
-import kr.pickple.back.address.dto.response.MainAddressResponse;
+import kr.pickple.back.address.dto.response.MainAddressId;
 
 public class AddressDtoFixtures {
 
@@ -19,11 +19,11 @@ public class AddressDtoFixtures {
                 .build();
     }
 
-    public static MainAddressResponse mainAddressResponseBuild(
+    public static MainAddressId mainAddressResponseBuild(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2
     ) {
-        return MainAddressResponse.builder()
+        return MainAddressId.builder()
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
                 .build();

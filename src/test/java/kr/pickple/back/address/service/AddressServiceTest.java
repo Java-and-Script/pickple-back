@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import kr.pickple.back.address.dto.response.AllAddressResponse;
-import kr.pickple.back.address.dto.response.MainAddressResponse;
+import kr.pickple.back.address.dto.response.MainAddressId;
 
 @SpringBootTest
 class AddressServiceTest {
@@ -35,11 +35,11 @@ class AddressServiceTest {
         String addressDepth2Name = "강남구";
 
         //when
-        MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(addressDepth1Name,
+        MainAddressId mainAddressId = addressService.findMainAddressByNames(addressDepth1Name,
                 addressDepth2Name);
 
         //then
-        assertThat(mainAddressResponse.getAddressDepth1().getName()).isEqualTo(addressDepth1Name);
-        assertThat(mainAddressResponse.getAddressDepth2().getName()).isEqualTo(addressDepth2Name);
+        assertThat(mainAddressId.getAddressDepth1().getName()).isEqualTo(addressDepth1Name);
+        assertThat(mainAddressId.getAddressDepth2().getName()).isEqualTo(addressDepth2Name);
     }
 }

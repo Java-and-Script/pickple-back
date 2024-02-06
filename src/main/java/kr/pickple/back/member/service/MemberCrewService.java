@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -33,6 +34,7 @@ public class MemberCrewService {
     private final CrewMemberRepository crewMemberRepository;
     private final CrewRepository crewRepository;
     private final MemberPositionRepository memberPositionRepository;
+    private final AddressReader addressReader;
 
     /**
      * 사용자가 가입한 크루 목록 조회
@@ -94,7 +96,7 @@ public class MemberCrewService {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositions(member)))
+                .map(member -> MemberResponse.of(member, getPositions(member), addressReader.readMainAddress(member)))
                 .toList();
     }
 

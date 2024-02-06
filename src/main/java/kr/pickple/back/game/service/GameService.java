@@ -19,7 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddressResponse;
+import kr.pickple.back.address.dto.response.MainAddressId;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.auth.repository.RedisRepository;
@@ -77,10 +77,10 @@ public class GameService {
         final Member host = memberRepository.getMemberById(loggedInMemberId);
         final Point point = kakaoAddressSearchClient.fetchAddress(
                 gameCreateRequest.getMainAddress());
-        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(
+        final MainAddressId mainAddressId = addressService.findMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
-        final Game game = gameCreateRequest.toEntity(host, mainAddressResponse, point);
+        final Game game = gameCreateRequest.toEntity(host, mainAddressId, point);
 
         final GameMember gameHost = GameMember.builder()
                 .member(host)
@@ -179,7 +179,7 @@ public class GameService {
      * 주소별 게스트 모집글 조회
      */
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
-        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByAddressStrings(address);
+        final MainAddressId mainAddressId = addressService.findMainAddressByAddressStrings(address);
 
         final PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),
@@ -192,8 +192,8 @@ public class GameService {
         );
 
         final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2AndStatusNot(
-                mainAddressResponse.getAddressDepth1(),
-                mainAddressResponse.getAddressDepth2(),
+                mainAddressId.getAddressDepth1(),
+                mainAddressId.getAddressDepth2(),
                 GameStatus.ENDED,
                 pageRequest
         );
@@ -207,10 +207,10 @@ public class GameService {
     /**
      * 특정 지역의 게스트 모집글 조회
      */
-    public List<GameResponse> findGamesWithInAddress(final MainAddressResponse mainAddressResponse) {
+    public List<GameResponse> findGamesWithInAddress(final MainAddressId mainAddressId) {
         final List<Game> games = gameRepository.findGamesWithInAddress(
-                mainAddressResponse.getAddressDepth1(),
-                mainAddressResponse.getAddressDepth2()
+                mainAddressId.getAddressDepth1(),
+                mainAddressId.getAddressDepth2()
         );
 
         return games.stream()
