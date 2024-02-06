@@ -15,8 +15,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.address.dto.response.MainAddressResponse;
-import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
@@ -43,7 +43,7 @@ class MemberServiceTest {
     private JwtProvider jwtProvider;
 
     @Mock
-    private AddressService addressService;
+    private AddressReader addressReader;
 
     @Mock
     private JwtProperties jwtProperties;
@@ -64,7 +64,7 @@ class MemberServiceTest {
                 .name("영등포구")
                 .addressDepth1(addressDepth1)
                 .build();
-        final MainAddressResponse mainAddressResponse = MainAddressResponse.builder()
+        final MainAddress mainAddress = MainAddress.builder()
                 .addressDepth1(addressDepth1)
                 .addressDepth2(addressDepth2)
                 .build();
@@ -73,9 +73,9 @@ class MemberServiceTest {
                 .refreshToken("refreshToken")
                 .build();
 
-        final Member member = memberCreateRequest.toEntity(mainAddressResponse);
+        final Member member = memberCreateRequest.toEntity(mainAddress);
 
-        given(addressService.findMainAddressByNames(anyString(), anyString())).willReturn(mainAddressResponse);
+        given(addressReader.readMainAddressByNames(anyString(), anyString())).willReturn(mainAddress);
         given(memberRepository.save(any(Member.class))).willReturn(member);
         given(jwtProvider.createLoginToken(anyString())).willReturn(authTokens);
         given(jwtProperties.getRefreshTokenExpirationTime()).willReturn(1000L);

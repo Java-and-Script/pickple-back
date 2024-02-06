@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AddressDepth1 extends BaseEntity {
 
@@ -20,7 +21,6 @@ public class AddressDepth1 extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
     @NotNull
     @Column(unique = true, length = 10)
     private String name;

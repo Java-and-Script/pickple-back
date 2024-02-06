@@ -9,8 +9,8 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddressResponse;
-import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.domain.token.JwtProvider;
@@ -20,8 +20,6 @@ import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
-import kr.pickple.back.game.repository.GameMemberRepository;
-import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
@@ -45,11 +43,9 @@ public class MemberService {
     private final CrewMemberRepository crewMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
     private final RedisRepository redisRepository;
-    private final AddressService addressService;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
-    private final GamePositionRepository gamePositionRepository;
-    private final GameMemberRepository gameMemberRepository;
+    private final AddressReader addressReader;
 
     /**
      * 사용자 회원가입 (카카오)
@@ -58,12 +54,12 @@ public class MemberService {
     public AuthenticatedMemberResponse createMember(final MemberCreateRequest memberCreateRequest) {
         validateIsDuplicatedMemberInfo(memberCreateRequest);
 
-        final MainAddressResponse mainAddressResponse = addressService.findMainAddressByNames(
+        final MainAddress mainAddressId = addressReader.readMainAddressByNames(
                 memberCreateRequest.getAddressDepth1(),
                 memberCreateRequest.getAddressDepth2()
         );
 
-        final Member member = memberCreateRequest.toEntity(mainAddressResponse);
+        final Member member = memberCreateRequest.toEntity(mainAddressId);
         final Member savedMember = memberRepository.save(member);
 
         final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember);
@@ -85,7 +81,9 @@ public class MemberService {
                 jwtProperties.getRefreshTokenExpirationTime()
         );
 
-        return AuthenticatedMemberResponse.of(savedMember, loginTokens);
+        final MainAddress mainAddress = addressReader.readMainAddress(savedMember);
+
+        return AuthenticatedMemberResponse.of(savedMember, loginTokens, mainAddress);
     }
 
     private void validateIsDuplicatedMemberInfo(final MemberCreateRequest memberCreateRequest) {
@@ -114,13 +112,16 @@ public class MemberService {
                 .map(crew -> CrewResponse.from(crew, getLeaderResponse(crew)))
                 .toList();
 
-        return MemberProfileResponse.of(member, crewResponses, positions);
+        final MainAddress mainAddress = addressReader.readMainAddress(member);
+
+        return MemberProfileResponse.of(member, crewResponses, positions, mainAddress);
     }
 
     private MemberResponse getLeaderResponse(final Crew crew) {
         final Member member = crew.getLeader();
+        final MainAddress mainAddress = addressReader.readMainAddress(member);
 
-        return MemberResponse.of(member, getPositionsByMember(member));
+        return MemberResponse.of(member, getPositionsByMember(member), mainAddress);
     }
 
     private List<Position> getPositionsByMember(final Member member) {

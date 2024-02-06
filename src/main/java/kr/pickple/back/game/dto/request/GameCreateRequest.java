@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import kr.pickple.back.address.dto.response.MainAddressResponse;
+import kr.pickple.back.address.dto.response.MainAddressId;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GamePosition;
 import kr.pickple.back.member.domain.Member;
@@ -69,7 +69,7 @@ public class GameCreateRequest {
 
     public Game toEntity(
             final Member host,
-            final MainAddressResponse mainAddressResponse,
+            final MainAddressId mainAddressId,
             final Point point
     ) {
         return Game.builder()
@@ -84,8 +84,8 @@ public class GameCreateRequest {
                 .maxMemberCount(maxMemberCount)
                 .host(host)
                 .point(point)
-                .addressDepth1(mainAddressResponse.getAddressDepth1())
-                .addressDepth2(mainAddressResponse.getAddressDepth2())
+                .addressDepth1(mainAddressId.getAddressDepth1())
+                .addressDepth2(mainAddressId.getAddressDepth2())
                 .build();
     }
 

@@ -10,15 +10,10 @@ import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.member.exception.MemberException;
@@ -76,14 +71,10 @@ public class Member extends BaseEntity {
     private OauthProvider oauthProvider;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth1_id")
-    private AddressDepth1 addressDepth1;
+    private Long addressDepth1Id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth2_id")
-    private AddressDepth2 addressDepth2;
+    private Long addressDepth2Id;
 
     @Builder
     private Member(
@@ -93,8 +84,8 @@ public class Member extends BaseEntity {
             final MemberStatus status,
             final Long oauthId,
             final OauthProvider oauthProvider,
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2
+            final Long addressDepth1Id,
+            final Long addressDepth2Id
     ) {
         this.email = email;
         this.nickname = nickname;
@@ -102,8 +93,8 @@ public class Member extends BaseEntity {
         this.status = status;
         this.oauthId = oauthId;
         this.oauthProvider = oauthProvider;
-        this.addressDepth1 = addressDepth1;
-        this.addressDepth2 = addressDepth2;
+        this.addressDepth1Id = addressDepth1Id;
+        this.addressDepth2Id = addressDepth2Id;
 
         setDefaultIntroduction(nickname);
     }

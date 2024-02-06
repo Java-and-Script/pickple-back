@@ -8,6 +8,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
@@ -33,6 +34,7 @@ public class MemberGameService {
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
+    private final AddressReader addressReader;
 
     /**
      * 사용자의 참여 확정 게스트 모집글 목록 조회
@@ -107,7 +109,12 @@ public class MemberGameService {
         return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), memberStatus)
                 .stream()
                 .map(GameMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .map(member -> MemberResponse.of(
+                                member,
+                                getPositionsByMember(member),
+                                addressReader.readMainAddress(member)
+                        )
+                )
                 .toList();
     }
 
