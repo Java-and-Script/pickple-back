@@ -4,7 +4,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddressId;
+import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.map.domain.MapPolygon;
 import kr.pickple.back.map.repository.MapPolygonRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,12 +16,12 @@ public class MapService {
     private final MapPolygonRepository mapPolygonRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "polygon", key = "#mainAddressId.addressDepth2.name")
-    public MapPolygon findMapPolygonByMainAddress(final MainAddressId mainAddressId) {
+    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "polygon", key = "#mainAddress.addressDepth2.name")
+    public MapPolygon findMapPolygonByMainAddress(final MainAddress mainAddress) {
 
         return mapPolygonRepository.findByAddressDepth1IdAndAddressDepth2Id(
-                mainAddressId.getAddressDepth1Id(),
-                mainAddressId.getAddressDepth2Id()
+                mainAddress.getAddressDepth1().getId(),
+                mainAddress.getAddressDepth2().getId()
         );
     }
 }
