@@ -73,7 +73,7 @@ public class OauthService {
                     jwtProperties.getRefreshTokenExpirationTime()
             );
 
-            final MainAddress mainAddress = addressReader.readMainAddress(loginMember);
+            final MainAddress mainAddress = addressReader.readMainAddressByMember(loginMember);
 
             return AuthenticatedMemberResponse.of(loginMember, loginTokens, mainAddress);
         }
