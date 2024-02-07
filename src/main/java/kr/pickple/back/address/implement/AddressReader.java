@@ -16,6 +16,7 @@ import kr.pickple.back.address.exception.AddressException;
 import kr.pickple.back.address.repository.AddressDepth1Repository;
 import kr.pickple.back.address.repository.AddressDepth2Repository;
 import kr.pickple.back.address.util.AddressParser;
+import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 
@@ -68,9 +69,19 @@ public class AddressReader {
         return readMainAddressByNames(depthedAddress.get(0), depthedAddress.get(1));
     }
 
-    public MainAddress readMainAddress(final Member member) {
+    public MainAddress readMainAddressByMember(final Member member) {
         final AddressDepth1 addressDepth1 = getAddressDepth1ById(member.getAddressDepth1Id());
         final AddressDepth2 addressDepth2 = getAddressDepth2ById(member.getAddressDepth2Id());
+
+        return MainAddress.builder()
+                .addressDepth1(addressDepth1)
+                .addressDepth2(addressDepth2)
+                .build();
+    }
+
+    public MainAddress readMainAddressByGame(final Game game) {
+        final AddressDepth1 addressDepth1 = getAddressDepth1ById(game.getAddressDepth1Id());
+        final AddressDepth2 addressDepth2 = getAddressDepth2ById(game.getAddressDepth2Id());
 
         return MainAddress.builder()
                 .addressDepth1(addressDepth1)
@@ -96,7 +107,7 @@ public class AddressReader {
                 .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Id));
     }
 
-    private AddressDepth2 getAddressDepth2ById(final Long addressDepth2Id) {
+    public AddressDepth2 getAddressDepth2ById(final Long addressDepth2Id) {
         return addressDepth2Repository.findById(addressDepth2Id)
                 .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth2Id));
     }

@@ -91,7 +91,7 @@ public class CrewMemberService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddress(member)
+                                addressReader.readMainAddressByMember(member)
                         )
                 )
                 .toList();

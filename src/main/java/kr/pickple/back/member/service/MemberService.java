@@ -82,7 +82,7 @@ public class MemberService {
                 jwtProperties.getRefreshTokenExpirationTime()
         );
 
-        final MainAddress mainAddress = addressReader.readMainAddress(savedMember);
+        final MainAddress mainAddress = addressReader.readMainAddressByMember(savedMember);
 
         return AuthenticatedMemberResponse.of(savedMember, loginTokens, mainAddress);
     }
@@ -123,14 +123,14 @@ public class MemberService {
                 .map(crew -> CrewResponse.from(crew, getLeaderResponse(crew)))
                 .toList();
 
-        final MainAddress mainAddress = addressReader.readMainAddress(member);
+        final MainAddress mainAddress = addressReader.readMainAddressByMember(member);
 
         return MemberProfileResponse.of(member, crewResponses, positions, mainAddress);
     }
 
     private MemberResponse getLeaderResponse(final Crew crew) {
         final Member member = crew.getLeader();
-        final MainAddress mainAddress = addressReader.readMainAddress(member);
+        final MainAddress mainAddress = addressReader.readMainAddressByMember(member);
 
         return MemberResponse.of(member, getPositionsByMember(member), mainAddress);
     }
