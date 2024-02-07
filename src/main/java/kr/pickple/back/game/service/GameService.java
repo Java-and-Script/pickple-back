@@ -19,7 +19,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddressId;
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.auth.repository.RedisRepository;
@@ -51,6 +52,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class GameService {
 
+    private final AddressReader addressReader;
+
     private final GameRepository gameRepository;
     private final MemberPositionRepository memberPositionRepository;
     private final MemberRepository memberRepository;
@@ -75,17 +78,16 @@ public class GameService {
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
         final Member host = memberRepository.getMemberById(loggedInMemberId);
-        final Point point = kakaoAddressSearchClient.fetchAddress(
-                gameCreateRequest.getMainAddress());
-        final MainAddressId mainAddressId = addressService.findMainAddressByAddressStrings(
+        final Point point = kakaoAddressSearchClient.fetchAddress(gameCreateRequest.getMainAddress());
+        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
-        final Game game = gameCreateRequest.toEntity(host, mainAddressId, point);
-
+        final Game game = gameCreateRequest.toEntity(host, mainAddress, point);
         final GameMember gameHost = GameMember.builder()
                 .member(host)
                 .game(game)
                 .build();
+
         gameHost.confirmRegistration();
 
         final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(host, makeGameRoomName(game), GAME);
@@ -179,7 +181,7 @@ public class GameService {
      * 주소별 게스트 모집글 조회
      */
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
-        final MainAddressId mainAddressId = addressService.findMainAddressByAddressStrings(address);
+        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(address);
 
         final PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),
@@ -192,8 +194,8 @@ public class GameService {
         );
 
         final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2AndStatusNot(
-                mainAddressId.getAddressDepth1(),
-                mainAddressId.getAddressDepth2(),
+                mainAddress.getAddressDepth1(),
+                mainAddress.getAddressDepth2(),
                 GameStatus.ENDED,
                 pageRequest
         );
@@ -207,10 +209,10 @@ public class GameService {
     /**
      * 특정 지역의 게스트 모집글 조회
      */
-    public List<GameResponse> findGamesWithInAddress(final MainAddressId mainAddressId) {
+    public List<GameResponse> findGamesWithInAddress(final MainAddress mainAddress) {
         final List<Game> games = gameRepository.findGamesWithInAddress(
-                mainAddressId.getAddressDepth1(),
-                mainAddressId.getAddressDepth2()
+                mainAddress.getAddressDepth1(),
+                mainAddress.getAddressDepth2()
         );
 
         return games.stream()
@@ -241,7 +243,12 @@ public class GameService {
         return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), status)
                 .stream()
                 .map(GameMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .map(member -> MemberResponse.of(
+                                member,
+                                getPositionsByMember(member),
+                                addressReader.readMainAddress(member)
+                        )
+                )
                 .toList();
     }
 

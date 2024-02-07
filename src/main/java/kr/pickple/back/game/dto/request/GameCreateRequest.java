@@ -15,7 +15,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import kr.pickple.back.address.dto.response.MainAddressId;
+import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GamePosition;
 import kr.pickple.back.member.domain.Member;
@@ -69,7 +69,7 @@ public class GameCreateRequest {
 
     public Game toEntity(
             final Member host,
-            final MainAddressId mainAddressId,
+            final MainAddress mainAddress,
             final Point point
     ) {
         return Game.builder()
@@ -78,14 +78,14 @@ public class GameCreateRequest {
                 .playStartTime(playStartTime)
                 .playEndTime(playStartTime.plusMinutes(playTimeMinutes))
                 .playTimeMinutes(playTimeMinutes)
-                .mainAddress(mainAddress)
+                .mainAddress(this.mainAddress)
                 .detailAddress(detailAddress)
                 .cost(cost)
                 .maxMemberCount(maxMemberCount)
                 .host(host)
                 .point(point)
-                .addressDepth1(mainAddressId.getAddressDepth1())
-                .addressDepth2(mainAddressId.getAddressDepth2())
+                .addressDepth1(mainAddress.getAddressDepth1())
+                .addressDepth2(mainAddress.getAddressDepth2())
                 .build();
     }
 

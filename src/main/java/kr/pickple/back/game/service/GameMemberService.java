@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
@@ -35,6 +36,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class GameMemberService {
+
+    private final AddressReader addressReader;
 
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
@@ -96,7 +99,12 @@ public class GameMemberService {
         return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), status)
                 .stream()
                 .map(GameMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .map(member -> MemberResponse.of(
+                                member,
+                                getPositionsByMember(member),
+                                addressReader.readMainAddress(member)
+                        )
+                )
                 .toList();
     }
 
