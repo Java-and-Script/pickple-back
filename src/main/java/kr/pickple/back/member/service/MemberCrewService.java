@@ -30,11 +30,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberCrewService {
 
+    private final AddressReader addressReader;
+
     private final MemberRepository memberRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewRepository crewRepository;
     private final MemberPositionRepository memberPositionRepository;
-    private final AddressReader addressReader;
 
     /**
      * 사용자가 가입한 크루 목록 조회
@@ -88,7 +89,12 @@ public class MemberCrewService {
     ) {
 
         return crews.stream()
-                .map(crew -> CrewProfileResponse.of(crew, getMemberResponsesByCrew(crew, memberStatus)))
+                .map(crew -> CrewProfileResponse.of(
+                                crew,
+                                getMemberResponsesByCrew(crew, memberStatus),
+                                addressReader.readMainAddressById(crew.getAddressDepth1Id(), crew.getAddressDepth2Id())
+                        )
+                )
                 .toList();
     }
 
@@ -96,7 +102,13 @@ public class MemberCrewService {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositions(member), addressReader.readMainAddressByMember(member)))
+                .map(member -> MemberResponse.of(
+                                member,
+                                getPositions(member),
+                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id()
+                                )
+                        )
+                )
                 .toList();
     }
 

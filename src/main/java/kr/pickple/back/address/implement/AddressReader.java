@@ -16,8 +16,6 @@ import kr.pickple.back.address.exception.AddressException;
 import kr.pickple.back.address.repository.AddressDepth1Repository;
 import kr.pickple.back.address.repository.AddressDepth2Repository;
 import kr.pickple.back.address.util.AddressParser;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -44,10 +42,7 @@ public class AddressReader {
                 .build();
     }
 
-    public MainAddress readMainAddressByNames(
-            final String addressDepth1Name,
-            final String addressDepth2Name
-    ) {
+    public MainAddress readMainAddressByNames(final String addressDepth1Name, final String addressDepth2Name) {
         final AddressDepth1 addressDepth1 = getAddressDepth1ByName(addressDepth1Name);
         final AddressDepth2 addressDepth2 = getAddressDepth2ByNamesAndAddressDepth1(
                 addressDepth1Name,
@@ -61,6 +56,20 @@ public class AddressReader {
                 .build();
     }
 
+    private AddressDepth1 getAddressDepth1ByName(final String addressDepth1Name) {
+        return addressDepth1Repository.findByName(addressDepth1Name)
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name));
+    }
+
+    private AddressDepth2 getAddressDepth2ByNamesAndAddressDepth1(
+            final String addressDepth1Name,
+            final String addressDepth2Name,
+            final AddressDepth1 addressDepth1
+    ) {
+        return addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2Name, addressDepth1)
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name, addressDepth2Name));
+    }
+
     //기존 메서드 네이밍 및 시그니처 유지를 위해 임시적으로 아래와 구현했습니다.
     //todo 현호:서로 다른 입력을 받아 MainAddressResponse를 반환하는 두 메서드를 어떻게 통합하면 좋을 지 논의해보면 좋겠습니다.
     public MainAddress readMainAddressByAddressStrings(final String mainAddress) {
@@ -69,37 +78,11 @@ public class AddressReader {
         return readMainAddressByNames(depthedAddress.get(0), depthedAddress.get(1));
     }
 
-    public MainAddress readMainAddressByMember(final Member member) {
-        final AddressDepth1 addressDepth1 = getAddressDepth1ById(member.getAddressDepth1Id());
-        final AddressDepth2 addressDepth2 = getAddressDepth2ById(member.getAddressDepth2Id());
-
+    public MainAddress readMainAddressById(final Long addressDepth1Id, final Long addressDepth2Id) {
         return MainAddress.builder()
-                .addressDepth1(addressDepth1)
-                .addressDepth2(addressDepth2)
+                .addressDepth1(getAddressDepth1ById(addressDepth1Id))
+                .addressDepth2(getAddressDepth2ById(addressDepth2Id))
                 .build();
-    }
-
-    public MainAddress readMainAddressByGame(final Game game) {
-        final AddressDepth1 addressDepth1 = getAddressDepth1ById(game.getAddressDepth1Id());
-        final AddressDepth2 addressDepth2 = getAddressDepth2ById(game.getAddressDepth2Id());
-
-        return MainAddress.builder()
-                .addressDepth1(addressDepth1)
-                .addressDepth2(addressDepth2)
-                .build();
-    }
-
-    private AddressDepth2 getAddressDepth2ByNamesAndAddressDepth1(final String addressDepth1Name,
-            final String addressDepth2Name,
-            final AddressDepth1 addressDepth1
-    ) {
-        return addressDepth2Repository.findByNameAndAddressDepth1(addressDepth2Name, addressDepth1)
-                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name, addressDepth2Name));
-    }
-
-    private AddressDepth1 getAddressDepth1ByName(final String addressDepth1Name) {
-        return addressDepth1Repository.findByName(addressDepth1Name)
-                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name));
     }
 
     private AddressDepth1 getAddressDepth1ById(final Long addressDepth1Id) {

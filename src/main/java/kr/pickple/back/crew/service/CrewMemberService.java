@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
@@ -91,12 +92,17 @@ public class CrewMemberService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddressByMember(member)
+                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id())
                         )
                 )
                 .toList();
 
-        return CrewProfileResponse.of(crew, memberResponses);
+        final MainAddress mainAddress = addressReader.readMainAddressById(
+                crew.getAddressDepth1Id(),
+                crew.getAddressDepth2Id()
+        );
+
+        return CrewProfileResponse.of(crew, memberResponses, mainAddress);
     }
 
     private List<Position> getPositionsByMember(final Member member) {

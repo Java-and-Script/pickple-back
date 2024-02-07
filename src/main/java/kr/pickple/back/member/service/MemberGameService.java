@@ -30,11 +30,12 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberGameService {
 
+    private final AddressReader addressReader;
+
     private final MemberRepository memberRepository;
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
-    private final AddressReader addressReader;
 
     /**
      * 사용자의 참여 확정 게스트 모집글 목록 조회
@@ -100,7 +101,10 @@ public class MemberGameService {
                                 memberGame,
                                 getMemberResponsesByGame(memberGame.getGame(), memberStatus),
                                 getPositionsByMember(memberGame.getMember()),
-                                addressReader.readMainAddressByGame(memberGame.getGame())
+                                addressReader.readMainAddressById(
+                                        memberGame.getGame().getAddressDepth1Id(),
+                                        memberGame.getGame().getAddressDepth2Id()
+                                )
                         )
                 )
                 .toList();
@@ -113,7 +117,7 @@ public class MemberGameService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddressByMember(member)
+                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id())
                         )
                 )
                 .toList();

@@ -39,13 +39,14 @@ public class MemberService {
 
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
 
+    private final AddressReader addressReader;
+
     private final MemberRepository memberRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
     private final RedisRepository redisRepository;
     private final JwtProvider jwtProvider;
     private final JwtProperties jwtProperties;
-    private final AddressReader addressReader;
 
     /**
      * 사용자 회원가입 (카카오)
@@ -82,7 +83,10 @@ public class MemberService {
                 jwtProperties.getRefreshTokenExpirationTime()
         );
 
-        final MainAddress mainAddress = addressReader.readMainAddressByMember(savedMember);
+        final MainAddress mainAddress = addressReader.readMainAddressById(
+                savedMember.getAddressDepth1Id(),
+                savedMember.getAddressDepth2Id()
+        );
 
         return AuthenticatedMemberResponse.of(savedMember, loginTokens, mainAddress);
     }
@@ -120,17 +124,28 @@ public class MemberService {
                 .toList();
 
         final List<CrewResponse> crewResponses = crews.stream()
-                .map(crew -> CrewResponse.from(crew, getLeaderResponse(crew)))
+                .map(crew -> CrewResponse.of(
+                                crew,
+                                getLeaderResponse(crew),
+                                addressReader.readMainAddressById(crew.getAddressDepth1Id(), crew.getAddressDepth2Id())
+                        )
+                )
                 .toList();
 
-        final MainAddress mainAddress = addressReader.readMainAddressByMember(member);
+        final MainAddress mainAddress = addressReader.readMainAddressById(
+                member.getAddressDepth1Id(),
+                member.getAddressDepth2Id()
+        );
 
         return MemberProfileResponse.of(member, crewResponses, positions, mainAddress);
     }
 
     private MemberResponse getLeaderResponse(final Crew crew) {
         final Member member = crew.getLeader();
-        final MainAddress mainAddress = addressReader.readMainAddressByMember(member);
+        final MainAddress mainAddress = addressReader.readMainAddressById(
+                member.getAddressDepth1Id(),
+                member.getAddressDepth2Id()
+        );
 
         return MemberResponse.of(member, getPositionsByMember(member), mainAddress);
     }
