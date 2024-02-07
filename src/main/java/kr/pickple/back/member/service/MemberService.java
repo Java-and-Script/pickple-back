@@ -88,7 +88,7 @@ public class MemberService {
     }
 
     private void validatedIsDuplicatedPositions(final List<Position> positions) {
-        long distinctPositionsSize = positions.stream()
+        final Long distinctPositionsSize = positions.stream()
                 .distinct()
                 .count();
 
