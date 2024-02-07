@@ -92,7 +92,7 @@ public class GameMemberService {
             throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
         }
 
-        return GameResponse.of(game, getMemberResponsesByStatus(game, status), getPositionsByGame(game));
+        return GameResponse.of(game, getMemberResponsesByStatus(game, status), getPositionsByGame(game), addressReader.readMainAddressByGame(game));
     }
 
     private List<MemberResponse> getMemberResponsesByStatus(final Game game, final RegistrationStatus status) {
@@ -102,7 +102,7 @@ public class GameMemberService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddress(member)
+                                addressReader.readMainAddressByMember(member)
                         )
                 )
                 .toList();

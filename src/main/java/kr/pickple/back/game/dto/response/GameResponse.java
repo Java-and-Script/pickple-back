@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.member.dto.response.MemberResponse;
@@ -40,7 +41,7 @@ public class GameResponse {
     private List<MemberResponse> members;
 
     public static GameResponse of(final Game game, final List<MemberResponse> memberResponses,
-            List<Position> positions) {
+            final List<Position> positions, final MainAddress mainAddress) {
         return GameResponse.builder()
                 .id(game.getId())
                 .content(game.getContent())
@@ -58,8 +59,8 @@ public class GameResponse {
                 .memberCount(game.getMemberCount())
                 .maxMemberCount(game.getMaxMemberCount())
                 .host(getHostResponse(memberResponses, game.getHost().getId()))
-                .addressDepth1(game.getAddressDepth1().getName())
-                .addressDepth2(game.getAddressDepth2().getName())
+                .addressDepth1(mainAddress.getAddressDepth1().getName())
+                .addressDepth2(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
                 .members(memberResponses)
                 .build();
