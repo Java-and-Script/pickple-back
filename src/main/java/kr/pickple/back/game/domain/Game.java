@@ -20,8 +20,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.exception.GameException;
@@ -91,14 +89,10 @@ public class Game extends BaseEntity {
     private Member host;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth1_id")
-    private AddressDepth1 addressDepth1;
+    private Long addressDepth1Id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth2_id")
-    private AddressDepth2 addressDepth2;
+    private Long addressDepth2Id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
@@ -117,8 +111,8 @@ public class Game extends BaseEntity {
             final Integer maxMemberCount,
             final Member host,
             final Point point,
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2
+            final Long addressDepth1Id,
+            final Long addressDepth2Id
     ) {
         this.content = content;
         this.playDate = playDate;
@@ -131,8 +125,8 @@ public class Game extends BaseEntity {
         this.maxMemberCount = maxMemberCount;
         this.host = host;
         this.point = point;
-        this.addressDepth1 = addressDepth1;
-        this.addressDepth2 = addressDepth2;
+        this.addressDepth1Id = addressDepth1Id;
+        this.addressDepth2Id = addressDepth2Id;
     }
 
     public void updateGameStatus(final GameStatus gameStatus) {

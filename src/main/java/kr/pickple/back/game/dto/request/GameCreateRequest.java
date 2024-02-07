@@ -84,8 +84,8 @@ public class GameCreateRequest {
                 .maxMemberCount(maxMemberCount)
                 .host(host)
                 .point(point)
-                .addressDepth1(mainAddress.getAddressDepth1())
-                .addressDepth2(mainAddress.getAddressDepth2())
+                .addressDepth1Id(mainAddress.getAddressDepth1().getId())
+                .addressDepth2Id(mainAddress.getAddressDepth2().getId())
                 .build();
     }
 

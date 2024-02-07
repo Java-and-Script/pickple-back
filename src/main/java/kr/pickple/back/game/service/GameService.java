@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.address.service.AddressService;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.chat.domain.ChatRoom;
@@ -58,7 +57,6 @@ public class GameService {
     private final MemberPositionRepository memberPositionRepository;
     private final MemberRepository memberRepository;
     private final KakaoAddressSearchClient kakaoAddressSearchClient;
-    private final AddressService addressService;
     private final ChatRoomService chatRoomService;
     private final RedisRepository redisRepository;
     private final GamePositionRepository gamePositionRepository;
@@ -105,7 +103,7 @@ public class GameService {
 
     private String makeGameRoomName(final Game game) {
         final String playDateFormat = game.getPlayDate().format(DateTimeFormatter.ofPattern("MM.dd"));
-        final String addressDepth2Name = game.getAddressDepth2().getName();
+        final String addressDepth2Name = addressReader.getAddressDepth2ById(game.getAddressDepth2Id()).getName();
 
         return MessageFormat.format("{0} {1}", playDateFormat, addressDepth2Name);
     }
@@ -159,7 +157,7 @@ public class GameService {
         final Game game = gameRepository.getGameById(gameId);
         game.increaseViewCount();
 
-        return GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game));
+        return GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game), addressReader.readMainAddressByGame(game));
     }
 
     /**
@@ -202,7 +200,7 @@ public class GameService {
 
         return games.stream()
                 .map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED),
-                        getPositionsByGame(game)))
+                        getPositionsByGame(game), addressReader.readMainAddressByGame(game)))
                 .toList();
     }
 
@@ -218,7 +216,7 @@ public class GameService {
         return games.stream()
                 .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED),
-                        getPositionsByGame(game)))
+                        getPositionsByGame(game), addressReader.readMainAddressByGame(game)))
                 .toList();
     }
 
@@ -235,7 +233,7 @@ public class GameService {
         return games.stream()
                 .filter(Game::isNotEndedGame)
                 .map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED),
-                        getPositionsByGame(game)))
+                        getPositionsByGame(game), addressReader.readMainAddressByGame(game)))
                 .toList();
     }
 
@@ -246,7 +244,7 @@ public class GameService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddress(member)
+                                addressReader.readMainAddressByMember(member)
                         )
                 )
                 .toList();
