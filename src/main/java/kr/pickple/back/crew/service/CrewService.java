@@ -12,8 +12,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddressId;
-import kr.pickple.back.address.service.AddressService;
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
@@ -43,11 +43,12 @@ public class CrewService {
     private static final Integer CREW_IMAGE_END_NUMBER = 20;
     private static final Integer CREW_CREATE_MAX_SIZE = 3;
 
+    private final AddressReader addressReader;
+
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
-    private final AddressService addressService;
     private final ChatRoomService chatRoomService;
     private final S3Properties s3Properties;
 
@@ -62,7 +63,7 @@ public class CrewService {
 
         validateMemberCreatedCrewsCount(leader);
 
-        final MainAddressId mainAddressId = addressService.findMainAddressByNames(
+        final MainAddress mainAddress = addressReader.readMainAddressByNames(
                 crewCreateRequest.getAddressDepth1(),
                 crewCreateRequest.getAddressDepth2()
         );
@@ -74,7 +75,7 @@ public class CrewService {
 
         final Crew crew = crewCreateRequest.toEntity(
                 leader,
-                mainAddressId,
+                mainAddress,
                 MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
                 MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
         );
@@ -126,12 +127,11 @@ public class CrewService {
             final String addressDepth2,
             final Pageable pageable
     ) {
-        final MainAddressId mainAddressId = addressService.findMainAddressByNames(addressDepth1,
-                addressDepth2);
+        final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1, addressDepth2);
 
         final Page<Crew> crews = crewRepository.findByAddressDepth1AndAddressDepth2(
-                mainAddressId.getAddressDepth1(),
-                mainAddressId.getAddressDepth2(),
+                mainAddress.getAddressDepth1(),
+                mainAddress.getAddressDepth2(),
                 pageable
         );
 
@@ -144,13 +144,17 @@ public class CrewService {
         return crewMemberRepository.findAllByCrewIdAndStatus(crewId, CONFIRMED)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .map(member -> MemberResponse.of(
+                                member,
+                                getPositionsByMember(member),
+                                addressReader.readMainAddress(member)
+                        )
+                )
                 .toList();
     }
 
     private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-                member.getId());
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(member.getId());
 
         return Position.fromMemberPositions(memberPositions);
     }

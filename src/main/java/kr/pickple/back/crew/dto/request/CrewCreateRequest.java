@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import kr.pickple.back.address.dto.response.MainAddressId;
+import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
@@ -40,7 +40,7 @@ public class CrewCreateRequest {
 
     public Crew toEntity(
             final Member leader,
-            final MainAddressId mainAddressId,
+            final MainAddress mainAddress,
             final String profile,
             final String background
     ) {
@@ -52,8 +52,8 @@ public class CrewCreateRequest {
                 .leader(leader)
                 .profileImageUrl(profile)
                 .backgroundImageUrl(background)
-                .addressDepth1(mainAddressId.getAddressDepth1())
-                .addressDepth2(mainAddressId.getAddressDepth2())
+                .addressDepth1(mainAddress.getAddressDepth1())
+                .addressDepth2(mainAddress.getAddressDepth2())
                 .build();
     }
 }

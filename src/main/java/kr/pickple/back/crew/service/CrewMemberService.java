@@ -9,6 +9,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
@@ -33,6 +34,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CrewMemberService {
+
+    private final AddressReader addressReader;
 
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
@@ -85,7 +88,12 @@ public class CrewMemberService {
         final List<MemberResponse> memberResponses = crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositionsByMember(member)))
+                .map(member -> MemberResponse.of(
+                                member,
+                                getPositionsByMember(member),
+                                addressReader.readMainAddress(member)
+                        )
+                )
                 .toList();
 
         return CrewProfileResponse.of(crew, memberResponses);
