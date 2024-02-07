@@ -69,14 +69,6 @@ public class GameMember extends BaseEntity {
         this.status = status;
     }
 
-    public Boolean equalsStatus(final RegistrationStatus status) {
-        return this.status == status;
-    }
-
-    public Boolean equalsGame(final Game game) {
-        return this.game.equals(game);
-    }
-
     public ChatRoom getCrewChatRoom() {
         return game.getChatRoom();
     }

@@ -52,14 +52,6 @@ public class CrewMember extends BaseEntity {
         this.crew = crew;
     }
 
-    public Boolean equalsStatus(final RegistrationStatus status) {
-        return this.status == status;
-    }
-
-    public Boolean equalsCrew(final Crew crew) {
-        return this.crew.equals(crew);
-    }
-
     public void confirmRegistration() {
         this.status = CONFIRMED;
     }
