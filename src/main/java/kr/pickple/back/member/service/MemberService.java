@@ -62,6 +62,7 @@ public class MemberService {
         final Member member = memberCreateRequest.toEntity(mainAddressId);
         final Member savedMember = memberRepository.save(member);
 
+        validatedIsDuplicatedPositions(memberCreateRequest.getPositions());
         final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember);
 
         memberPositionRepository.saveAll(memberPositions); /* TODO: 벌크 연산으로 고치기 */
@@ -84,6 +85,16 @@ public class MemberService {
         final MainAddress mainAddress = addressReader.readMainAddress(savedMember);
 
         return AuthenticatedMemberResponse.of(savedMember, loginTokens, mainAddress);
+    }
+
+    private void validatedIsDuplicatedPositions(final List<Position> positions) {
+        long distinctPositionsSize = positions.stream()
+                .distinct()
+                .count();
+
+        if (distinctPositionsSize != positions.size()) {
+            throw new MemberException(MEMBER_POSITIONS_IS_DUPLICATED, positions);
+        }
     }
 
     private void validateIsDuplicatedMemberInfo(final MemberCreateRequest memberCreateRequest) {
