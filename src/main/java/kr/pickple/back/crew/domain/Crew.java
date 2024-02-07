@@ -14,8 +14,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.crew.exception.CrewException;
@@ -73,14 +71,10 @@ public class Crew extends BaseEntity {
     private Member leader;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth1_id")
-    private AddressDepth1 addressDepth1;
+    private Long addressDepth1Id;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_depth2_id")
-    private AddressDepth2 addressDepth2;
+    private Long addressDepth2Id;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chat_room_id")
@@ -94,8 +88,8 @@ public class Crew extends BaseEntity {
             final String backgroundImageUrl,
             final Integer maxMemberCount,
             final Member leader,
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2
+            final Long addressDepth1Id,
+            final Long addressDepth2Id
     ) {
         this.name = name;
         this.content = content;
@@ -103,8 +97,8 @@ public class Crew extends BaseEntity {
         this.backgroundImageUrl = backgroundImageUrl;
         this.maxMemberCount = maxMemberCount;
         this.leader = leader;
-        this.addressDepth1 = addressDepth1;
-        this.addressDepth2 = addressDepth2;
+        this.addressDepth1Id = addressDepth1Id;
+        this.addressDepth2Id = addressDepth2Id;
 
         updateStatusIfCrewMemberFull();
     }
@@ -146,10 +140,6 @@ public class Crew extends BaseEntity {
 
     private Boolean isFullCrew() {
         return memberCount.equals(maxMemberCount);
-    }
-
-    public Boolean isLeader(final Member member) {
-        return member.equals(leader);
     }
 
     public Boolean isLeader(final Long memberId) {

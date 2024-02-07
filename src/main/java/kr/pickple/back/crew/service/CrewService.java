@@ -115,8 +115,12 @@ public class CrewService {
      */
     public CrewProfileResponse findCrewById(final Long crewId) {
         final Crew crew = crewRepository.getCrewById(crewId);
+        final MainAddress mainAddress = addressReader.readMainAddressById(
+                crew.getAddressDepth1Id(),
+                crew.getAddressDepth2Id()
+        );
 
-        return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId));
+        return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId), mainAddress);
     }
 
     /**
@@ -136,7 +140,12 @@ public class CrewService {
         );
 
         return crews.stream()
-                .map(crew -> CrewProfileResponse.of(crew, getConfirmedMemberResponses(crew.getId())))
+                .map(crew -> CrewProfileResponse.of(
+                                crew,
+                                getConfirmedMemberResponses(crew.getId()),
+                                addressReader.readMainAddressById(crew.getAddressDepth1Id(), crew.getAddressDepth2Id())
+                        )
+                )
                 .toList();
     }
 
@@ -147,7 +156,7 @@ public class CrewService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddressByMember(member)
+                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id())
                         )
                 )
                 .toList();

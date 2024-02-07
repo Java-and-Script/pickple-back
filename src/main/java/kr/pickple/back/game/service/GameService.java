@@ -77,8 +77,7 @@ public class GameService {
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
         final Member host = memberRepository.getMemberById(loggedInMemberId);
         final Point point = kakaoAddressSearchClient.fetchAddress(gameCreateRequest.getMainAddress());
-        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(
-                gameCreateRequest.getMainAddress());
+        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(gameCreateRequest.getMainAddress());
 
         final Game game = gameCreateRequest.toEntity(host, mainAddress, point);
         final GameMember gameHost = GameMember.builder()
@@ -157,7 +156,12 @@ public class GameService {
         final Game game = gameRepository.getGameById(gameId);
         game.increaseViewCount();
 
-        return GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED), getPositionsByGame(game), addressReader.readMainAddressByGame(game));
+        return GameResponse.of(
+                game,
+                getMemberResponsesByStatus(game, CONFIRMED),
+                getPositionsByGame(game),
+                addressReader.readMainAddressById(game.getAddressDepth1Id(), game.getAddressDepth2Id())
+        );
     }
 
     /**
@@ -199,8 +203,13 @@ public class GameService {
         );
 
         return games.stream()
-                .map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED),
-                        getPositionsByGame(game), addressReader.readMainAddressByGame(game)))
+                .map(game -> GameResponse.of(
+                                game,
+                                getMemberResponsesByStatus(game, CONFIRMED),
+                                getPositionsByGame(game),
+                                addressReader.readMainAddressById(game.getAddressDepth1Id(), game.getAddressDepth2Id())
+                        )
+                )
                 .toList();
     }
 
@@ -215,8 +224,13 @@ public class GameService {
 
         return games.stream()
                 .filter(Game::isNotEndedGame)
-                .map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED),
-                        getPositionsByGame(game), addressReader.readMainAddressByGame(game)))
+                .map(game -> GameResponse.of(
+                                game,
+                                getMemberResponsesByStatus(game, CONFIRMED),
+                                getPositionsByGame(game),
+                                addressReader.readMainAddressById(game.getAddressDepth1Id(), game.getAddressDepth2Id())
+                        )
+                )
                 .toList();
     }
 
@@ -232,8 +246,13 @@ public class GameService {
 
         return games.stream()
                 .filter(Game::isNotEndedGame)
-                .map(game -> GameResponse.of(game, getMemberResponsesByStatus(game, CONFIRMED),
-                        getPositionsByGame(game), addressReader.readMainAddressByGame(game)))
+                .map(game -> GameResponse.of(
+                                game,
+                                getMemberResponsesByStatus(game, CONFIRMED),
+                                getPositionsByGame(game),
+                                addressReader.readMainAddressById(game.getAddressDepth1Id(), game.getAddressDepth2Id())
+                        )
+                )
                 .toList();
     }
 
@@ -244,15 +263,14 @@ public class GameService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddressByMember(member)
+                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id())
                         )
                 )
                 .toList();
     }
 
     private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-                member.getId());
+        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(member.getId());
 
         return Position.fromMemberPositions(memberPositions);
     }

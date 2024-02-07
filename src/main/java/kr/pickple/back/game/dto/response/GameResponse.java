@@ -40,8 +40,12 @@ public class GameResponse {
     private List<Position> positions;
     private List<MemberResponse> members;
 
-    public static GameResponse of(final Game game, final List<MemberResponse> memberResponses,
-            final List<Position> positions, final MainAddress mainAddress) {
+    public static GameResponse of(
+            final Game game,
+            final List<MemberResponse> memberResponses,
+            final List<Position> positions,
+            final MainAddress mainAddress
+    ) {
         return GameResponse.builder()
                 .id(game.getId())
                 .content(game.getContent())
