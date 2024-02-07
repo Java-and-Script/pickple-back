@@ -85,11 +85,4 @@ public class ChatRoomDetailResponse {
                 .createdAt(chatRoom.getCreatedAt())
                 .build();
     }
-
-    // private static List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
-    //     return chatRoom.getActiveMembersInRoom()
-    //             .stream()
-    //             .map(ChatMemberResponse::from)
-    //             .toList();
-    // }
 }
