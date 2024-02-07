@@ -96,7 +96,7 @@ public class MemberCrewService {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
                 .map(CrewMember::getMember)
-                .map(member -> MemberResponse.of(member, getPositions(member), addressReader.readMainAddress(member)))
+                .map(member -> MemberResponse.of(member, getPositions(member), addressReader.readMainAddressByMember(member)))
                 .toList();
     }
 

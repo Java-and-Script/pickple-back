@@ -99,7 +99,8 @@ public class MemberGameService {
                         MemberGameResponse.of(
                                 memberGame,
                                 getMemberResponsesByGame(memberGame.getGame(), memberStatus),
-                                getPositionsByMember(memberGame.getMember())
+                                getPositionsByMember(memberGame.getMember()),
+                                addressReader.readMainAddressByGame(memberGame.getGame())
                         )
                 )
                 .toList();
@@ -112,7 +113,7 @@ public class MemberGameService {
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
-                                addressReader.readMainAddress(member)
+                                addressReader.readMainAddressByMember(member)
                         )
                 )
                 .toList();
