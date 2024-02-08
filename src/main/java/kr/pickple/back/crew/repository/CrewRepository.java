@@ -9,9 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
 
@@ -19,13 +16,13 @@ public interface CrewRepository extends JpaRepository<Crew, Long> {
 
     Boolean existsByName(final String name);
 
-    Page<Crew> findByAddressDepth1AndAddressDepth2(
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2,
+    Page<Crew> findByAddressDepth1IdAndAddressDepth2Id(
+            final Long addressDepth1Id,
+            final Long addressDepth2Id,
             final Pageable pageable
     );
 
-    Optional<Crew> findByChatRoom(final ChatRoom chatRoom);
+    Optional<Crew> findByChatRoomId(final Long chatRoomId);
 
     List<Crew> findAllByLeaderId(final Long leaderId);
 

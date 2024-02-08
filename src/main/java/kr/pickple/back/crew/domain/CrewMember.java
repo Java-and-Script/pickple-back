@@ -9,7 +9,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
@@ -50,9 +49,5 @@ public class CrewMember extends BaseEntity {
 
     public void updateStatus(final RegistrationStatus status) {
         this.status = status;
-    }
-
-    public ChatRoom getCrewChatRoom() {
-        return crew.getChatRoom();
     }
 }

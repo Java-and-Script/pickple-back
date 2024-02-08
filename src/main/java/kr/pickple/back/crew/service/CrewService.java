@@ -133,9 +133,9 @@ public class CrewService {
     ) {
         final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1, addressDepth2);
 
-        final Page<Crew> crews = crewRepository.findByAddressDepth1AndAddressDepth2(
-                mainAddress.getAddressDepth1(),
-                mainAddress.getAddressDepth2(),
+        final Page<Crew> crews = crewRepository.findByAddressDepth1IdAndAddressDepth2Id(
+                mainAddress.getAddressDepth1().getId(),
+                mainAddress.getAddressDepth2().getId(),
                 pageable
         );
 

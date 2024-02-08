@@ -17,30 +17,26 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatRoom extends BaseEntity {
 
     @Id
-    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
     @NotNull
     @Column(length = 20)
     private String name;
 
-    @Getter
     @NotNull
     @Convert(converter = RoomTypeAttributeConverter.class)
     private RoomType type;
 
-    @Getter
     @NotNull
     private Integer memberCount = 0;
 
-    @Getter
     @NotNull
     private Integer maxMemberCount = 2;
 

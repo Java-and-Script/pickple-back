@@ -14,6 +14,8 @@ import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
+import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
@@ -42,8 +44,19 @@ public class CrewMemberService {
     private final CrewRepository crewRepository;
     private final MemberPositionRepository memberPositionRepository;
     private final CrewMemberRepository crewMemberRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageService chatMessageService;
     private final ApplicationEventPublisher eventPublisher;
+
+    private static void increaseMemberCount(
+            final Crew crew,
+            final CrewMember crewMember,
+            final RegistrationStatus status
+    ) {
+        if (crewMember.getStatus() == WAITING && status == CONFIRMED) {
+            crew.increaseMemberCount();
+        }
+    }
 
     /**
      * 크루 가입 신청
@@ -128,7 +141,8 @@ public class CrewMemberService {
         validateIsLeader(loggedInMemberId, crew);
 
         final RegistrationStatus updateStatus = crewMemberUpdateStatusRequest.getStatus();
-        enterCrewChatRoom(updateStatus, crewMember);
+        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(crew.getChatRoomId());
+        enterCrewChatRoom(updateStatus, crewMember, chatRoom);
 
         increaseMemberCount(crew, crewMember, updateStatus);
         crewMember.updateStatus(updateStatus);
@@ -139,28 +153,22 @@ public class CrewMemberService {
                 .build());
     }
 
-    private static void increaseMemberCount(
-            final Crew crew,
-            final CrewMember crewMember,
-            final RegistrationStatus status
-    ) {
-        if (crewMember.getStatus() == WAITING && status == CONFIRMED) {
-            crew.increaseMemberCount();
-        }
-    }
-
     private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
         if (!crew.isLeader(loggedInMemberId)) {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
         }
     }
 
-    private void enterCrewChatRoom(final RegistrationStatus updateStatus, final CrewMember crewMember) {
+    private void enterCrewChatRoom(
+            final RegistrationStatus updateStatus,
+            final CrewMember crewMember,
+            final ChatRoom chatRoom
+    ) {
         final RegistrationStatus nowStatus = crewMember.getStatus();
         final Member member = memberRepository.getMemberById(crewMember.getMemberId());
 
         if (nowStatus == WAITING && updateStatus == CONFIRMED) {
-            chatMessageService.enterRoomAndSaveEnteringMessages(crewMember.getCrewChatRoom(), member);
+            chatMessageService.enterRoomAndSaveEnteringMessages(chatRoom, member);
         }
     }
 

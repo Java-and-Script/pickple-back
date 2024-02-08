@@ -43,7 +43,7 @@ public class ChatMessageService {
         final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
         final ChatMessage enteringMessage = enterRoomAndSaveEnteringMessages(chatRoom, member);
 
-        return ChatMessageResponse.from(enteringMessage);
+        return ChatMessageResponse.of(enteringMessage, member, chatRoom);
     }
 
     @Transactional
@@ -66,8 +66,8 @@ public class ChatMessageService {
 
     private ChatRoomMember buildChatRoomMember(final ChatRoom chatRoom, final Member member) {
         return ChatRoomMember.builder()
-                .chatRoom(chatRoom)
-                .member(member)
+                .chatRoomId(chatRoom.getId())
+                .memberId(member.getId())
                 .build();
     }
 
@@ -88,7 +88,7 @@ public class ChatMessageService {
         final ChatMessage chatMessage = buildChatMessage(TALK, content, chatRoom, sender);
         final ChatMessage sendingMessage = chatMessageRepository.save(chatMessage);
 
-        return ChatMessageResponse.from(sendingMessage);
+        return ChatMessageResponse.of(sendingMessage, sender, chatRoom);
     }
 
     /**
@@ -119,7 +119,7 @@ public class ChatMessageService {
         final ChatMessage chatMessage = buildChatMessage(LEAVE, content, chatRoom, member);
         final ChatMessage leavingMessage = chatMessageRepository.save(chatMessage);
 
-        return ChatMessageResponse.from(leavingMessage);
+        return ChatMessageResponse.of(leavingMessage, member, chatRoom);
     }
 
     private ChatMessage buildChatMessage(
@@ -131,8 +131,8 @@ public class ChatMessageService {
         return ChatMessage.builder()
                 .type(type)
                 .content(content)
-                .chatRoom(chatRoom)
-                .sender(member)
+                .chatRoomId(chatRoom.getId())
+                .senderId(member.getId())
                 .build();
     }
 
@@ -148,10 +148,18 @@ public class ChatMessageService {
         final ChatMessage lastEnteringMessage = chatMessageRepository.getLastEnteringChatMessageBySenderId(
                 loggedInMember.getId());
 
-        return chatMessageRepository.findAllByChatRoomIdAndCreatedAtGreaterThanEqual(chatRoom.getId(),
-                        lastEnteringMessage.getCreatedAt())
-                .stream()
-                .map(ChatMessageResponse::from)
+        final List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIdAndCreatedAtGreaterThanEqual(
+                chatRoom.getId(),
+                lastEnteringMessage.getCreatedAt()
+        );
+
+        return chatMessages.stream()
+                .map(chatMessage -> ChatMessageResponse.of(
+                                chatMessage,
+                                memberRepository.getMemberById(chatMessage.getSenderId()),
+                                chatRoom
+                        )
+                )
                 .toList();
     }
 }

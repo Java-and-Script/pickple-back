@@ -77,7 +77,8 @@ public class GameService {
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
         final Member host = memberRepository.getMemberById(loggedInMemberId);
         final Point point = kakaoAddressSearchClient.fetchAddress(gameCreateRequest.getMainAddress());
-        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(gameCreateRequest.getMainAddress());
+        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(
+                gameCreateRequest.getMainAddress());
 
         final Game game = gameCreateRequest.toEntity(host, mainAddress, point);
         final GameMember gameHost = GameMember.builder()
@@ -195,9 +196,9 @@ public class GameService {
                 )
         );
 
-        final Page<Game> games = gameRepository.findByAddressDepth1AndAddressDepth2AndStatusNot(
-                mainAddress.getAddressDepth1(),
-                mainAddress.getAddressDepth2(),
+        final Page<Game> games = gameRepository.findByAddressDepth1IdAndAddressDepth2IdAndStatusNot(
+                mainAddress.getAddressDepth1().getId(),
+                mainAddress.getAddressDepth2().getId(),
                 GameStatus.ENDED,
                 pageRequest
         );

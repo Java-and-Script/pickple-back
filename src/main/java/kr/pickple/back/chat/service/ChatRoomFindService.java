@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.chat.domain.ChatMessage;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.domain.ChatRoomMember;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.response.ChatMemberResponse;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
@@ -46,7 +45,7 @@ public class ChatRoomFindService {
 
         return chatRoomMemberRepository.findAllByActiveTrueAndMemberId(loggedInMember.getId())
                 .stream()
-                .map(ChatRoomMember::getChatRoom)
+                .map(chatRoomMember -> chatRoomRepository.getChatRoomById(chatRoomMember.getChatRoomId()))
                 .filter(chatRoom -> chatRoom.isMatchedRoomType(type))
                 .map(chatRoom -> getChatRoomResponse(loggedInMemberId, chatRoom))
                 .toList();
@@ -78,21 +77,22 @@ public class ChatRoomFindService {
 
     private ChatRoomDetailResponse getPersonalChatRoomDetailResponse(final Long memberId, final ChatRoom chatRoom) {
         final Member sender = memberRepository.getMemberById(memberId);
-        final Member receiver = chatRoomMemberRepository.getPersonalChatRoomReceiver(chatRoom.getId(), sender.getId())
-                .getMember();
+        final Long receiverId = chatRoomMemberRepository.getPersonalChatRoomReceiver(chatRoom.getId(), sender.getId())
+                .getMemberId();
+        final Member receiver = memberRepository.getMemberById(receiverId);
 
         return ChatRoomDetailResponse.of(chatRoom, receiver, getChatMemberResponses(chatRoom));
     }
 
     private ChatRoomDetailResponse getCrewChatRoomDetailResponse(final ChatRoom chatRoom) {
-        final Crew crew = crewRepository.findByChatRoom(chatRoom)
+        final Crew crew = crewRepository.findByChatRoomId(chatRoom.getId())
                 .orElseThrow(() -> new ChatException(CHAT_CREW_NOT_FOUND, chatRoom.getId()));
 
         return ChatRoomDetailResponse.of(chatRoom, crew, getChatMemberResponses(chatRoom));
     }
 
     private ChatRoomDetailResponse getGameChatRoomDetailResponse(final ChatRoom chatRoom) {
-        final Game game = gameRepository.findByChatRoom(chatRoom)
+        final Game game = gameRepository.findByChatRoomId(chatRoom.getId())
                 .orElseThrow(() -> new ChatException(CHAT_GAME_NOT_FOUND, chatRoom.getId()));
 
         return ChatRoomDetailResponse.of(chatRoom, game, getChatMemberResponses(chatRoom));
@@ -101,7 +101,7 @@ public class ChatRoomFindService {
     private List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
         return chatRoomMemberRepository.findAllByActiveTrueAndChatRoomId(chatRoom.getId())
                 .stream()
-                .map(ChatRoomMember::getMember)
+                .map(chatRoomMember -> memberRepository.getMemberById(chatRoomMember.getMemberId()))
                 .map(ChatMemberResponse::from)
                 .toList();
     }

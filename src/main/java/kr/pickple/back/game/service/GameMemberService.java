@@ -13,6 +13,8 @@ import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
+import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
@@ -42,6 +44,7 @@ public class GameMemberService {
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
     private final MemberPositionRepository memberPositionRepository;
+    private final ChatRoomRepository chatRoomRepository;
     private final ChatMessageService chatMessageService;
     private final ApplicationEventPublisher eventPublisher;
     private final GameMemberRepository gameMemberRepository;
@@ -144,7 +147,8 @@ public class GameMemberService {
         validateIsHost(loggedInMemberId, game);
 
         final RegistrationStatus updateStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
-        enterGameChatRoom(updateStatus, gameMember);
+        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(game.getChatRoomId());
+        enterGameChatRoom(updateStatus, gameMember, chatRoom);
 
         gameMember.updateStatus(updateStatus);
 
@@ -162,11 +166,15 @@ public class GameMemberService {
         }
     }
 
-    private void enterGameChatRoom(final RegistrationStatus updateStatus, final GameMember gameMember) {
+    private void enterGameChatRoom(
+            final RegistrationStatus updateStatus,
+            final GameMember gameMember,
+            final ChatRoom chatRoom
+    ) {
         final RegistrationStatus nowStatus = gameMember.getStatus();
 
         if (nowStatus == WAITING && updateStatus == CONFIRMED) {
-            chatMessageService.enterRoomAndSaveEnteringMessages(gameMember.getCrewChatRoom(), gameMember.getMember());
+            chatMessageService.enterRoomAndSaveEnteringMessages(chatRoom, gameMember.getMember());
         }
     }
 
