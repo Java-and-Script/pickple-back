@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,7 +38,7 @@ public class CrewCreateRequest {
     private String addressDepth2;
 
     public Crew toEntity(
-            final Member leader,
+            final Long leaderId,
             final MainAddress mainAddress,
             final String profile,
             final String background
@@ -49,7 +48,7 @@ public class CrewCreateRequest {
                 .name(name)
                 .content(content)
                 .maxMemberCount(maxMemberCount)
-                .leader(leader)
+                .leaderId(leaderId)
                 .profileImageUrl(profile)
                 .backgroundImageUrl(background)
                 .addressDepth1Id(mainAddress.getAddressDepth1().getId())

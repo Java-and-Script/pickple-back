@@ -74,7 +74,7 @@ public class CrewService {
         );
 
         final Crew crew = crewCreateRequest.toEntity(
-                leader,
+                leader.getId(),
                 mainAddress,
                 MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
                 MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
