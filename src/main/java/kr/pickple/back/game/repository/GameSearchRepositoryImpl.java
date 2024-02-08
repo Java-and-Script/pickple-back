@@ -30,9 +30,6 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
 
         return jpaQueryFactory
                 .selectFrom(game)
-                .join(game.host).fetchJoin()
-                .join(game.addressDepth1).fetchJoin()
-                .join(game.addressDepth2).fetchJoin()
                 .where(isWithInDistance(pointWKT, distance))
                 .orderBy(getOrderByDistance(pointWKT))
                 .fetch();
