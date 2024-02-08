@@ -50,7 +50,7 @@ public class MemberCrewService {
         final Member member = memberRepository.getMemberById(memberId);
         final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
                 .stream()
-                .map(CrewMember::getCrew)
+                .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
                 .toList();
 
         return convertToCrewProfileResponses(crews, memberStatus);
@@ -101,7 +101,7 @@ public class MemberCrewService {
     private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
-                .map(CrewMember::getMember)
+                .map(crewMember -> memberRepository.getMemberById(crewMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositions(member),

@@ -81,8 +81,8 @@ public class CrewService {
         );
 
         final CrewMember crewLeader = CrewMember.builder()
-                .member(leader)
-                .crew(crew)
+                .memberId(leader.getId())
+                .crewId(crew.getId())
                 .build();
 
         crewLeader.confirmRegistration();
@@ -152,7 +152,7 @@ public class CrewService {
     private List<MemberResponse> getConfirmedMemberResponses(final Long crewId) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crewId, CONFIRMED)
                 .stream()
-                .map(CrewMember::getMember)
+                .map(crewMember -> memberRepository.getMemberById(crewMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),

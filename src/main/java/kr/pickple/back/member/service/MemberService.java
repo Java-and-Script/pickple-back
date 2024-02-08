@@ -20,6 +20,7 @@ import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
+import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
@@ -40,7 +41,8 @@ public class MemberService {
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
 
     private final AddressReader addressReader;
-
+    
+    private final CrewRepository crewRepository;
     private final MemberRepository memberRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
@@ -64,7 +66,7 @@ public class MemberService {
         final Member savedMember = memberRepository.save(member);
 
         validatedIsDuplicatedPositions(memberCreateRequest.getPositions());
-        final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember);
+        final List<MemberPosition> memberPositions = memberCreateRequest.toMemberPositionEntities(savedMember.getId());
 
         memberPositionRepository.saveAll(memberPositions); /* TODO: 벌크 연산으로 고치기 */
 
@@ -120,7 +122,7 @@ public class MemberService {
 
         final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), CONFIRMED)
                 .stream()
-                .map(CrewMember::getCrew)
+                .map(this::getCrewByCrewId)
                 .toList();
 
         final List<CrewResponse> crewResponses = crews.stream()
@@ -140,8 +142,14 @@ public class MemberService {
         return MemberProfileResponse.of(member, crewResponses, positions, mainAddress);
     }
 
+    private Crew getCrewByCrewId(final CrewMember crewMember) {
+        return crewRepository.getCrewById(crewMember.getMemberId());
+    }
+
     private MemberResponse getLeaderResponse(final Crew crew) {
-        final Member member = crew.getLeader();
+        final Long memberId = crew.getLeaderId();
+        final Member member = memberRepository.getMemberById(memberId);
+
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 member.getAddressDepth1Id(),
                 member.getAddressDepth2Id()

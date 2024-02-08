@@ -11,14 +11,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.util.CrewStatusConverter;
-import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -66,9 +64,7 @@ public class Crew extends BaseEntity {
     private Integer competitionPoint = 0;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "leader_id")
-    private Member leader;
+    private Long leaderId;
 
     @NotNull
     private Long addressDepth1Id;
@@ -87,7 +83,7 @@ public class Crew extends BaseEntity {
             final String profileImageUrl,
             final String backgroundImageUrl,
             final Integer maxMemberCount,
-            final Member leader,
+            final Long leaderId,
             final Long addressDepth1Id,
             final Long addressDepth2Id
     ) {
@@ -96,7 +92,7 @@ public class Crew extends BaseEntity {
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.maxMemberCount = maxMemberCount;
-        this.leader = leader;
+        this.leaderId = leaderId;
         this.addressDepth1Id = addressDepth1Id;
         this.addressDepth2Id = addressDepth2Id;
 
@@ -143,7 +139,7 @@ public class Crew extends BaseEntity {
     }
 
     public Boolean isLeader(final Long memberId) {
-        return memberId.equals(leader.getId());
+        return memberId.equals(leaderId);
     }
 
     public void makeNewCrewChatRoom(final ChatRoom chatRoom) {

@@ -61,10 +61,10 @@ public class MemberCreateRequest {
                 .build();
     }
 
-    public List<MemberPosition> toMemberPositionEntities(final Member member) {
+    public List<MemberPosition> toMemberPositionEntities(final Long memberId) {
         return positions.stream()
                 .map(position -> MemberPosition.builder()
-                        .member(member)
+                        .memberId(memberId)
                         .position(position)
                         .build()
                 ).toList();

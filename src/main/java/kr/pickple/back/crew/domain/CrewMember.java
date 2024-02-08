@@ -5,18 +5,14 @@ import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
-import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,19 +33,15 @@ public class CrewMember extends BaseEntity {
     private RegistrationStatus status = WAITING;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private Long memberId;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "crew_id")
-    private Crew crew;
+    private Long crewId;
 
     @Builder
-    private CrewMember(final Member member, final Crew crew) {
-        this.member = member;
-        this.crew = crew;
+    private CrewMember(final Long memberId, final Long crewId) {
+        this.memberId = memberId;
+        this.crewId = crewId;
     }
 
     public void confirmRegistration() {
@@ -57,10 +49,6 @@ public class CrewMember extends BaseEntity {
     }
 
     public void updateStatus(final RegistrationStatus status) {
-        if (this.status == WAITING && status == CONFIRMED) {
-            crew.increaseMemberCount();
-        }
-
         this.status = status;
     }
 
