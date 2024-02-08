@@ -3,12 +3,9 @@ package kr.pickple.back.member.domain;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.position.domain.Position;
@@ -19,6 +16,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class MemberPosition extends BaseEntity {
 
@@ -26,19 +24,17 @@ public class MemberPosition extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Getter
     @NotNull
     @Convert(converter = PositionConverter.class)
     @Column(length = 2)
     private Position position;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @NotNull
+    private Long memberId;
 
     @Builder
-    private MemberPosition(final Position position, final Member member) {
+    private MemberPosition(final Position position, final Long memberId) {
         this.position = position;
-        this.member = member;
+        this.memberId = memberId;
     }
 }

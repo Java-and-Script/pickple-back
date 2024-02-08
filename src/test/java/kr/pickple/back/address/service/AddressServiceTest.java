@@ -8,13 +8,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import kr.pickple.back.address.dto.response.AllAddressResponse;
-import kr.pickple.back.address.dto.response.MainAddressId;
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 
 @SpringBootTest
 class AddressServiceTest {
 
     @Autowired
     private AddressService addressService;
+
+    @Autowired
+    private AddressReader addressReader;
 
     @Test
     @DisplayName("지역 목록 조회 시, 전체 도, 시, 구 정보를 반환한다.")
@@ -35,11 +39,10 @@ class AddressServiceTest {
         String addressDepth2Name = "강남구";
 
         //when
-        MainAddressId mainAddressId = addressService.findMainAddressByNames(addressDepth1Name,
-                addressDepth2Name);
+        MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1Name, addressDepth2Name);
 
         //then
-        assertThat(mainAddressId.getAddressDepth1().getName()).isEqualTo(addressDepth1Name);
-        assertThat(mainAddressId.getAddressDepth2().getName()).isEqualTo(addressDepth2Name);
+        assertThat(mainAddress.getAddressDepth1().getName()).isEqualTo(addressDepth1Name);
+        assertThat(mainAddress.getAddressDepth2().getName()).isEqualTo(addressDepth2Name);
     }
 }

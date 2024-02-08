@@ -56,15 +56,15 @@ public class CrewMemberService {
         validateIsAlreadyRegisteredCrewMember(crewId, loggedInMemberId);
 
         final CrewMember newCrewMember = CrewMember.builder()
-                .member(member)
-                .crew(crew)
+                .memberId(member.getId())
+                .crewId(crew.getId())
                 .build();
 
         crewMemberRepository.save(newCrewMember);
 
         eventPublisher.publishEvent(CrewJoinRequestNotificationEvent.builder()
                 .crewId(crewId)
-                .memberId(crew.getLeader().getId())
+                .memberId(crew.getLeaderId())
                 .build());
     }
 
@@ -88,7 +88,7 @@ public class CrewMemberService {
 
         final List<MemberResponse> memberResponses = crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
                 .stream()
-                .map(CrewMember::getMember)
+                .map(crewMember -> memberRepository.getMemberById(crewMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
@@ -123,19 +123,30 @@ public class CrewMemberService {
             final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
     ) {
         final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-        final Crew crew = crewMember.getCrew();
+        final Crew crew = crewRepository.getCrewById(crewId);
 
         validateIsLeader(loggedInMemberId, crew);
 
         final RegistrationStatus updateStatus = crewMemberUpdateStatusRequest.getStatus();
         enterCrewChatRoom(updateStatus, crewMember);
 
+        increaseMemberCount(crew, crewMember, updateStatus);
         crewMember.updateStatus(updateStatus);
 
         eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
                 .crewId(crewId)
                 .memberId(memberId)
                 .build());
+    }
+
+    private static void increaseMemberCount(
+            final Crew crew,
+            final CrewMember crewMember,
+            final RegistrationStatus status
+    ) {
+        if (crewMember.getStatus() == WAITING && status == CONFIRMED) {
+            crew.increaseMemberCount();
+        }
     }
 
     private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
@@ -146,9 +157,10 @@ public class CrewMemberService {
 
     private void enterCrewChatRoom(final RegistrationStatus updateStatus, final CrewMember crewMember) {
         final RegistrationStatus nowStatus = crewMember.getStatus();
+        final Member member = memberRepository.getMemberById(crewMember.getMemberId());
 
         if (nowStatus == WAITING && updateStatus == CONFIRMED) {
-            chatMessageService.enterRoomAndSaveEnteringMessages(crewMember.getCrewChatRoom(), crewMember.getMember());
+            chatMessageService.enterRoomAndSaveEnteringMessages(crewMember.getCrewChatRoom(), member);
         }
     }
 
@@ -158,7 +170,7 @@ public class CrewMemberService {
     @Transactional
     public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
         final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-        final Crew crew = crewMember.getCrew();
+        final Crew crew = crewRepository.getCrewById(crewId);
 
         if (crew.isLeader(loggedInMemberId)) {
             validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
