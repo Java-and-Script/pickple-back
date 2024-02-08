@@ -44,7 +44,7 @@ public class CrewProfileResponse {
                 .status(crew.getStatus())
                 .likeCount(crew.getLikeCount())
                 .competitionPoint(crew.getCompetitionPoint())
-                .leader(getLeaderResponse(memberResponses, crew.getLeader().getId()))
+                .leader(getLeaderResponse(memberResponses, crew.getLeaderId()))
                 .addressDepth1(mainAddress.getAddressDepth1().getName())
                 .addressDepth2(mainAddress.getAddressDepth2().getName())
                 .members(memberResponses)

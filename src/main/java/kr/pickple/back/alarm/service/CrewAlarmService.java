@@ -44,7 +44,7 @@ public class CrewAlarmService {
 
         final Long crewId = crewJoinRequestNotificationEvent.getCrewId();
         final Crew crew = getCrewInfo(crewId);
-        final Member leader = crew.getLeader();
+        final Member leader = memberRepository.getMemberById(crew.getLeaderId());
 
         final CrewAlarm crewAlarm = CrewAlarm.builder()
                 .crew(crew)
@@ -114,8 +114,10 @@ public class CrewAlarmService {
         final Long crewId = crewAlarmEvent.getCrewId();
         final Crew crew = crewRepository.findById(crewId).orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
+        final Member leader = memberRepository.getMemberById(crew.getLeaderId());
+
         if (!crew.isLeader(crewAlarmEvent.getMemberId())) {
-            throw new CrewException(CREW_IS_NOT_LEADER, crewId, crew.getLeader());
+            throw new CrewException(CREW_IS_NOT_LEADER, crewId, leader.getId());
         }
     }
 
