@@ -58,7 +58,7 @@ public class ChatRoomService {
     private List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
         return chatRoomMemberRepository.findAllByActiveTrueAndChatRoomId(chatRoom.getId())
                 .stream()
-                .map(ChatRoomMember::getMember)
+                .map(chatRoomMember -> memberRepository.getMemberById(chatRoomMember.getMemberId()))
                 .map(ChatMemberResponse::from)
                 .toList();
     }
@@ -90,11 +90,15 @@ public class ChatRoomService {
 
         final ChatRoomMember foundChatRoomMember = chatRoomMemberRepository.findAllByMemberId(sender.getId())
                 .stream()
-                .filter(chatRoomMember -> existsReceiverInPersonalChatRoom(receiver, chatRoomMember.getChatRoom()))
+                .filter(chatRoomMember -> existsReceiverInPersonalChatRoom(
+                                receiver,
+                                chatRoomRepository.getChatRoomById(chatRoomMember.getChatRoomId())
+                        )
+                )
                 .findFirst()
                 .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND));
 
-        final Long personalChatRoomId = foundChatRoomMember.getChatRoom().getId();
+        final Long personalChatRoomId = foundChatRoomMember.getChatRoomId();
         final Boolean isSenderActive = foundChatRoomMember.isActive();
 
         return PersonalChatRoomExistedResponse.of(personalChatRoomId, isSenderActive);

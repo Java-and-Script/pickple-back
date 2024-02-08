@@ -17,7 +17,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     @Query("""
                 select cm
                 from ChatMessage cm
-                where cm.sender.id = :senderId and cm.type = kr.pickple.back.chat.domain.MessageType.ENTER
+                where cm.senderId= :senderId and cm.type = kr.pickple.back.chat.domain.MessageType.ENTER
                 order by cm.createdAt desc
                 limit 1
             """)

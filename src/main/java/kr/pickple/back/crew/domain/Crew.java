@@ -6,12 +6,9 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
@@ -72,9 +69,7 @@ public class Crew extends BaseEntity {
     @NotNull
     private Long addressDepth2Id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_room_id")
-    private ChatRoom chatRoom;
+    private Long chatRoomId;
 
     @Builder
     private Crew(
@@ -144,6 +139,6 @@ public class Crew extends BaseEntity {
 
     public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
         chatRoom.updateMaxMemberCount(maxMemberCount);
-        this.chatRoom = chatRoom;
+        this.chatRoomId = chatRoom.getId();
     }
 }

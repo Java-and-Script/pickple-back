@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
@@ -67,10 +66,6 @@ public class GameMember extends BaseEntity {
         }
 
         this.status = status;
-    }
-
-    public ChatRoom getCrewChatRoom() {
-        return game.getChatRoom();
     }
 
     public Boolean isAlreadyReviewDone() {

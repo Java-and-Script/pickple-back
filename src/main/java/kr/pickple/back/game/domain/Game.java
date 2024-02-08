@@ -18,7 +18,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
@@ -94,9 +93,7 @@ public class Game extends BaseEntity {
     @NotNull
     private Long addressDepth2Id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "chat_room_id")
-    private ChatRoom chatRoom;
+    private Long chatRoomId;
 
     @Builder
     private Game(
@@ -179,6 +176,6 @@ public class Game extends BaseEntity {
 
     public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
         chatRoom.updateMaxMemberCount(maxMemberCount);
-        this.chatRoom = chatRoom;
+        this.chatRoomId = chatRoom.getId();
     }
 }

@@ -58,7 +58,7 @@ public class ChatValidator {
     }
 
     private void validateCrewChatRoomLeavingConditions(final Member member, final ChatRoom chatRoom) {
-        final Optional<Crew> optionalCrew = crewRepository.findByChatRoom(chatRoom);
+        final Optional<Crew> optionalCrew = crewRepository.findByChatRoomId(chatRoom.getId());
 
         if (optionalCrew.isEmpty()) {
             return;
@@ -75,7 +75,7 @@ public class ChatValidator {
     }
 
     private void validateGameChatRoomLeavingConditions(final Member member, final ChatRoom chatRoom) {
-        final Optional<Game> optionalGame = gameRepository.findByChatRoom(chatRoom);
+        final Optional<Game> optionalGame = gameRepository.findByChatRoomId(chatRoom.getId());
 
         if (optionalGame.isEmpty()) {
             return;
