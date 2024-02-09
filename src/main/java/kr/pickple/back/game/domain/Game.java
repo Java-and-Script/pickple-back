@@ -12,18 +12,14 @@ import org.locationtech.jts.geom.Point;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
-import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -83,9 +79,7 @@ public class Game extends BaseEntity {
     private Integer maxMemberCount = 2;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "host_id")
-    private Member host;
+    private Long hostId;
 
     @NotNull
     private Long addressDepth1Id;
@@ -106,7 +100,7 @@ public class Game extends BaseEntity {
             final String detailAddress,
             final Integer cost,
             final Integer maxMemberCount,
-            final Member host,
+            final Long hostId,
             final Point point,
             final Long addressDepth1Id,
             final Long addressDepth2Id
@@ -120,7 +114,7 @@ public class Game extends BaseEntity {
         this.detailAddress = detailAddress;
         this.cost = cost;
         this.maxMemberCount = maxMemberCount;
-        this.host = host;
+        this.hostId = hostId;
         this.point = point;
         this.addressDepth1Id = addressDepth1Id;
         this.addressDepth2Id = addressDepth2Id;
@@ -166,12 +160,8 @@ public class Game extends BaseEntity {
         viewCount++;
     }
 
-    public Boolean isHost(final Member member) {
-        return member.equals(host);
-    }
-
     public Boolean isHost(final Long hostId) {
-        return hostId.equals(host.getId());
+        return hostId.equals(this.hostId);
     }
 
     public void makeNewCrewChatRoom(final ChatRoom chatRoom) {

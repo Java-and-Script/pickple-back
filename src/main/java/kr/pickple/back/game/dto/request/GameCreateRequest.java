@@ -18,7 +18,6 @@ import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GamePosition;
-import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -68,7 +67,7 @@ public class GameCreateRequest {
     private List<Position> positions;
 
     public Game toEntity(
-            final Member host,
+            final Long hostId,
             final MainAddress mainAddress,
             final Point point
     ) {
@@ -82,7 +81,7 @@ public class GameCreateRequest {
                 .detailAddress(detailAddress)
                 .cost(cost)
                 .maxMemberCount(maxMemberCount)
-                .host(host)
+                .hostId(hostId)
                 .point(point)
                 .addressDepth1Id(mainAddress.getAddressDepth1().getId())
                 .addressDepth2Id(mainAddress.getAddressDepth2().getId())

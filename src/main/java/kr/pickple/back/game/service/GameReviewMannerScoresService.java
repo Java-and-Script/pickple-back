@@ -15,7 +15,9 @@ import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
+import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -26,6 +28,8 @@ public class GameReviewMannerScoresService {
     private static final int REVIEW_POSSIBLE_DAYS = 7;
 
     private final GameMemberRepository gameMemberRepository;
+    private final GameRepository gameRepository;
+    private final MemberRepository memberRepository;
 
     @Transactional
     public void reviewMannerScores(
@@ -44,8 +48,8 @@ public class GameReviewMannerScoresService {
             throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
         }
 
-        final Game game = gameMember.getGame();
-        final Member loggedInMember = gameMember.getMember();
+        final Game game = gameRepository.getGameById(gameMember.getGameId());
+        final Member loggedInMember = memberRepository.getMemberById(gameMember.getMemberId());
 
         if (isNotReviewPeriod(game)) {
             throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(),
@@ -92,7 +96,7 @@ public class GameReviewMannerScoresService {
     private List<Member> getConfirmedMembers(Game game) {
         return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), CONFIRMED)
                 .stream()
-                .map(GameMember::getMember)
+                .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))
                 .toList();
     }
 }
