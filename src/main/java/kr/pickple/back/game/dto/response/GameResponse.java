@@ -62,7 +62,7 @@ public class GameResponse {
                 .cost(game.getCost())
                 .memberCount(game.getMemberCount())
                 .maxMemberCount(game.getMaxMemberCount())
-                .host(getHostResponse(memberResponses, game.getHost().getId()))
+                .host(getHostResponse(memberResponses, game.getHostId()))
                 .addressDepth1(mainAddress.getAddressDepth1().getName())
                 .addressDepth2(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
