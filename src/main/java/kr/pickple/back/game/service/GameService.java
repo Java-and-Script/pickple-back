@@ -80,10 +80,10 @@ public class GameService {
         final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(
                 gameCreateRequest.getMainAddress());
 
-        final Game game = gameCreateRequest.toEntity(host, mainAddress, point);
+        final Game game = gameCreateRequest.toEntity(host.getId(), mainAddress, point);
         final GameMember gameHost = GameMember.builder()
-                .member(host)
-                .game(game)
+                .memberId(host.getId())
+                .gameId(game.getId())
                 .build();
 
         gameHost.confirmRegistration();
@@ -260,7 +260,7 @@ public class GameService {
     private List<MemberResponse> getMemberResponsesByStatus(final Game game, final RegistrationStatus status) {
         return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), status)
                 .stream()
-                .map(GameMember::getMember)
+                .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
