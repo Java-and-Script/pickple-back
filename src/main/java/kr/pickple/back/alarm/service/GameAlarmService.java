@@ -44,7 +44,7 @@ public class GameAlarmService {
 
         final Long gameId = gameJoinRequestNotificationEvent.getGameId();
         final Game game = getGameInfo(gameId);
-        final Member host = game.getHost();
+        final Member host = getMemberInfo(game.getHostId());
 
         final GameAlarm gameAlarm = GameAlarm.builder()
                 .game(game)
@@ -102,7 +102,7 @@ public class GameAlarmService {
         final Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
 
         if (!game.isHost(gameJoinRequestNotificationEvent.getMemberId())) {
-            throw new GameException(GAME_MEMBER_IS_NOT_HOST, gameId, game.getHost());
+            throw new GameException(GAME_MEMBER_IS_NOT_HOST, gameId, game.getHostId());
         }
     }
 
