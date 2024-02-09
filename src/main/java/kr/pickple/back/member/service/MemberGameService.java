@@ -96,24 +96,28 @@ public class MemberGameService {
             final RegistrationStatus memberStatus
     ) {
         return memberGames.stream()
-                .map(memberGame ->
-                        MemberGameResponse.of(
-                                memberGame,
-                                getMemberResponsesByGame(memberGame.getGame(), memberStatus),
-                                getPositionsByMember(memberGame.getMember()),
-                                addressReader.readMainAddressById(
-                                        memberGame.getGame().getAddressDepth1Id(),
-                                        memberGame.getGame().getAddressDepth2Id()
-                                )
-                        )
-                )
+                .map(memberGame -> {
+                    Game game = gameRepository.getGameById(memberGame.getGameId());
+                    Member member = memberRepository.getMemberById(memberGame.getMemberId());
+
+                    return MemberGameResponse.of(
+                            memberGame,
+                            game,
+                            getMemberResponsesByGame(game, memberStatus),
+                            getPositionsByMember(member),
+                            addressReader.readMainAddressById(
+                                    game.getAddressDepth1Id(),
+                                    game.getAddressDepth2Id()
+                            )
+                    );
+                })
                 .toList();
     }
 
     private List<MemberResponse> getMemberResponsesByGame(final Game game, final RegistrationStatus memberStatus) {
         return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), memberStatus)
                 .stream()
-                .map(GameMember::getMember)
+                .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),

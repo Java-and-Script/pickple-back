@@ -6,17 +6,13 @@ import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
-import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,20 +36,16 @@ public class GameMember extends BaseEntity {
     private Boolean isReview = FALSE;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    private Long memberId;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "game_id")
-    private Game game;
+    private Long gameId;
 
     @Builder
-    private GameMember(final Member member, final Game game) {
-        this.status = getRegistrationStatus(member, game);
-        this.member = member;
-        this.game = game;
+    private GameMember(final Long memberId, final Long gameId, final RegistrationStatus status) {
+        this.status = status;
+        this.memberId = memberId;
+        this.gameId = gameId;
     }
 
     public void confirmRegistration() {
@@ -61,11 +53,11 @@ public class GameMember extends BaseEntity {
     }
 
     public void updateStatus(final RegistrationStatus status) {
-        if (this.status == WAITING && status == CONFIRMED) {
-            game.increaseMemberCount();
-        }
-
         this.status = status;
+    }
+
+    public Boolean isStatusChangedFromWaitingToConfirmed(RegistrationStatus updateStatus) {
+        return this.status == WAITING && updateStatus == CONFIRMED;
     }
 
     public Boolean isAlreadyReviewDone() {
@@ -74,15 +66,5 @@ public class GameMember extends BaseEntity {
 
     public void updateReviewDone() {
         this.isReview = TRUE;
-    }
-
-    private RegistrationStatus getRegistrationStatus(final Member member, final Game game) {
-        final Member host = game.getHost();
-
-        if (member.equals(host)) {
-            return CONFIRMED;
-        }
-
-        return status;
     }
 }
