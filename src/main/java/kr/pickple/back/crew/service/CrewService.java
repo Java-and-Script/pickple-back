@@ -19,11 +19,11 @@ import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewMember;
-import kr.pickple.back.crew.dto.request.CrewCreateRequest;
+import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
+import kr.pickple.back.crew.implement.CrewWriter;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
@@ -44,6 +44,7 @@ public class CrewService {
     private static final Integer CREW_CREATE_MAX_SIZE = 3;
 
     private final AddressReader addressReader;
+    private final CrewWriter crewWriter;
 
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
@@ -56,58 +57,36 @@ public class CrewService {
      * 크루 생성
      */
     @Transactional
-    public CrewIdResponse createCrew(final CrewCreateRequest crewCreateRequest, final Long loggedInMemberId) {
-        validateIsDuplicatedCrewInfo(crewCreateRequest.getName());
-
+    public CrewIdResponse createCrew(final Long loggedInMemberId, final CrewDomain crew) {
         final Member leader = memberRepository.getMemberById(loggedInMemberId);
-
-        validateMemberCreatedCrewsCount(leader);
-
-        final MainAddress mainAddress = addressReader.readMainAddressByNames(
-                crewCreateRequest.getAddressDepth1(),
-                crewCreateRequest.getAddressDepth2()
-        );
-
-        final Integer crewImageRandomNumber = RandomUtil.getRandomNumber(
-                CREW_IMAGE_START_NUMBER,
-                CREW_IMAGE_END_NUMBER
-        );
-
-        final Crew crew = crewCreateRequest.toEntity(
-                leader.getId(),
-                mainAddress,
-                MessageFormat.format(s3Properties.getCrewProfile(), crewImageRandomNumber),
-                MessageFormat.format(s3Properties.getCrewBackground(), crewImageRandomNumber)
-        );
-
-        final CrewMember crewLeader = CrewMember.builder()
-                .memberId(leader.getId())
-                .crewId(crew.getId())
-                .build();
-
-        crewLeader.confirmRegistration();
+        validateCreateCrewMoreThanMaxCount(leader);
 
         final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, crew.getName(), CREW);
-        crew.makeNewCrewChatRoom(chatRoom);
+        chatRoom.updateMaxMemberCount(crew.getMaxMemberCount());
 
-        final Long crewId = crewRepository.save(crew).getId();
-        crewMemberRepository.save(crewLeader);
+        crew.updateLeader(leader);
+        crew.updateChatRoom(chatRoom);
+        initializeNewCrewImages(crew);
 
-        return CrewIdResponse.from(crewId);
+        crewWriter.create(crew);
+        crewWriter.register(leader, crew);
+
+        return CrewIdResponse.from(crew.getCrewId());
     }
 
-    private void validateIsDuplicatedCrewInfo(final String name) {
-        if (crewRepository.existsByName(name)) {
-            throw new CrewException(CREW_IS_EXISTED, name);
-        }
-    }
-
-    private void validateMemberCreatedCrewsCount(final Member leader) {
+    private void validateCreateCrewMoreThanMaxCount(final Member leader) {
         final Integer createdCrewsCount = crewRepository.countByLeaderId(leader.getId());
 
         if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
             throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
         }
+    }
+
+    private void initializeNewCrewImages(final CrewDomain crew) {
+        final Integer randomImageNumber = RandomUtil.getRandomNumber(CREW_IMAGE_START_NUMBER, CREW_IMAGE_END_NUMBER);
+
+        crew.updateProfileImageUrl(MessageFormat.format(s3Properties.getCrewProfile(), randomImageNumber));
+        crew.updateBackgroundImageUrl(MessageFormat.format(s3Properties.getCrewBackground(), randomImageNumber));
     }
 
     /**

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
@@ -40,8 +41,10 @@ public class CrewController {
             @Login final Long loggedInMemberId,
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
+        final CrewDomain newCrew = crewCreateRequest.toDomain();
+
         return ResponseEntity.status(CREATED)
-                .body(crewService.createCrew(crewCreateRequest, loggedInMemberId));
+                .body(crewService.createCrew(loggedInMemberId, newCrew));
     }
 
     @GetMapping("/{crewId}")

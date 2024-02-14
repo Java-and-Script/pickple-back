@@ -38,16 +38,9 @@ public class CrewMember extends BaseEntity {
     private Long crewId;
 
     @Builder
-    private CrewMember(final Long memberId, final Long crewId) {
+    private CrewMember(final RegistrationStatus status, final Long memberId, final Long crewId) {
+        this.status = status;
         this.memberId = memberId;
         this.crewId = crewId;
-    }
-
-    public void confirmRegistration() {
-        this.status = CONFIRMED;
-    }
-
-    public void updateStatus(final RegistrationStatus status) {
-        this.status = status;
     }
 }
