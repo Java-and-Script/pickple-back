@@ -80,7 +80,8 @@ public class Crew extends BaseEntity {
             final Integer maxMemberCount,
             final Long leaderId,
             final Long addressDepth1Id,
-            final Long addressDepth2Id
+            final Long addressDepth2Id,
+            final Long chatRoomId
     ) {
         this.name = name;
         this.content = content;
@@ -90,6 +91,7 @@ public class Crew extends BaseEntity {
         this.leaderId = leaderId;
         this.addressDepth1Id = addressDepth1Id;
         this.addressDepth2Id = addressDepth2Id;
+        this.chatRoomId = chatRoomId;
 
         updateStatusIfCrewMemberFull();
     }
