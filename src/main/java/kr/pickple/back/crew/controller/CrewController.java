@@ -42,9 +42,10 @@ public class CrewController {
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
         final CrewDomain newCrew = crewCreateRequest.toDomain();
+        final Long crewId = crewService.createCrew(loggedInMemberId, newCrew);
 
         return ResponseEntity.status(CREATED)
-                .body(crewService.createCrew(loggedInMemberId, newCrew));
+                .body(CrewIdResponse.from(crewId));
     }
 
     @GetMapping("/{crewId}")

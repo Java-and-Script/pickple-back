@@ -20,9 +20,9 @@ import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewDomain;
-import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
+import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
@@ -44,6 +44,7 @@ public class CrewService {
     private static final Integer CREW_CREATE_MAX_SIZE = 3;
 
     private final AddressReader addressReader;
+    private final CrewReader crewReader;
     private final CrewWriter crewWriter;
 
     private final MemberRepository memberRepository;
@@ -57,7 +58,7 @@ public class CrewService {
      * 크루 생성
      */
     @Transactional
-    public CrewIdResponse createCrew(final Long loggedInMemberId, final CrewDomain crew) {
+    public Long createCrew(final Long loggedInMemberId, final CrewDomain crew) {
         final Member leader = memberRepository.getMemberById(loggedInMemberId);
         validateCreateCrewMoreThanMaxCount(leader);
 
@@ -71,11 +72,11 @@ public class CrewService {
         crewWriter.create(crew);
         crewWriter.register(leader, crew);
 
-        return CrewIdResponse.from(crew.getCrewId());
+        return crew.getCrewId();
     }
 
     private void validateCreateCrewMoreThanMaxCount(final Member leader) {
-        final Integer createdCrewsCount = crewRepository.countByLeaderId(leader.getId());
+        final Integer createdCrewsCount = crewReader.countByLeader(leader);
 
         if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
             throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
@@ -93,13 +94,10 @@ public class CrewService {
      * 크루 상세 조회
      */
     public CrewProfileResponse findCrewById(final Long crewId) {
-        final Crew crew = crewRepository.getCrewById(crewId);
-        final MainAddress mainAddress = addressReader.readMainAddressById(
-                crew.getAddressDepth1Id(),
-                crew.getAddressDepth2Id()
-        );
+        final CrewDomain crew = crewReader.read(crewId);
 
-        return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId), mainAddress);
+        // TODO: CrewProfileResponse 변환작업 컨트롤러로 이관
+        return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId));
     }
 
     /**

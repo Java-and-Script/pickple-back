@@ -1,7 +1,6 @@
 package kr.pickple.back.crew.domain;
 
 import static kr.pickple.back.crew.domain.CrewStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -12,7 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.util.CrewStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -92,47 +90,6 @@ public class Crew extends BaseEntity {
         this.addressDepth1Id = addressDepth1Id;
         this.addressDepth2Id = addressDepth2Id;
         this.chatRoomId = chatRoomId;
-
-        updateStatusIfCrewMemberFull();
-    }
-
-    public void increaseMemberCount() {
-        validateCrewIsClosedOrFull();
-
-        this.memberCount++;
-
-        updateStatusIfCrewMemberFull();
-    }
-
-    private void updateStatusIfCrewMemberFull() {
-        if (isFullCrew()) {
-            this.status = CLOSED;
-        }
-    }
-
-    private void validateCrewIsClosedOrFull() {
-        validateCrewClosed();
-        validateCrewFull();
-    }
-
-    private void validateCrewClosed() {
-        if (isClosedCrew()) {
-            throw new CrewException(CREW_STATUS_IS_CLOSED, status);
-        }
-    }
-
-    private Boolean isClosedCrew() {
-        return status == CLOSED;
-    }
-
-    private void validateCrewFull() {
-        if (isFullCrew()) {
-            throw new CrewException(CREW_CAPACITY_LIMIT_REACHED, memberCount);
-        }
-    }
-
-    private Boolean isFullCrew() {
-        return memberCount.equals(maxMemberCount);
     }
 
     public Boolean isLeader(final Long memberId) {
