@@ -42,6 +42,8 @@ public class CrewWriter {
                 .build();
 
         crewMember.confirmRegistration();
+        crew.increaseMemberCount();
+        //TODO : crew 인원 + 1 쿼리 추가 예정
 
         final CrewMember crewMemberEntity = crewMapper.mapCrewMemberDomainToEntity(crewMember);
         final CrewMember savedCrewMemberEntity = crewMemberRepository.save(crewMemberEntity);

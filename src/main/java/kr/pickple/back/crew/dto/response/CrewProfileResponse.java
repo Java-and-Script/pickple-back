@@ -2,8 +2,7 @@ package kr.pickple.back.crew.dto.response;
 
 import java.util.List;
 
-import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.domain.CrewStatus;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.Builder;
@@ -28,13 +27,9 @@ public class CrewProfileResponse {
     private String addressDepth2;
     private List<MemberResponse> members;
 
-    public static CrewProfileResponse of(
-            final Crew crew,
-            final List<MemberResponse> memberResponses,
-            final MainAddress mainAddress
-    ) {
+    public static CrewProfileResponse of(final CrewDomain crew, final List<MemberResponse> memberResponses) {
         return CrewProfileResponse.builder()
-                .id(crew.getId())
+                .id(crew.getCrewId())
                 .name(crew.getName())
                 .content(crew.getContent())
                 .memberCount(crew.getMemberCount())
@@ -44,9 +39,9 @@ public class CrewProfileResponse {
                 .status(crew.getStatus())
                 .likeCount(crew.getLikeCount())
                 .competitionPoint(crew.getCompetitionPoint())
-                .leader(getLeaderResponse(memberResponses, crew.getLeaderId()))
-                .addressDepth1(mainAddress.getAddressDepth1().getName())
-                .addressDepth2(mainAddress.getAddressDepth2().getName())
+                .leader(getLeaderResponse(memberResponses, crew.getLeader().getId()))
+                .addressDepth1(crew.getAddressDepth1Name())
+                .addressDepth2(crew.getAddressDepth2Name())
                 .members(memberResponses)
                 .build();
     }
