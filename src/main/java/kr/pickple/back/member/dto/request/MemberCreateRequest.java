@@ -5,11 +5,7 @@ import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
-import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
-import kr.pickple.back.member.domain.MemberStatus;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -47,26 +43,4 @@ public class MemberCreateRequest {
 
     @NotBlank(message = "주소2는 null이거나 빈 문자열이거나 공백일 수 없음")
     private String addressDepth2;
-
-    public Member toEntity(final MainAddress mainAddress) {
-        return Member.builder()
-                .email(email)
-                .nickname(nickname)
-                .profileImageUrl(profileImageUrl)
-                .status(MemberStatus.ACTIVE)
-                .oauthId(oauthId)
-                .oauthProvider(oauthProvider)
-                .addressDepth1Id(mainAddress.getAddressDepth1().getId())
-                .addressDepth2Id(mainAddress.getAddressDepth2().getId())
-                .build();
-    }
-
-    public List<MemberPosition> toMemberPositionEntities(final Long memberId) {
-        return positions.stream()
-                .map(position -> MemberPosition.builder()
-                        .memberId(memberId)
-                        .position(position)
-                        .build()
-                ).toList();
-    }
 }

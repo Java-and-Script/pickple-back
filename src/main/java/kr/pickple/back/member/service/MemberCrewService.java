@@ -20,8 +20,7 @@ import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
@@ -31,11 +30,9 @@ import lombok.RequiredArgsConstructor;
 public class MemberCrewService {
 
     private final AddressReader addressReader;
-
-    private final MemberRepository memberRepository;
+    private final MemberReader memberReader;
     private final CrewMemberRepository crewMemberRepository;
     private final CrewRepository crewRepository;
-    private final MemberPositionRepository memberPositionRepository;
 
     /**
      * 사용자가 가입한 크루 목록 조회
@@ -47,7 +44,7 @@ public class MemberCrewService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberRepository.getMemberById(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
                 .stream()
                 .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
@@ -62,7 +59,7 @@ public class MemberCrewService {
     public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long loggedInMemberId, final Long memberId) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberRepository.getMemberById(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final List<Crew> crews = crewRepository.findAllByLeaderId(member.getId());
 
         return convertToCrewProfileResponses(crews, CONFIRMED);
@@ -101,7 +98,7 @@ public class MemberCrewService {
     private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
-                .map(crewMember -> memberRepository.getMemberById(crewMember.getMemberId()))
+                .map(crewMember -> memberReader.readByMemberId(crewMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositions(member),
@@ -113,8 +110,7 @@ public class MemberCrewService {
     }
 
     private List<Position> getPositions(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-                member.getId());
+        final List<MemberPosition> memberPositions = memberPositionReader.readAll(member.getId());
 
         return Position.fromMemberPositions(memberPositions);
     }

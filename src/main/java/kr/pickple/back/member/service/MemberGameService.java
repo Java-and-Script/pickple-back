@@ -20,8 +20,7 @@ import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
@@ -31,11 +30,9 @@ import lombok.RequiredArgsConstructor;
 public class MemberGameService {
 
     private final AddressReader addressReader;
-
-    private final MemberRepository memberRepository;
+    private final MemberReader memberReader;
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
-    private final MemberPositionRepository memberPositionRepository;
 
     /**
      * 사용자의 참여 확정 게스트 모집글 목록 조회
@@ -47,7 +44,7 @@ public class MemberGameService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberRepository.getMemberById(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
                 memberStatus);
 
@@ -60,7 +57,7 @@ public class MemberGameService {
     public List<MemberGameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberRepository.getMemberById(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
         return convertToMemberGameResponses(memberGames, CONFIRMED);
@@ -76,7 +73,7 @@ public class MemberGameService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberRepository.getMemberById(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final Game game = gameRepository.getGameById(gameId);
 
         final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId())
@@ -128,7 +125,7 @@ public class MemberGameService {
     }
 
     private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(member.getId());
+        final List<MemberPosition> memberPositions = memberPositionReader.readAll(member.getId());
 
         return Position.fromMemberPositions(memberPositions);
     }

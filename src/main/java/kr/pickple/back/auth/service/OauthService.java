@@ -24,7 +24,7 @@ import kr.pickple.back.auth.service.authcode.AuthCodeRequestUrlProviderComposite
 import kr.pickple.back.auth.service.memberclient.OauthMemberClientComposite;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
-import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,7 +34,7 @@ public class OauthService {
 
     private static final String REFRESH_TOKEN_KEY = "refresh_token";
 
-    private final MemberRepository memberRepository;
+    private final MemberReader memberReader;
     private final AuthCodeRequestUrlProviderComposite authCodeRequestUrlProviderComposite;
     private final OauthMemberClientComposite oauthMemberClientComposite;
     private final TokenExtractor tokenExtractor;
@@ -53,7 +53,7 @@ public class OauthService {
             final String authCode
     ) {
         final OauthMember oauthMember = oauthMemberClientComposite.fetch(oauthProvider, authCode);
-        final Optional<Member> member = memberRepository.findByOauthId(oauthMember.getOauthId());
+        final Optional<Member> member = memberReader.readByOauthId(oauthMember.getOauthId());
 
         // 사용자가 로그인 하는 경우
         if (member.isPresent()) {
