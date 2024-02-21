@@ -23,6 +23,10 @@ import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.config.resolver.SignUp;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.member.domain.MemberProfile;
+import kr.pickple.back.member.domain.NewMember;
+import kr.pickple.back.member.dto.mapper.MemberRequestMapper;
+import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
@@ -58,7 +62,11 @@ public class MemberController {
             throw new MemberException(MEMBER_SIGNUP_OAUTH_SUBJECT_INVALID, requestOauthSubject);
         }
 
-        final AuthenticatedMemberResponse authenticatedMemberResponse = memberService.createMember(memberCreateRequest);
+        final NewMember newMember = MemberRequestMapper.mapToNewMemberDomain(memberCreateRequest);
+        final NewMember savedNewMember = memberService.createMember(newMember);
+        final AuthenticatedMemberResponse authenticatedMemberResponse = MemberResponseMapper
+                .mapToAuthenticatedMemberResponseDto(savedNewMember);
+
         final String refreshToken = authenticatedMemberResponse.getRefreshToken();
 
         if (refreshToken != null) {
@@ -79,8 +87,12 @@ public class MemberController {
 
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberProfileResponse> findMemberProfileById(@PathVariable final Long memberId) {
+        final MemberProfile memberProfile = memberService.findMemberProfileById(memberId);
+        final MemberProfileResponse memberProfileResponse = MemberResponseMapper
+                .mapToMemberProfileResponseDto(memberProfile);
+
         return ResponseEntity.status(OK)
-                .body(memberService.findMemberProfileById(memberId));
+                .body(memberProfileResponse);
     }
 
     @GetMapping("/{memberId}/crews")
