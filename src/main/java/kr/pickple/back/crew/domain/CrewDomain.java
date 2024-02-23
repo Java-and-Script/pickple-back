@@ -16,7 +16,6 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-//TODO: CrewDomain -> Crew, CrewMemberDomain -> CrewMember 변경 예정 (2024.02.15 김영주)
 public class CrewDomain {
 
     private Long crewId;
