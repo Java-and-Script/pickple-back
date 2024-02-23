@@ -44,7 +44,7 @@ public class MemberCrewService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberReader.readByMemberId(memberId);
+        final Member member = memberReader.readEntityByMemberId(memberId);
         final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
                 .stream()
                 .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
@@ -59,7 +59,7 @@ public class MemberCrewService {
     public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long loggedInMemberId, final Long memberId) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberReader.readByMemberId(memberId);
+        final Member member = memberReader.readEntityByMemberId(memberId);
         final List<Crew> crews = crewRepository.findAllByLeaderId(member.getId());
 
         return convertToCrewProfileResponses(crews, CONFIRMED);
@@ -98,7 +98,7 @@ public class MemberCrewService {
     private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
-                .map(crewMember -> memberReader.readByMemberId(crewMember.getMemberId()))
+                .map(crewMember -> memberReader.readEntityByMemberId(crewMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositions(member),
