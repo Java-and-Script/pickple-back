@@ -115,12 +115,17 @@ public class CrewController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CrewProfileResponse>> findCrewsByAddress(
+    public ResponseEntity<List<CrewProfileResponse>> findNearCrewsByAddress(
             @RequestParam final String addressDepth1,
             @RequestParam final String addressDepth2,
             final Pageable pageable
     ) {
+        final List<CrewDomain> nearCrews = crewService.findNearCrewsByAddress(addressDepth1, addressDepth2, pageable);
+        final List<CrewProfileResponse> crewProfileResponses = nearCrews.stream()
+                .map(CrewResponseMapper::mapToCrewProfileResponseDto)
+                .toList();
+
         return ResponseEntity.status(OK)
-                .body(crewService.findCrewsByAddress(addressDepth1, addressDepth2, pageable));
+                .body(crewProfileResponses);
     }
 }
