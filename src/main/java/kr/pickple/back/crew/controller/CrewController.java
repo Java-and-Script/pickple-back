@@ -41,11 +41,11 @@ public class CrewController {
             @Login final Long loggedInMemberId,
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
-        final CrewDomain newCrew = crewCreateRequest.toDomain();
+        final NewCrew newCrew = CrewRequestMapper.mapToNewCrewDomain(crewCreateRequest);
         final Long crewId = crewService.createCrew(loggedInMemberId, newCrew);
 
         return ResponseEntity.status(CREATED)
-                .body(CrewIdResponse.from(crewId));
+                .body(crewIdResponse);
     }
 
     @GetMapping("/{crewId}")

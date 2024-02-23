@@ -10,7 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.implement.TokenManager;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.MemberProfile;
@@ -28,6 +29,7 @@ public class MemberService {
     private final TokenManager tokenManager;
     private final MemberWriter memberWriter;
     private final MemberReader memberReader;
+    private final CrewReader crewReader;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
 
@@ -49,41 +51,14 @@ public class MemberService {
     public MemberProfile findMemberProfileById(final Long memberId) {
         final MemberProfile memberProfile = memberReader.readProfileByMemberId(memberId);
 
-        final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(memberProfile.getMemberId(), CONFIRMED)
+        final List<CrewDomain> crews = crewMemberRepository.findAllByMemberIdAndStatus(memberProfile.getMemberId(),
+                        CONFIRMED)
                 .stream()
-                .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
+                .map(crewMember -> crewReader.read(crewMember.getCrewId()))
                 .toList();
 
         memberProfile.updateJoinedCrews(crews);
 
-/*      final List<CrewResponse> crewResponses = crews.stream()
-                .map(crew -> CrewResponse.of(
-                                crew,
-                                getLeaderResponse(crew),
-                                addressReader.readMainAddressById(crew.getAddressDepth1Id(), crew.getAddressDepth2Id())
-                        )
-                )
-                .toList();
-                */
-
         return memberProfile;
     }
-
-    /*private MemberResponse getLeaderResponse(final Crew crew) {
-        final Long memberId = crew.getLeaderId();
-        final Member member = memberReader.readByMemberId(memberId);
-
-        final MainAddress mainAddress = addressReader.readMainAddressById(
-                member.getAddressDepth1Id(),
-                member.getAddressDepth2Id()
-        );
-
-        return MemberResponse.of(member, getPositionsByMember(member), mainAddress);
-    }
-
-    private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionReader.readAll(member.getId());
-
-        return Position.fromMemberPositions(memberPositions);
-    }*/
 }

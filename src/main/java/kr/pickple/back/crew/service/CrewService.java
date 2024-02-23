@@ -20,6 +20,7 @@ import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
@@ -27,10 +28,11 @@ import kr.pickple.back.crew.implement.CrewWriter;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
 import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
@@ -44,10 +46,10 @@ public class CrewService {
     private static final Integer CREW_CREATE_MAX_SIZE = 3;
 
     private final AddressReader addressReader;
+    private final MemberReader memberReader;
     private final CrewReader crewReader;
     private final CrewWriter crewWriter;
 
-    private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final MemberPositionRepository memberPositionRepository;
@@ -58,46 +60,44 @@ public class CrewService {
      * 크루 생성
      */
     @Transactional
-    public Long createCrew(final Long loggedInMemberId, final CrewDomain crew) {
-        final Member leader = memberRepository.getMemberById(loggedInMemberId);
-        validateCreateCrewMoreThanMaxCount(leader);
+    public Long createCrew(final Long loggedInMemberId, final NewCrew newCrew) {
+        final MemberDomain leader = memberReader.readByMemberId(loggedInMemberId);
+        validateCreateCrewMoreThanMaxCount(loggedInMemberId);
 
-        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, crew.getName(), CREW);
-        chatRoom.updateMaxMemberCount(crew.getMaxMemberCount());
+        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, newCrew.getName(), CREW);
+        chatRoom.updateMaxMemberCount(newCrew.getMaxMemberCount());
 
-        crew.updateLeader(leader);
-        crew.updateChatRoom(chatRoom);
-        initializeNewCrewImages(crew);
+        newCrew.assignLeader(leader);
+        newCrew.assignChatRoom(chatRoom);
+        assignImageUrls(newCrew);
 
-        crewWriter.create(crew);
+        final CrewDomain crew = crewWriter.create(newCrew);
         crewWriter.register(leader, crew);
 
         return crew.getCrewId();
     }
 
-    private void validateCreateCrewMoreThanMaxCount(final Member leader) {
-        final Integer createdCrewsCount = crewReader.countByLeader(leader);
+    private void validateCreateCrewMoreThanMaxCount(final Long leaderId) {
+        final Integer createdCrewsCount = crewReader.countByLeaderId(leaderId);
 
         if (createdCrewsCount >= CREW_CREATE_MAX_SIZE) {
             throw new CrewException(CREW_CREATE_MAX_COUNT_EXCEEDED, createdCrewsCount);
         }
     }
 
-    private void initializeNewCrewImages(final CrewDomain crew) {
+    private void assignImageUrls(final NewCrew newCrew) {
         final Integer randomImageNumber = RandomUtil.getRandomNumber(CREW_IMAGE_START_NUMBER, CREW_IMAGE_END_NUMBER);
+        final String profileImageUrl = MessageFormat.format(s3Properties.getCrewProfile(), randomImageNumber);
+        final String backgroundImageUrl = MessageFormat.format(s3Properties.getCrewBackground(), randomImageNumber);
 
-        crew.updateProfileImageUrl(MessageFormat.format(s3Properties.getCrewProfile(), randomImageNumber));
-        crew.updateBackgroundImageUrl(MessageFormat.format(s3Properties.getCrewBackground(), randomImageNumber));
+        newCrew.assignImageUrls(profileImageUrl, backgroundImageUrl);
     }
 
     /**
      * 크루 상세 조회
      */
-    public CrewProfileResponse findCrewById(final Long crewId) {
-        final CrewDomain crew = crewReader.read(crewId);
-
-        // TODO: CrewProfileResponse 변환작업 컨트롤러로 이관
-        return CrewProfileResponse.of(crew, getConfirmedMemberResponses(crewId));
+    public CrewDomain findCrewById(final Long crewId) {
+        return crewReader.read(crewId);
     }
 
     /**
@@ -129,7 +129,7 @@ public class CrewService {
     private List<MemberResponse> getConfirmedMemberResponses(final Long crewId) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crewId, CONFIRMED)
                 .stream()
-                .map(crewMember -> memberRepository.getMemberById(crewMember.getMemberId()))
+                .map(crewMember -> memberReader.readEntityByMemberId(crewMember.getMemberId()))
                 .map(member -> MemberResponse.of(
                                 member,
                                 getPositionsByMember(member),
