@@ -44,7 +44,7 @@ public class MemberGameService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberReader.readByMemberId(memberId);
+        final Member member = memberReader.readEntityByMemberId(memberId);
         final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
                 memberStatus);
 
@@ -57,7 +57,7 @@ public class MemberGameService {
     public List<MemberGameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberReader.readByMemberId(memberId);
+        final Member member = memberReader.readEntityByMemberId(memberId);
         final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
         return convertToMemberGameResponses(memberGames, CONFIRMED);
@@ -73,7 +73,7 @@ public class MemberGameService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final Member member = memberReader.readByMemberId(memberId);
+        final Member member = memberReader.readEntityByMemberId(memberId);
         final Game game = gameRepository.getGameById(gameId);
 
         final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId())

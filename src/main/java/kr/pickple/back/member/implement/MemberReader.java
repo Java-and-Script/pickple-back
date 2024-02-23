@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.exception.MemberException;
@@ -27,33 +27,39 @@ import lombok.RequiredArgsConstructor;
 public class MemberReader {
 
     private final AddressReader addressReader;
+    private final MemberMapper memberMapper;
     private final MemberRepository memberRepository;
-    private final CrewRepository crewRepository;
     private final MemberPositionRepository memberPositionRepository;
 
     public MemberProfile readProfileByMemberId(final Long memberId) {
-        final Member member = readByMemberId(memberId);
-
+        final Member member = readEntityByMemberId(memberId);
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 member.getAddressDepth1Id(),
                 member.getAddressDepth2Id()
         );
-
-        final List<Position> positions = readAllMemberPosition(memberId)
-                .stream()
-                .map(MemberPosition::getPosition)
-                .toList();
+        final List<Position> positions = readPositionsByMemberId(memberId);
 
         return MemberMapper.mapToMemberProfileDomain(member, mainAddress, positions);
     }
 
-    public Member readByMemberId(final Long memberId) {
+    //TODO: member -> memberDomain 변경 작업 후 제거 예정 (김영주)
+    public Member readEntityByMemberId(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 
-    public List<MemberPosition> readAllMemberPosition(final Long memberId) {
-        return memberPositionRepository.findAllByMemberId(memberId);
+    public MemberDomain readByMemberId(final Long memberId) {
+        final Member memberEntity = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+
+        return memberMapper.mapToMemberDomain(memberEntity);
+    }
+
+    public List<Position> readPositionsByMemberId(final Long memberId) {
+        return memberPositionRepository.findAllByMemberId(memberId)
+                .stream()
+                .map(MemberPosition::getPosition)
+                .toList();
     }
 
     public Optional<Member> readByOauthId(final Long oauthId) {
