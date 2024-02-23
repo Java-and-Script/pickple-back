@@ -13,10 +13,10 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -33,27 +33,27 @@ public class CrewReader {
         return crewRepository.countByLeaderId(leaderId);
     }
 
-    public CrewDomain read(final Long crewId) {
-        final Crew crewEntity = crewRepository.findById(crewId)
+    public Crew read(final Long crewId) {
+        final CrewEntity crewEntity = crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
         return crewMapper.mapCrewEntityToDomain(crewEntity);
     }
 
-    public List<CrewDomain> readJoinedCrewsByMemberId(final Long memberId) {
+    public List<Crew> readJoinedCrewsByMemberId(final Long memberId) {
         return crewMemberRepository.findAllByMemberIdAndStatus(memberId, CONFIRMED)
                 .stream()
                 .map(crewMember -> read(crewMember.getCrewId()))
                 .toList();
     }
 
-    public List<CrewDomain> readNearCrewsByAddress(
+    public List<Crew> readNearCrewsByAddress(
             final String addressDepth1Name,
             final String addressDepth2Name,
             final Pageable pageable
     ) {
         final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1Name, addressDepth2Name);
-        final Page<Crew> crewEntities = crewRepository.findByAddressDepth1IdAndAddressDepth2Id(
+        final Page<CrewEntity> crewEntities = crewRepository.findByAddressDepth1IdAndAddressDepth2Id(
                 mainAddress.getAddressDepth1().getId(),
                 mainAddress.getAddressDepth2().getId(),
                 pageable

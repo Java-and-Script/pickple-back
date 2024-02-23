@@ -11,7 +11,7 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.common.util.DateTimeUtil;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.game.domain.Game;
@@ -58,13 +58,13 @@ public class ChatValidator {
     }
 
     private void validateCrewChatRoomLeavingConditions(final Member member, final ChatRoom chatRoom) {
-        final Optional<Crew> optionalCrew = crewRepository.findByChatRoomId(chatRoom.getId());
+        final Optional<CrewEntity> optionalCrew = crewRepository.findByChatRoomId(chatRoom.getId());
 
         if (optionalCrew.isEmpty()) {
             return;
         }
 
-        final Crew crew = optionalCrew.get();
+        final CrewEntity crew = optionalCrew.get();
         validateIsMemberConfirmedCrewMember(crew.getId(), member.getId(), chatRoom.getId());
     }
 

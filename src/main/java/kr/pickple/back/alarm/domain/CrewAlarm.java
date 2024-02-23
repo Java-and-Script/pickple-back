@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.alarm.util.CrewAlarmTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,7 +38,7 @@ public class CrewAlarm extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "crew_id")
-    private Crew crew;
+    private CrewEntity crew;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -47,7 +47,7 @@ public class CrewAlarm extends BaseEntity {
     @Builder
     private CrewAlarm(
             final CrewAlarmType crewAlarmType,
-            final Crew crew,
+            final CrewEntity crew,
             final Member member
     ) {
         this.crewAlarmType = crewAlarmType;

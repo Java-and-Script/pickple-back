@@ -27,8 +27,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.crew.IntegrationCrewTest;
-import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.fixture.dto.CrewDtoFixtures;
@@ -36,7 +35,7 @@ import kr.pickple.back.fixture.setup.AddressSetup;
 import kr.pickple.back.member.domain.Member;
 
 @Transactional
-public class CrewDocumentTest extends IntegrationCrewTest {
+public class CrewEntityDocumentTest extends IntegrationCrewTest {
 
     private static final String BASE_URL = "/crews";
 
@@ -50,7 +49,7 @@ public class CrewDocumentTest extends IntegrationCrewTest {
     @DisplayName("크루원 모집글 상세 정보 조회")
     void findCrewById_ReturnCrewResponse() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithWaitingMembers(3);
+        final CrewEntity crew = crewSetup.saveWithWaitingMembers(3);
 
         //when
         final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{crewId}", crew.getId()))
@@ -147,7 +146,7 @@ public class CrewDocumentTest extends IntegrationCrewTest {
         final List<Member> members = memberSetup.save(2);
         final Member crewLeader = members.get(0);
         final Member crewApplyMember = members.get(1);
-        final Crew crew = crewSetup.save(crewLeader);
+        final CrewEntity crew = crewSetup.save(crewLeader);
 
         final String subject = String.valueOf(crewApplyMember.getId());
         final AuthTokens authTokens = jwtProvider.createLoginToken(subject);
@@ -185,7 +184,7 @@ public class CrewDocumentTest extends IntegrationCrewTest {
     @DisplayName("크루원 모집에 참여 신청된 혹은 확정된 사용자 정보 목록 조회")
     void findAllCrewMembers_ReturnCrewResponseWithWaitingMembers() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithConfirmedMembers(2);
+        final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
         final Member crewLeader = crew.getLeader();
 
         final String subject = String.valueOf(crewLeader.getId());
@@ -287,7 +286,7 @@ public class CrewDocumentTest extends IntegrationCrewTest {
     @DisplayName("크루원 모집 참여 신청 수락")
     void updateCrewMemberRegistrationStatus_ReturnVoid() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithWaitingMembers(2);
+        final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
         final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
@@ -341,7 +340,7 @@ public class CrewDocumentTest extends IntegrationCrewTest {
     @DisplayName("크루원 모집 참여 신청 거절/취소")
     void deleteCrewMember_ReturnVoid() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithWaitingMembers(2);
+        final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
         final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
@@ -384,7 +383,7 @@ public class CrewDocumentTest extends IntegrationCrewTest {
     @DisplayName("사용자 위치 근처 크루 조회")
     void findCrewsByAddress_ReturnCrews() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithConfirmedMembers(2);
+        final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 

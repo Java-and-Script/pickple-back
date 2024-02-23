@@ -6,14 +6,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.implement.AddressReader;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewDomain;
-import kr.pickple.back.crew.domain.CrewMemberDomain;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
-import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.RequiredArgsConstructor;
 
@@ -27,18 +26,18 @@ public class CrewWriter {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
 
-    public CrewDomain create(final NewCrew newCrew) {
+    public Crew create(final NewCrew newCrew) {
         if (crewRepository.existsByName(newCrew.getName())) {
             throw new CrewException(CREW_IS_EXISTED, newCrew.getName());
         }
 
-        final Crew crewEntity = crewRepository.save(crewMapper.mapNewCrewDomainToEntity(newCrew));
+        final CrewEntity crewEntity = crewRepository.save(crewMapper.mapNewCrewDomainToEntity(newCrew));
 
         return crewMapper.mapCrewEntityToDomain(crewEntity);
     }
 
-    public void register(final MemberDomain member, final CrewDomain crew) {
-        final CrewMemberDomain crewMember = CrewMemberDomain.builder()
+    public void register(final MemberDomain member, final Crew crew) {
+        final CrewMember crewMember = CrewMember.builder()
                 .memberId(member.getMemberId())
                 .crewId(crew.getCrewId())
                 .build();

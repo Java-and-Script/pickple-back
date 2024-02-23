@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.crew.domain.CrewMember;
-import kr.pickple.back.crew.domain.CrewMemberDomain;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.member.domain.MemberDomain;
@@ -28,13 +28,13 @@ public class CrewMapper {
     private final CrewMemberRepository crewMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    public Crew mapNewCrewDomainToEntity(final NewCrew newCrew) {
+    public CrewEntity mapNewCrewDomainToEntity(final NewCrew newCrew) {
         final MainAddress mainAddress = addressReader.readMainAddressByNames(
                 newCrew.getAddressDepth1Name(),
                 newCrew.getAddressDepth2Name()
         );
 
-        return Crew.builder()
+        return CrewEntity.builder()
                 .name(newCrew.getName())
                 .content(newCrew.getContent())
                 .maxMemberCount(newCrew.getMaxMemberCount())
@@ -47,7 +47,7 @@ public class CrewMapper {
                 .build();
     }
 
-    public CrewDomain mapCrewEntityToDomain(final Crew crewEntity) {
+    public Crew mapCrewEntityToDomain(final CrewEntity crewEntity) {
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 crewEntity.getAddressDepth1Id(),
                 crewEntity.getAddressDepth2Id()
@@ -58,7 +58,7 @@ public class CrewMapper {
                 .map(crewMember -> memberReader.readByMemberId(crewMember.getMemberId()))
                 .toList();
 
-        return CrewDomain.builder()
+        return Crew.builder()
                 .crewId(crewEntity.getId())
                 .name(crewEntity.getName())
                 .content(crewEntity.getContent())
@@ -76,8 +76,8 @@ public class CrewMapper {
                 .build();
     }
 
-    public CrewMember mapCrewMemberDomainToEntity(final CrewMemberDomain crewMember) {
-        return CrewMember.builder()
+    public CrewMemberEntity mapCrewMemberDomainToEntity(final CrewMember crewMember) {
+        return CrewMemberEntity.builder()
                 .status(crewMember.getStatus())
                 .memberId(crewMember.getMemberId())
                 .crewId(crewMember.getCrewId())

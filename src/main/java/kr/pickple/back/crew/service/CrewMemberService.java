@@ -18,8 +18,8 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
@@ -39,18 +39,18 @@ import lombok.RequiredArgsConstructor;
 public class CrewMemberService {
 
     private final AddressReader addressReader;
-
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final MemberPositionRepository memberPositionRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
+
     private final ChatMessageService chatMessageService;
     private final ApplicationEventPublisher eventPublisher;
 
     private static void increaseMemberCount(
-            final Crew crew,
-            final CrewMember crewMember,
+            final CrewEntity crew,
+            final CrewMemberEntity crewMember,
             final RegistrationStatus status
     ) {
         if (crewMember.getStatus() == WAITING && status == CONFIRMED) {
@@ -63,12 +63,12 @@ public class CrewMemberService {
      */
     @Transactional
     public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
-        final Crew crew = crewRepository.getCrewById(crewId);
+        final CrewEntity crew = crewRepository.getCrewById(crewId);
         final Member member = memberRepository.getMemberById(loggedInMemberId);
 
         validateIsAlreadyRegisteredCrewMember(crewId, loggedInMemberId);
 
-        final CrewMember newCrewMember = CrewMember.builder()
+        final CrewMemberEntity newCrewMember = CrewMemberEntity.builder()
                 .memberId(member.getId())
                 .crewId(crew.getId())
                 .build();
@@ -95,7 +95,7 @@ public class CrewMemberService {
             final Long crewId,
             final RegistrationStatus status
     ) {
-        final Crew crew = crewRepository.getCrewById(crewId);
+        final CrewEntity crew = crewRepository.getCrewById(crewId);
 
         validateIsLeader(loggedInMemberId, crew);
 
@@ -135,8 +135,8 @@ public class CrewMemberService {
             final Long memberId,
             final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
     ) {
-        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-        final Crew crew = crewRepository.getCrewById(crewId);
+        final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
+        final CrewEntity crew = crewRepository.getCrewById(crewId);
 
         validateIsLeader(loggedInMemberId, crew);
 
@@ -153,7 +153,7 @@ public class CrewMemberService {
                 .build());
     }
 
-    private void validateIsLeader(final Long loggedInMemberId, final Crew crew) {
+    private void validateIsLeader(final Long loggedInMemberId, final CrewEntity crew) {
         if (!crew.isLeader(loggedInMemberId)) {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
         }
@@ -161,7 +161,7 @@ public class CrewMemberService {
 
     private void enterCrewChatRoom(
             final RegistrationStatus updateStatus,
-            final CrewMember crewMember,
+            final CrewMemberEntity crewMember,
             final ChatRoom chatRoom
     ) {
         final RegistrationStatus nowStatus = crewMember.getStatus();
@@ -177,8 +177,8 @@ public class CrewMemberService {
      */
     @Transactional
     public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
-        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-        final Crew crew = crewRepository.getCrewById(crewId);
+        final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
+        final CrewEntity crew = crewRepository.getCrewById(crewId);
 
         if (crew.isLeader(loggedInMemberId)) {
             validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
@@ -207,7 +207,7 @@ public class CrewMemberService {
         }
     }
 
-    private void cancelCrewMember(final CrewMember crewMember) {
+    private void cancelCrewMember(final CrewMemberEntity crewMember) {
         if (crewMember.getStatus() != WAITING) {
             throw new CrewException(CREW_MEMBER_STATUS_IS_NOT_WAITING);
         }
@@ -215,7 +215,7 @@ public class CrewMemberService {
         deleteCrewMember(crewMember);
     }
 
-    private void deleteCrewMember(final CrewMember crewMember) {
+    private void deleteCrewMember(final CrewMemberEntity crewMember) {
         crewMemberRepository.delete(crewMember);
     }
 }

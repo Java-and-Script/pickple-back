@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
@@ -45,7 +45,7 @@ public class MemberCrewService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = memberReader.readEntityByMemberId(memberId);
-        final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
+        final List<CrewEntity> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
                 .stream()
                 .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
                 .toList();
@@ -60,7 +60,7 @@ public class MemberCrewService {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
         final Member member = memberReader.readEntityByMemberId(memberId);
-        final List<Crew> crews = crewRepository.findAllByLeaderId(member.getId());
+        final List<CrewEntity> crews = crewRepository.findAllByLeaderId(member.getId());
 
         return convertToCrewProfileResponses(crews, CONFIRMED);
     }
@@ -75,13 +75,13 @@ public class MemberCrewService {
     ) {
         validateSelfMemberAccess(loggedInMemberId, memberId);
 
-        final CrewMember crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(crewId, memberId);
+        final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(crewId, memberId);
 
         return CrewMemberRegistrationStatusResponse.from(crewMember.getStatus());
     }
 
     private List<CrewProfileResponse> convertToCrewProfileResponses(
-            final List<Crew> crews,
+            final List<CrewEntity> crews,
             final RegistrationStatus memberStatus
     ) {
 
@@ -95,7 +95,7 @@ public class MemberCrewService {
                 .toList();
     }
 
-    private List<MemberResponse> getMemberResponsesByCrew(final Crew crew, final RegistrationStatus memberStatus) {
+    private List<MemberResponse> getMemberResponsesByCrew(final CrewEntity crew, final RegistrationStatus memberStatus) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
                 .map(crewMember -> memberReader.readEntityByMemberId(crewMember.getMemberId()))

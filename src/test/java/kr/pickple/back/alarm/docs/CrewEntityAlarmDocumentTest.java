@@ -5,7 +5,7 @@ import kr.pickple.back.alarm.IntegrationAlarmTest;
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.dto.request.CrewAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.repository.CrewAlarmRepository;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.fixture.domain.CrewAlarmFixtures;
 import kr.pickple.back.fixture.setup.CrewSetup;
 import kr.pickple.back.member.domain.Member;
@@ -28,7 +28,7 @@ import static org.springframework.restdocs.request.RequestDocumentation.paramete
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-public class CrewAlarmDocumentTest extends IntegrationAlarmTest {
+public class CrewEntityAlarmDocumentTest extends IntegrationAlarmTest {
 
     private static final String BASE_URL = "/crew-alarms";
 
@@ -44,7 +44,7 @@ public class CrewAlarmDocumentTest extends IntegrationAlarmTest {
         //given
         final Member member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
-        final Crew crew = crewSetup.saveWithConfirmedMembers(1);
+        final CrewEntity crew = crewSetup.saveWithConfirmedMembers(1);
         final CrewAlarm crewAlarm = crewAlarmRepository.save(CrewAlarmFixtures.crewAlarmBuild(member, crew));
         final CrewAlarmUpdateStatusRequest request = CrewAlarmUpdateStatusRequest.from(true);
 

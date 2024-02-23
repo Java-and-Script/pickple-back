@@ -14,7 +14,7 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
@@ -54,7 +54,7 @@ public class CrewService {
         newCrew.assignChatRoom(chatRoom);
         assignImageUrls(newCrew);
 
-        final CrewDomain crew = crewWriter.create(newCrew);
+        final Crew crew = crewWriter.create(newCrew);
         crewWriter.register(leader, crew);
 
         return crew.getCrewId();
@@ -79,14 +79,14 @@ public class CrewService {
     /**
      * 크루 상세 조회
      */
-    public CrewDomain findCrewById(final Long crewId) {
+    public Crew findCrewById(final Long crewId) {
         return crewReader.read(crewId);
     }
 
     /**
      *  사용자 근처 크루 목록 조회
      */
-    public List<CrewDomain> findNearCrewsByAddress(
+    public List<Crew> findNearCrewsByAddress(
             final String addressDepth1Name,
             final String addressDepth2Name,
             final Pageable pageable

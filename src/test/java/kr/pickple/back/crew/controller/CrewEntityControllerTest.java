@@ -3,7 +3,7 @@ package kr.pickple.back.crew.controller;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.IntegrationCrewTest;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @Transactional
-public class CrewControllerTest extends IntegrationCrewTest {
+public class CrewEntityControllerTest extends IntegrationCrewTest {
 
     private static final String BASE_URL = "/crews";
 
@@ -40,7 +40,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @DisplayName("사용자는 해당 크루의 상세 정보를 조회할 수 있다.")
     void findCrewDetailsById_ReturnCrewResponse() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithConfirmedMembers(2);
+        final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
         final Member crewLeader = crew.getLeader();
         final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
                 .get(1)
@@ -85,7 +85,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
         final List<Member> members = memberSetup.save(2);
         final Member crewLeader = members.get(0);
         final Member crewApplyMember = members.get(1);
-        final Crew crew = crewSetup.save(crewLeader);
+        final CrewEntity crew = crewSetup.save(crewLeader);
 
         final String subject = String.valueOf(crewApplyMember.getId());
         final AuthTokens authTokens = jwtProvider.createLoginToken(subject);
@@ -104,7 +104,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @DisplayName("크루장은 크루 모집글에 참여 신청한 사용자 정보 목록을 조회할 수 있다.")
     void findAllCrewMembers_WaitingStatus_ReturnCrewResponse() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithWaitingMembers(2);
+        final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
         final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
@@ -152,7 +152,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @DisplayName("크루장은 다른 사용자의 크루 모집글 참여 신청을 수락할 수 있다.")
     void updateCrewMemberRegistrationStatus_Success() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithWaitingMembers(2);
+        final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
         final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
@@ -181,7 +181,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @DisplayName("크루장은 다른 사용자의 크루 모집글 참여 신청을 거절할 수 있다.")
     void deleteCrewMember_CrewLeader_Success() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithWaitingMembers(2);
+        final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
         final Member crewLeader = crew.getLeader();
         final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
@@ -204,7 +204,7 @@ public class CrewControllerTest extends IntegrationCrewTest {
     @DisplayName("사용자는 자신 위치 근처의 크루를 조회할 수 있다.")
     void findCrewsByAddress_Success() throws Exception {
         //given
-        final Crew crew = crewSetup.saveWithConfirmedMembers(2);
+        final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
         final Member crewLeader = crew.getLeader();

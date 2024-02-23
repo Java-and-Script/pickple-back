@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.Crew;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,8 +36,8 @@ public class CrewCreateRequest {
     @NotBlank(message = "해당 크루의 활동 장소(구) 정보는 필수입니다.")
     private String addressDepth2;
 
-    public CrewDomain toDomain() {
-        return CrewDomain.builder()
+    public Crew toDomain() {
+        return Crew.builder()
                 .name(name)
                 .content(content)
                 .maxMemberCount(maxMemberCount)
