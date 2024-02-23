@@ -3,9 +3,12 @@ package kr.pickple.back.crew.domain;
 import static kr.pickple.back.crew.domain.CrewStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
+import java.util.List;
+
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,37 +24,18 @@ public class CrewDomain {
     private Long crewId;
     private String name;
     private String content;
-    private Integer memberCount = 0;
-    private Integer maxMemberCount = 1;
+    private Integer memberCount;
+    private Integer maxMemberCount;
     private CrewStatus status = OPEN;
-    private Member leader;
+    private MemberDomain leader;
     private String addressDepth1Name;
     private String addressDepth2Name;
     private String profileImageUrl;
     private String backgroundImageUrl;
-    private Integer likeCount = 0;
-    private Integer competitionPoint = 0;
+    private Integer likeCount;
+    private Integer competitionPoint;
     private ChatRoom chatRoom;
-
-    public void updateCrewId(final Long crewId) {
-        this.crewId = crewId;
-    }
-
-    public void updateLeader(final Member leader) {
-        this.leader = leader;
-    }
-
-    public void updateProfileImageUrl(final String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
-
-    public void updateBackgroundImageUrl(final String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
-    }
-
-    public void updateChatRoom(final ChatRoom chatRoom) {
-        this.chatRoom = chatRoom;
-    }
+    private List<MemberDomain> members;
 
     public void increaseMemberCount() {
         if (status == CLOSED) {
@@ -67,5 +51,13 @@ public class CrewDomain {
         if (memberCount.equals(maxMemberCount)) {
             this.status = CLOSED;
         }
+    }
+
+    public void addMember(final MemberDomain member) {
+        if (members.contains(member)) {
+            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, crewId, member.getMemberId());
+        }
+
+        members.add(member);
     }
 }

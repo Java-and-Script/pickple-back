@@ -1,5 +1,9 @@
 package kr.pickple.back.crew.implement;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
+
+import java.util.List;
+
 import org.springframework.stereotype.Component;
 
 import kr.pickple.back.address.dto.response.MainAddress;
@@ -9,6 +13,9 @@ import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.CrewMemberDomain;
+import kr.pickple.back.crew.domain.NewCrew;
+import kr.pickple.back.crew.repository.CrewMemberRepository;
+import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -18,24 +25,25 @@ public class CrewMapper {
 
     private final AddressReader addressReader;
     private final MemberReader memberReader;
+    private final CrewMemberRepository crewMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
 
-    public Crew mapCrewDomainToEntity(final CrewDomain crew) {
+    public Crew mapNewCrewDomainToEntity(final NewCrew newCrew) {
         final MainAddress mainAddress = addressReader.readMainAddressByNames(
-                crew.getAddressDepth1Name(),
-                crew.getAddressDepth2Name()
+                newCrew.getAddressDepth1Name(),
+                newCrew.getAddressDepth2Name()
         );
 
         return Crew.builder()
-                .name(crew.getName())
-                .content(crew.getContent())
-                .maxMemberCount(crew.getMaxMemberCount())
-                .leaderId(crew.getLeader().getId())
-                .profileImageUrl(crew.getProfileImageUrl())
-                .backgroundImageUrl(crew.getBackgroundImageUrl())
+                .name(newCrew.getName())
+                .content(newCrew.getContent())
+                .maxMemberCount(newCrew.getMaxMemberCount())
+                .leaderId(newCrew.getLeader().getMemberId())
+                .profileImageUrl(newCrew.getProfileImageUrl())
+                .backgroundImageUrl(newCrew.getBackgroundImageUrl())
                 .addressDepth1Id(mainAddress.getAddressDepth1().getId())
                 .addressDepth2Id(mainAddress.getAddressDepth2().getId())
-                .chatRoomId(crew.getChatRoom().getId())
+                .chatRoomId(newCrew.getChatRoom().getId())
                 .build();
     }
 
@@ -44,6 +52,11 @@ public class CrewMapper {
                 crewEntity.getAddressDepth1Id(),
                 crewEntity.getAddressDepth2Id()
         );
+
+        final List<MemberDomain> members = crewMemberRepository.findAllByCrewIdAndStatus(crewEntity.getId(), CONFIRMED)
+                .stream()
+                .map(crewMember -> memberReader.readByMemberId(crewMember.getMemberId()))
+                .toList();
 
         return CrewDomain.builder()
                 .crewId(crewEntity.getId())
@@ -59,6 +72,7 @@ public class CrewMapper {
                 .likeCount(crewEntity.getLikeCount())
                 .competitionPoint(crewEntity.getCompetitionPoint())
                 .chatRoom(chatRoomRepository.getChatRoomById(crewEntity.getChatRoomId()))
+                .members(members)
                 .build();
     }
 

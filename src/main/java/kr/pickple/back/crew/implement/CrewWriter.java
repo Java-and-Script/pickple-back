@@ -8,12 +8,13 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewDomain;
-import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.CrewMemberDomain;
+import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -26,30 +27,26 @@ public class CrewWriter {
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
 
-    public void create(final CrewDomain crew) {
-        if (crewRepository.existsByName(crew.getName())) {
-            throw new CrewException(CREW_IS_EXISTED, crew.getName());
+    public CrewDomain create(final NewCrew newCrew) {
+        if (crewRepository.existsByName(newCrew.getName())) {
+            throw new CrewException(CREW_IS_EXISTED, newCrew.getName());
         }
 
-        final Crew crewEntity = crewMapper.mapCrewDomainToEntity(crew);
-        final Crew savedCrewEntity = crewRepository.save(crewEntity);
+        final Crew crewEntity = crewRepository.save(crewMapper.mapNewCrewDomainToEntity(newCrew));
 
-        crew.updateCrewId(savedCrewEntity.getId());
+        return crewMapper.mapCrewEntityToDomain(crewEntity);
     }
 
-    public void register(final Member member, final CrewDomain crew) {
+    public void register(final MemberDomain member, final CrewDomain crew) {
         final CrewMemberDomain crewMember = CrewMemberDomain.builder()
-                .memberId(member.getId())
+                .memberId(member.getMemberId())
                 .crewId(crew.getCrewId())
                 .build();
 
         crewMember.confirmRegistration();
+        crewMemberRepository.save(crewMapper.mapCrewMemberDomainToEntity(crewMember));
 
-        final CrewMember crewMemberEntity = crewMapper.mapCrewMemberDomainToEntity(crewMember);
-        final CrewMember savedCrewMemberEntity = crewMemberRepository.save(crewMemberEntity);
-
-        crewMember.updateCrewMemberId(savedCrewMemberEntity.getId());
-
+        crew.addMember(member);
         crew.increaseMemberCount();
         crewRepository.updateMemberCountAndStatus(crew.getCrewId(), crew.getMemberCount(), crew.getStatus());
     }
