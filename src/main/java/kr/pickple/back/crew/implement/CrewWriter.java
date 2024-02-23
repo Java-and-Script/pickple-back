@@ -5,6 +5,7 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -20,6 +21,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewWriter {
 
+    private final AddressReader addressReader;
     private final CrewMapper crewMapper;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
@@ -42,12 +44,13 @@ public class CrewWriter {
                 .build();
 
         crewMember.confirmRegistration();
-        crew.increaseMemberCount();
-        //TODO : crew 인원 + 1 쿼리 추가 예정
 
         final CrewMember crewMemberEntity = crewMapper.mapCrewMemberDomainToEntity(crewMember);
         final CrewMember savedCrewMemberEntity = crewMemberRepository.save(crewMemberEntity);
 
         crewMember.updateCrewMemberId(savedCrewMemberEntity.getId());
+
+        crew.increaseMemberCount();
+        crewRepository.updateMemberCountAndStatus(crew.getCrewId(), crew.getMemberCount(), crew.getStatus());
     }
 }

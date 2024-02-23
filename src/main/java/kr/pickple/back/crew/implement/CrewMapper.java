@@ -9,7 +9,7 @@ import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewDomain;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.CrewMemberDomain;
-import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 public class CrewMapper {
 
     private final AddressReader addressReader;
-    private final MemberRepository memberRepository;
+    private final MemberReader memberReader;
     private final ChatRoomRepository chatRoomRepository;
 
     public Crew mapCrewDomainToEntity(final CrewDomain crew) {
@@ -51,7 +51,7 @@ public class CrewMapper {
                 .content(crewEntity.getContent())
                 .memberCount(crewEntity.getMemberCount())
                 .maxMemberCount(crewEntity.getMaxMemberCount())
-                .leader(memberRepository.getMemberById(crewEntity.getLeaderId()))
+                .leader(memberReader.readByMemberId(crewEntity.getLeaderId()))
                 .addressDepth1Name(mainAddress.getAddressDepth1().getName())
                 .addressDepth2Name(mainAddress.getAddressDepth2().getName())
                 .profileImageUrl(crewEntity.getProfileImageUrl())
