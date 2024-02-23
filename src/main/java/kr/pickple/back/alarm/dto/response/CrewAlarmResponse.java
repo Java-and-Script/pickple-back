@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import kr.pickple.back.alarm.domain.CrewAlarm;
 import kr.pickple.back.alarm.domain.CrewAlarmType;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class CrewAlarmResponse implements AlarmResponse {
     private final CrewAlarmType crewAlarmMessage;
 
     public static CrewAlarmResponse from(final CrewAlarm crewAlarm) {
-        final Crew crew = crewAlarm.getCrew();
+        final CrewEntity crew = crewAlarm.getCrew();
 
         return CrewAlarmResponse.builder()
                 .crewAlarmId(crewAlarm.getId())

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.dto.mapper.CrewRequestMapper;
 import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
@@ -56,7 +56,7 @@ public class CrewController {
     public ResponseEntity<CrewProfileResponse> findCrewById(
             @PathVariable final Long crewId
     ) {
-        final CrewDomain crew = crewService.findCrewById(crewId);
+        final Crew crew = crewService.findCrewById(crewId);
         final CrewProfileResponse crewProfileResponse = CrewResponseMapper.mapToCrewProfileResponseDto(crew);
 
         return ResponseEntity.status(OK)
@@ -120,7 +120,7 @@ public class CrewController {
             @RequestParam final String addressDepth2,
             final Pageable pageable
     ) {
-        final List<CrewDomain> nearCrews = crewService.findNearCrewsByAddress(addressDepth1, addressDepth2, pageable);
+        final List<Crew> nearCrews = crewService.findNearCrewsByAddress(addressDepth1, addressDepth2, pageable);
         final List<CrewProfileResponse> crewProfileResponses = nearCrews.stream()
                 .map(CrewResponseMapper::mapToCrewProfileResponseDto)
                 .toList();

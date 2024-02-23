@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.member.IntegrationMemberTest;
 import kr.pickple.back.member.domain.Member;
@@ -62,7 +62,7 @@ class MemberControllerTest extends IntegrationMemberTest {
     void findMemberById_ReturnMemberProfileResponse() throws Exception {
         // given
         final Member savedMember = memberSetup.save();
-        final Crew savedCrew = crewSetup.save(savedMember);
+        final CrewEntity savedCrew = crewSetup.save(savedMember);
 
         // when
         final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{members}", savedMember.getId()));
@@ -113,7 +113,7 @@ class MemberControllerTest extends IntegrationMemberTest {
     void findAllCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
         final Member member = memberSetup.save();
-        final Crew crew = crewSetup.save(member);
+        final CrewEntity crew = crewSetup.save(member);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
 
@@ -165,7 +165,7 @@ class MemberControllerTest extends IntegrationMemberTest {
     void findCreatedCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
         final Member member = memberSetup.save();
-        final Crew crew = crewSetup.save(member);
+        final CrewEntity crew = crewSetup.save(member);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
 

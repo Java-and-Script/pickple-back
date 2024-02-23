@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.auth.implement.TokenManager;
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
@@ -51,7 +51,7 @@ public class MemberService {
     public MemberProfile findMemberProfileById(final Long memberId) {
         final MemberProfile memberProfile = memberReader.readProfileByMemberId(memberId);
 
-        final List<CrewDomain> crews = crewMemberRepository.findAllByMemberIdAndStatus(memberProfile.getMemberId(),
+        final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(memberProfile.getMemberId(),
                         CONFIRMED)
                 .stream()
                 .map(crewMember -> crewReader.read(crewMember.getCrewId()))

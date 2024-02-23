@@ -17,7 +17,7 @@ import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.repository.GameRepository;
@@ -85,7 +85,7 @@ public class ChatRoomFindService {
     }
 
     private ChatRoomDetailResponse getCrewChatRoomDetailResponse(final ChatRoom chatRoom) {
-        final Crew crew = crewRepository.findByChatRoomId(chatRoom.getId())
+        final CrewEntity crew = crewRepository.findByChatRoomId(chatRoom.getId())
                 .orElseThrow(() -> new ChatException(CHAT_CREW_NOT_FOUND, chatRoom.getId()));
 
         return ChatRoomDetailResponse.of(chatRoom, crew, getChatMemberResponses(chatRoom));

@@ -22,7 +22,7 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 
-public class MemberCrewServiceTest {
+public class MemberCrewServiceTestEntity {
 
     @InjectMocks
     private MemberCrewService memberCrewService;

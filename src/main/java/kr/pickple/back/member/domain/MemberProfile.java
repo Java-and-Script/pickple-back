@@ -2,7 +2,7 @@ package kr.pickple.back.member.domain;
 
 import java.util.List;
 
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -24,9 +24,9 @@ public class MemberProfile {
     private String addressDepth1Name;
     private String addressDepth2Name;
     private List<Position> positions;
-    private List<CrewDomain> joinedCrews;
+    private List<Crew> joinedCrews;
 
-    public void updateJoinedCrews(final List<CrewDomain> joinedCrews) {
+    public void updateJoinedCrews(final List<Crew> joinedCrews) {
         this.joinedCrews = joinedCrews;
     }
 }

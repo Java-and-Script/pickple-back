@@ -6,7 +6,7 @@ import java.util.List;
 
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.RoomType;
-import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
@@ -70,7 +70,7 @@ public class ChatRoomDetailResponse {
 
     public static ChatRoomDetailResponse of(
             final ChatRoom chatRoom,
-            final Crew crew,
+            final CrewEntity crew,
             final List<ChatMemberResponse> chatMemberResponses
     ) {
         return ChatRoomDetailResponse.builder()

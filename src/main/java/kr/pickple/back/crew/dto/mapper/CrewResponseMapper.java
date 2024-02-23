@@ -2,7 +2,7 @@ package kr.pickple.back.crew.dto.mapper;
 
 import java.util.List;
 
-import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.dto.response.CrewResponse;
@@ -18,7 +18,7 @@ public final class CrewResponseMapper {
         return CrewIdResponse.from(crewId);
     }
 
-    public static CrewProfileResponse mapToCrewProfileResponseDto(final CrewDomain crew) {
+    public static CrewProfileResponse mapToCrewProfileResponseDto(final Crew crew) {
         final List<MemberResponse> memberResponses = crew.getMembers()
                 .stream()
                 .map(MemberResponseMapper::mapToMemberResponseDto)
@@ -42,7 +42,7 @@ public final class CrewResponseMapper {
                 .build();
     }
 
-    public static CrewResponse mapToCrewResponseDto(final CrewDomain crew) {
+    public static CrewResponse mapToCrewResponseDto(final Crew crew) {
         return CrewResponse.builder()
                 .id(crew.getCrewId())
                 .name(crew.getName())
