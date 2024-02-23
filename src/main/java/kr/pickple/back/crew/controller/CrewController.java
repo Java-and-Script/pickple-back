@@ -20,6 +20,9 @@ import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.CrewDomain;
+import kr.pickple.back.crew.domain.NewCrew;
+import kr.pickple.back.crew.dto.mapper.CrewRequestMapper;
+import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
@@ -43,6 +46,7 @@ public class CrewController {
     ) {
         final NewCrew newCrew = CrewRequestMapper.mapToNewCrewDomain(crewCreateRequest);
         final Long crewId = crewService.createCrew(loggedInMemberId, newCrew);
+        final CrewIdResponse crewIdResponse = CrewResponseMapper.mapToCrewIdResponseDto(crewId);
 
         return ResponseEntity.status(CREATED)
                 .body(crewIdResponse);
@@ -52,8 +56,11 @@ public class CrewController {
     public ResponseEntity<CrewProfileResponse> findCrewById(
             @PathVariable final Long crewId
     ) {
+        final CrewDomain crew = crewService.findCrewById(crewId);
+        final CrewProfileResponse crewProfileResponse = CrewResponseMapper.mapToCrewProfileResponseDto(crew);
+
         return ResponseEntity.status(OK)
-                .body(crewService.findCrewById(crewId));
+                .body(crewProfileResponse);
     }
 
     @PostMapping("/{crewId}/members")
