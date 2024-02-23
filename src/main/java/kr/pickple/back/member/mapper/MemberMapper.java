@@ -103,7 +103,7 @@ public class MemberMapper {
                 .addressDepth1Name(mainAddress.getAddressDepth1().getName())
                 .addressDepth2Name(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
-                .joinedCrews(crewReader.readAllConfirmedByMemberId(memberId))
+                .joinedCrews(crewReader.readJoinedCrewsByMemberId(memberId))
                 .joinedGames(joinedGames)
                 .build();
     }
