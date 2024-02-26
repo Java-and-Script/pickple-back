@@ -80,8 +80,11 @@ public class CrewController {
             @PathVariable final Long crewId,
             @RequestParam final RegistrationStatus status
     ) {
+        final Crew crew = crewMemberService.findCrewMembersByStatus(loggedInMemberId, crewId, status);
+        final CrewProfileResponse crewProfileResponse = CrewResponseMapper.mapToCrewProfileResponseDto(crew);
+
         return ResponseEntity.status(OK)
-                .body(crewMemberService.findAllCrewMembers(loggedInMemberId, crewId, status));
+                .body(crewProfileResponse);
     }
 
     @PatchMapping("/{crewId}/members/{memberId}")

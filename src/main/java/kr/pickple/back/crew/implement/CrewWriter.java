@@ -1,10 +1,12 @@
 package kr.pickple.back.crew.implement;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.NewCrew;
@@ -31,7 +33,7 @@ public class CrewWriter {
 
         final CrewEntity crewEntity = crewRepository.save(crewMapper.mapNewCrewDomainToEntity(newCrew));
 
-        return crewMapper.mapCrewEntityToDomain(crewEntity);
+        return crewMapper.mapCrewEntityToDomain(crewEntity, CONFIRMED);
     }
 
     public void register(final MemberDomain member, final Crew crew) {

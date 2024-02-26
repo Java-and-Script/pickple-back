@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
@@ -33,17 +34,17 @@ public class CrewReader {
         return crewRepository.countByLeaderId(leaderId);
     }
 
-    public Crew read(final Long crewId) {
+    public Crew read(final Long crewId, final RegistrationStatus status) {
         final CrewEntity crewEntity = crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
-        return crewMapper.mapCrewEntityToDomain(crewEntity);
+        return crewMapper.mapCrewEntityToDomain(crewEntity, status);
     }
 
     public List<Crew> readJoinedCrewsByMemberId(final Long memberId) {
         return crewMemberRepository.findAllByMemberIdAndStatus(memberId, CONFIRMED)
                 .stream()
-                .map(crewMember -> read(crewMember.getCrewId()))
+                .map(crewMember -> read(crewMember.getCrewId(), CONFIRMED))
                 .toList();
     }
 
@@ -60,7 +61,7 @@ public class CrewReader {
         );
 
         return crewEntities.stream()
-                .map(crewMapper::mapCrewEntityToDomain)
+                .map(crewEntity -> crewMapper.mapCrewEntityToDomain(crewEntity, CONFIRMED))
                 .toList();
     }
 }
