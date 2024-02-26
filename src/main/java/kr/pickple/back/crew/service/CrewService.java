@@ -58,7 +58,7 @@ public class CrewService {
 
         final Crew crew = crewWriter.create(newCrew);
         final CrewMember crewLeader = crewWriter.register(leader, crew);
-        crewWriter.confirm(crewLeader);
+        crewWriter.updateMemberRegistrationStatus(crewLeader, CONFIRMED);
 
         return crew.getCrewId();
     }

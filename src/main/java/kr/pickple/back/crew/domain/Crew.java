@@ -52,14 +52,6 @@ public class Crew {
         }
     }
 
-    public void addMember(final MemberDomain member) {
-        if (members.contains(member)) {
-            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, crewId, member.getMemberId());
-        }
-
-        members.add(member);
-    }
-
     public Boolean isLeader(final Long memberId) {
         return leader.isIdMatched(memberId);
     }

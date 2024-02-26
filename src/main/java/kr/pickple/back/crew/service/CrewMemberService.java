@@ -7,11 +7,9 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
-import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
@@ -19,14 +17,8 @@ import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
-import kr.pickple.back.crew.repository.CrewMemberRepository;
-import kr.pickple.back.crew.repository.CrewRepository;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
-import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.implement.MemberReader;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,15 +26,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class CrewMemberService {
 
-    private final AddressReader addressReader;
     private final MemberReader memberReader;
     private final CrewReader crewReader;
     private final CrewWriter crewWriter;
-    private final MemberRepository memberRepository;
-    private final CrewRepository crewRepository;
-    private final MemberPositionRepository memberPositionRepository;
-    private final CrewMemberRepository crewMemberRepository;
-    private final ChatRoomRepository chatRoomRepository;
 
     private final ChatMessageService chatMessageService;
     private final ApplicationEventPublisher eventPublisher;
@@ -97,7 +83,7 @@ public class CrewMemberService {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
         }
 
-        crewWriter.updateRegistrationStatus(crewMember, newRegistrationStatus);
+        crewWriter.updateMemberRegistrationStatus(crewMember, newRegistrationStatus);
         chatMessageService.enterRoomAndSaveEnteringMessages(crew.getChatRoom(), crewMember.getMember());
 
         eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
@@ -111,45 +97,33 @@ public class CrewMemberService {
      */
     @Transactional
     public void deleteCrewMember(final Long loggedInMemberId, final Long crewId, final Long memberId) {
-        final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-        final CrewEntity crew = crewRepository.getCrewById(crewId);
+        final CrewMember crewMember = crewReader.readCrewMember(memberId, crewId);
+        final Crew crew = crewMember.getCrew();
 
         if (crew.isLeader(loggedInMemberId)) {
-            validateIsLeaderSelfDeleted(loggedInMemberId, memberId);
+            validateLeaderDeleteSelf(loggedInMemberId, memberId);
+            crewWriter.delete(crewMember);
 
             eventPublisher.publishEvent(CrewMemberRejectedEvent.builder()
                     .crewId(crewId)
                     .memberId(memberId)
                     .build());
 
-            deleteCrewMember(crewMember);
-
             return;
         }
 
         if (loggedInMemberId.equals(memberId)) {
-            cancelCrewMember(crewMember);
+            crewWriter.cancel(crewMember);
+
             return;
         }
 
         throw new CrewException(CREW_MEMBER_NOT_ALLOWED, loggedInMemberId);
     }
 
-    private void validateIsLeaderSelfDeleted(Long loggedInMemberId, Long memberId) {
-        if (loggedInMemberId.equals(memberId)) {
-            throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, loggedInMemberId);
+    private void validateLeaderDeleteSelf(final Long leaderId, final Long deletingMemberId) {
+        if (leaderId.equals(deletingMemberId)) {
+            throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, deletingMemberId);
         }
-    }
-
-    private void cancelCrewMember(final CrewMemberEntity crewMember) {
-        if (crewMember.getStatus() != WAITING) {
-            throw new CrewException(CREW_MEMBER_STATUS_IS_NOT_WAITING);
-        }
-
-        deleteCrewMember(crewMember);
-    }
-
-    private void deleteCrewMember(final CrewMemberEntity crewMember) {
-        crewMemberRepository.delete(crewMember);
     }
 }
