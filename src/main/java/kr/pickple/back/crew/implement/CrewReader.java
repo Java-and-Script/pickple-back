@@ -14,10 +14,12 @@ import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -63,5 +65,12 @@ public class CrewReader {
         return crewEntities.stream()
                 .map(crewEntity -> crewMapper.mapCrewEntityToDomain(crewEntity, CONFIRMED))
                 .toList();
+    }
+
+    public CrewMember readCrewMember(final Long memberId, final Long crewId) {
+        final CrewMemberEntity crewMemberEntity = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
+                .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
+
+        return crewMapper.mapCrewMemberEntityToDomain(crewMemberEntity);
     }
 }

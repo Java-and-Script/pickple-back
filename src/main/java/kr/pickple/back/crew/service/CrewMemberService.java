@@ -11,12 +11,11 @@ import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
@@ -24,7 +23,6 @@ import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
-import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberPositionRepository;
@@ -48,16 +46,6 @@ public class CrewMemberService {
 
     private final ChatMessageService chatMessageService;
     private final ApplicationEventPublisher eventPublisher;
-
-    private static void increaseMemberCount(
-            final CrewEntity crew,
-            final CrewMemberEntity crewMember,
-            final RegistrationStatus status
-    ) {
-        if (crewMember.getStatus() == WAITING && status == CONFIRMED) {
-            crew.increaseMemberCount();
-        }
-    }
 
     /**
      * 크루 가입 신청
@@ -100,43 +88,22 @@ public class CrewMemberService {
             final Long loggedInMemberId,
             final Long crewId,
             final Long memberId,
-            final CrewMemberUpdateStatusRequest crewMemberUpdateStatusRequest
+            final RegistrationStatus newRegistrationStatus
     ) {
-        final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(memberId, crewId);
-        final CrewEntity crew = crewRepository.getCrewById(crewId);
+        final CrewMember crewMember = crewReader.readCrewMember(memberId, crewId);
+        final Crew crew = crewMember.getCrew();
 
-        validateIsLeader(loggedInMemberId, crew);
+        if (!crew.isLeader(loggedInMemberId)) {
+            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
+        }
 
-        final RegistrationStatus updateStatus = crewMemberUpdateStatusRequest.getStatus();
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(crew.getChatRoomId());
-        enterCrewChatRoom(updateStatus, crewMember, chatRoom);
-
-        increaseMemberCount(crew, crewMember, updateStatus);
-        crewMember.updateStatus(updateStatus);
+        crewWriter.updateRegistrationStatus(crewMember, newRegistrationStatus);
+        chatMessageService.enterRoomAndSaveEnteringMessages(crew.getChatRoom(), crewMember.getMember());
 
         eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
                 .crewId(crewId)
                 .memberId(memberId)
                 .build());
-    }
-
-    private void validateIsLeader(final Long loggedInMemberId, final CrewEntity crew) {
-        if (!crew.isLeader(loggedInMemberId)) {
-            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
-        }
-    }
-
-    private void enterCrewChatRoom(
-            final RegistrationStatus updateStatus,
-            final CrewMemberEntity crewMember,
-            final ChatRoom chatRoom
-    ) {
-        final RegistrationStatus nowStatus = crewMember.getStatus();
-        final Member member = memberRepository.getMemberById(crewMember.getMemberId());
-
-        if (nowStatus == WAITING && updateStatus == CONFIRMED) {
-            chatMessageService.enterRoomAndSaveEnteringMessages(chatRoom, member);
-        }
     }
 
     /**

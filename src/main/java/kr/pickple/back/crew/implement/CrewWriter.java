@@ -14,6 +14,7 @@ import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.RequiredArgsConstructor;
 
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewWriter {
 
+    private final CrewReader crewReader;
     private final CrewMapper crewMapper;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
@@ -31,12 +33,13 @@ public class CrewWriter {
             throw new CrewException(CREW_IS_EXISTED, newCrew.getName());
         }
 
-        final CrewEntity crewEntity = crewRepository.save(crewMapper.mapNewCrewDomainToEntity(newCrew));
+        final CrewEntity crewEntity = crewMapper.mapNewCrewDomainToEntity(newCrew);
+        final CrewEntity savedCrewEntity = crewRepository.save(crewEntity);
 
-        return crewMapper.mapCrewEntityToDomain(crewEntity, CONFIRMED);
+        return crewMapper.mapCrewEntityToDomain(savedCrewEntity, CONFIRMED);
     }
 
-    public void register(final MemberDomain member, final Crew crew) {
+    public CrewMember register(final MemberDomain member, final Crew crew) {
         final Long memberId = member.getMemberId();
         final Long crewId = crew.getCrewId();
 
@@ -45,15 +48,25 @@ public class CrewWriter {
         }
 
         final CrewMember crewMember = CrewMember.builder()
-                .memberId(memberId)
-                .crewId(crewId)
+                .status(WAITING)
+                .member(member)
+                .crew(crew)
                 .build();
 
-        crewMember.confirmRegistration();
-        crewMemberRepository.save(crewMapper.mapCrewMemberDomainToEntity(crewMember));
+        final CrewMemberEntity crewMemberEntity = crewMapper.mapCrewMemberDomainToEntity(crewMember);
+        final CrewMemberEntity savedCrewMemberEntity = crewMemberRepository.save(crewMemberEntity);
+        crewMember.updateCrewMemberId(savedCrewMemberEntity.getId());
 
-        crew.addMember(member);
+        return crewMember;
+    }
+
+    public void updateRegistrationStatus(final CrewMember crewMember, final RegistrationStatus status) {
+        crewMember.updateRegistrationStatus(status);
+        crewMemberRepository.updateRegistrationStatus(crewMember.getCrewMemberId(), status);
+
+        final Crew crew = crewMember.getCrew();
+        crew.addMember(crewMember.getMember());
         crew.increaseMemberCount();
-        crewRepository.updateMemberCountAndStatus(crewId, crew.getMemberCount(), crew.getStatus());
+        crewRepository.updateMemberCountAndStatus(crew.getCrewId(), crew.getMemberCount(), crew.getStatus());
     }
 }

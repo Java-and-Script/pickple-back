@@ -16,6 +16,7 @@ import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
@@ -56,7 +57,8 @@ public class CrewService {
         assignImageUrls(newCrew);
 
         final Crew crew = crewWriter.create(newCrew);
-        crewWriter.register(leader, crew);
+        final CrewMember crewLeader = crewWriter.register(leader, crew);
+        crewWriter.confirm(crewLeader);
 
         return crew.getCrewId();
     }
