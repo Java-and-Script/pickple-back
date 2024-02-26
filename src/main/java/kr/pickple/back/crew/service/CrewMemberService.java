@@ -18,16 +18,21 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
-import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
+import kr.pickple.back.crew.implement.CrewReader;
+import kr.pickple.back.crew.implement.CrewWriter;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.MemberResponse;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
 import kr.pickple.back.position.domain.Position;
@@ -39,6 +44,9 @@ import lombok.RequiredArgsConstructor;
 public class CrewMemberService {
 
     private final AddressReader addressReader;
+    private final MemberReader memberReader;
+    private final CrewReader crewReader;
+    private final CrewWriter crewWriter;
     private final MemberRepository memberRepository;
     private final CrewRepository crewRepository;
     private final MemberPositionRepository memberPositionRepository;
@@ -63,28 +71,15 @@ public class CrewMemberService {
      */
     @Transactional
     public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
-        final CrewEntity crew = crewRepository.getCrewById(crewId);
-        final Member member = memberRepository.getMemberById(loggedInMemberId);
+        final Crew crew = crewReader.read(crewId);
+        final MemberDomain member = memberReader.readByMemberId(loggedInMemberId);
 
-        validateIsAlreadyRegisteredCrewMember(crewId, loggedInMemberId);
-
-        final CrewMemberEntity newCrewMember = CrewMemberEntity.builder()
-                .memberId(member.getId())
-                .crewId(crew.getId())
-                .build();
-
-        crewMemberRepository.save(newCrewMember);
+        crewWriter.register(member, crew);
 
         eventPublisher.publishEvent(CrewJoinRequestNotificationEvent.builder()
                 .crewId(crewId)
-                .memberId(crew.getLeaderId())
+                .memberId(crew.getLeader().getMemberId())
                 .build());
-    }
-
-    private void validateIsAlreadyRegisteredCrewMember(final Long crewId, final Long memberId) {
-        if (crewMemberRepository.existsByCrewIdAndMemberId(crewId, memberId)) {
-            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, crewId, memberId);
-        }
     }
 
     /**
