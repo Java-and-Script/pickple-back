@@ -29,4 +29,8 @@ public class MemberDomain {
     private List<Position> positions;
     private List<Crew> joinedCrews;
     private List<Game> joinedGames;
+
+    public Boolean isIdMatched(final Long memberId) {
+        return this.memberId.equals(memberId);
+    }
 }

@@ -3,13 +3,10 @@ package kr.pickple.back.crew.service;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
-import java.util.List;
-
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
@@ -20,7 +17,6 @@ import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
-import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
@@ -30,12 +26,9 @@ import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberDomain;
-import kr.pickple.back.member.domain.MemberPosition;
-import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
-import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -71,7 +64,7 @@ public class CrewMemberService {
      */
     @Transactional
     public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
-        final Crew crew = crewReader.read(crewId);
+        final Crew crew = crewReader.read(crewId, CONFIRMED);
         final MemberDomain member = memberReader.readByMemberId(loggedInMemberId);
 
         crewWriter.register(member, crew);
@@ -85,39 +78,18 @@ public class CrewMemberService {
     /**
      * 크루에 가입 신청된 혹은 확정된 사용자 정보 목록 조회
      */
-    public CrewProfileResponse findAllCrewMembers(
+    public Crew findCrewMembersByStatus(
             final Long loggedInMemberId,
             final Long crewId,
             final RegistrationStatus status
     ) {
-        final CrewEntity crew = crewRepository.getCrewById(crewId);
+        final Crew crew = crewReader.read(crewId, status);
 
-        validateIsLeader(loggedInMemberId, crew);
+        if (!crew.isLeader(loggedInMemberId)) {
+            throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
+        }
 
-        final List<MemberResponse> memberResponses = crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
-                .stream()
-                .map(crewMember -> memberRepository.getMemberById(crewMember.getMemberId()))
-                .map(member -> MemberResponse.of(
-                                member,
-                                getPositionsByMember(member),
-                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id())
-                        )
-                )
-                .toList();
-
-        final MainAddress mainAddress = addressReader.readMainAddressById(
-                crew.getAddressDepth1Id(),
-                crew.getAddressDepth2Id()
-        );
-
-        return CrewProfileResponse.of(crew, memberResponses, mainAddress);
-    }
-
-    private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-                member.getId());
-
-        return Position.fromMemberPositions(memberPositions);
+        return crew;
     }
 
     /**

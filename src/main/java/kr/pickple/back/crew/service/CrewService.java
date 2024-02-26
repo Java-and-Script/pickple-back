@@ -1,6 +1,7 @@
 package kr.pickple.back.crew.service;
 
 import static kr.pickple.back.chat.domain.RoomType.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import java.text.MessageFormat;
@@ -80,7 +81,7 @@ public class CrewService {
      * 크루 상세 조회
      */
     public Crew findCrewById(final Long crewId) {
-        return crewReader.read(crewId);
+        return crewReader.read(crewId, CONFIRMED);
     }
 
     /**

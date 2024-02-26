@@ -59,4 +59,8 @@ public class Crew {
 
         members.add(member);
     }
+
+    public Boolean isLeader(final Long memberId) {
+        return leader.isIdMatched(memberId);
+    }
 }

@@ -54,7 +54,7 @@ public class MemberService {
         final List<Crew> crews = crewMemberRepository.findAllByMemberIdAndStatus(memberProfile.getMemberId(),
                         CONFIRMED)
                 .stream()
-                .map(crewMember -> crewReader.read(crewMember.getCrewId()))
+                .map(crewMember -> crewReader.read(crewMember.getCrewId(), CONFIRMED))
                 .toList();
 
         memberProfile.updateJoinedCrews(crews);

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
@@ -47,13 +48,13 @@ public class CrewMapper {
                 .build();
     }
 
-    public Crew mapCrewEntityToDomain(final CrewEntity crewEntity) {
+    public Crew mapCrewEntityToDomain(final CrewEntity crewEntity, final RegistrationStatus status) {
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 crewEntity.getAddressDepth1Id(),
                 crewEntity.getAddressDepth2Id()
         );
 
-        final List<MemberDomain> members = crewMemberRepository.findAllByCrewIdAndStatus(crewEntity.getId(), CONFIRMED)
+        final List<MemberDomain> members = crewMemberRepository.findAllByCrewIdAndStatus(crewEntity.getId(), status)
                 .stream()
                 .map(crewMember -> memberReader.readByMemberId(crewMember.getMemberId()))
                 .toList();
