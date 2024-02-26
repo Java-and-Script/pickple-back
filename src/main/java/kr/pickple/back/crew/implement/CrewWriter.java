@@ -23,7 +23,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewWriter {
 
-    private final CrewReader crewReader;
     private final CrewMapper crewMapper;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
@@ -60,13 +59,24 @@ public class CrewWriter {
         return crewMember;
     }
 
-    public void updateRegistrationStatus(final CrewMember crewMember, final RegistrationStatus status) {
+    public void updateMemberRegistrationStatus(final CrewMember crewMember, final RegistrationStatus status) {
         crewMember.updateRegistrationStatus(status);
         crewMemberRepository.updateRegistrationStatus(crewMember.getCrewMemberId(), status);
 
         final Crew crew = crewMember.getCrew();
-        crew.addMember(crewMember.getMember());
         crew.increaseMemberCount();
         crewRepository.updateMemberCountAndStatus(crew.getCrewId(), crew.getMemberCount(), crew.getStatus());
+    }
+
+    public void cancel(final CrewMember crewMember) {
+        if (crewMember.getStatus() != WAITING) {
+            throw new CrewException(CREW_MEMBER_STATUS_IS_NOT_WAITING, crewMember.getCrewMemberId());
+        }
+
+        delete(crewMember);
+    }
+
+    public void delete(final CrewMember crewMember) {
+        crewMemberRepository.deleteById(crewMember.getCrewMemberId());
     }
 }
