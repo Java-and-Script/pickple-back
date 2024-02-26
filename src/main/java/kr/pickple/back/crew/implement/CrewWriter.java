@@ -5,14 +5,13 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.RequiredArgsConstructor;
 
@@ -21,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewWriter {
 
-    private final AddressReader addressReader;
     private final CrewMapper crewMapper;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
@@ -37,9 +35,16 @@ public class CrewWriter {
     }
 
     public void register(final MemberDomain member, final Crew crew) {
+        final Long memberId = member.getMemberId();
+        final Long crewId = crew.getCrewId();
+
+        if (crewMemberRepository.existsByCrewIdAndMemberId(crewId, memberId)) {
+            throw new CrewException(CREW_MEMBER_ALREADY_EXISTED, crewId, memberId);
+        }
+
         final CrewMember crewMember = CrewMember.builder()
-                .memberId(member.getMemberId())
-                .crewId(crew.getCrewId())
+                .memberId(memberId)
+                .crewId(crewId)
                 .build();
 
         crewMember.confirmRegistration();
@@ -47,6 +52,6 @@ public class CrewWriter {
 
         crew.addMember(member);
         crew.increaseMemberCount();
-        crewRepository.updateMemberCountAndStatus(crew.getCrewId(), crew.getMemberCount(), crew.getStatus());
+        crewRepository.updateMemberCountAndStatus(crewId, crew.getMemberCount(), crew.getStatus());
     }
 }
