@@ -1,6 +1,7 @@
 package kr.pickple.back.crew.implement;
 
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import java.util.List;
 
@@ -10,12 +11,14 @@ import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.NewCrew;
+import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
+import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,7 @@ public class CrewMapper {
 
     private final AddressReader addressReader;
     private final MemberReader memberReader;
+    private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final ChatRoomRepository chatRoomRepository;
 
@@ -80,8 +84,20 @@ public class CrewMapper {
     public CrewMemberEntity mapCrewMemberDomainToEntity(final CrewMember crewMember) {
         return CrewMemberEntity.builder()
                 .status(crewMember.getStatus())
-                .memberId(crewMember.getMemberId())
-                .crewId(crewMember.getCrewId())
+                .memberId(crewMember.getMember().getMemberId())
+                .crewId(crewMember.getCrew().getCrewId())
+                .build();
+    }
+
+    public CrewMember mapCrewMemberEntityToDomain(final CrewMemberEntity crewMemberEntity) {
+        final CrewEntity crewEntity = crewRepository.findById(crewMemberEntity.getCrewId())
+                .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewMemberEntity.getCrewId()));
+
+        return CrewMember.builder()
+                .crewMemberId(crewMemberEntity.getId())
+                .status(crewMemberEntity.getStatus())
+                .member(memberReader.readByMemberId(crewMemberEntity.getMemberId()))
+                .crew(mapCrewEntityToDomain(crewEntity, CONFIRMED))
                 .build();
     }
 }

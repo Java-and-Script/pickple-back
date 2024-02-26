@@ -22,6 +22,7 @@ public enum CrewExceptionCode implements ExceptionCode {
     CREW_MEMBER_STATUS_IS_NOT_WAITING(HttpStatus.BAD_REQUEST, "CRE-010", "해당 크루에 가입 신청 대기 상태가 아니라면, 가입 신청을 취소할 수 없음"),
     CREW_LEADER_CANNOT_BE_DELETED(HttpStatus.BAD_REQUEST, "CRE-011", "크루장은 자신의 크루에서 삭제될 수 없음"),
     CREW_CREATE_MAX_COUNT_EXCEEDED(HttpStatus.BAD_REQUEST, "CRE-012", "사용자는 크루를 특정 MAX 값을 초과하여 생성할 수 없음"),
+    CREW_MEMBER_ALREADY_IN_THAT_REGISTRATION_STATUS(HttpStatus.BAD_REQUEST, "CRE-013", "크루원은 이미 해당 등록 상태를 가지고 있음"),
     ;
 
     private final HttpStatus status;

@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RegistrationStatus {
 
-    NONE("없음"),
     WAITING("대기"),
     CONFIRMED("확정"),
     ;

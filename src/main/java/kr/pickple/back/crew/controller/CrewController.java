@@ -98,7 +98,7 @@ public class CrewController {
                 loggedInMemberId,
                 crewId,
                 memberId,
-                crewMemberStatusUpdateRequest
+                crewMemberStatusUpdateRequest.getStatus()
         );
 
         return ResponseEntity.status(NO_CONTENT)

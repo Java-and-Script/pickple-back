@@ -30,7 +30,7 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long> {
 
     Integer countByLeaderId(final Long leaderId);
 
-    @Query("update CrewEntity c set c.memberCount = :memberCount, c.status =: status where c.id = :crewId")
+    @Query("update CrewEntity c set c.memberCount = :memberCount, c.status = :status where c.id = :crewId")
     void updateMemberCountAndStatus(final Long crewId, final Integer memberCount, final CrewStatus status);
 
     default CrewEntity getCrewById(final Long crewId) {
