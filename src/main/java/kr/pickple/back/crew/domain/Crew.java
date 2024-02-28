@@ -3,8 +3,6 @@ package kr.pickple.back.crew.domain;
 import static kr.pickple.back.crew.domain.CrewStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
-import java.util.List;
-
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.member.domain.MemberDomain;
@@ -34,7 +32,6 @@ public class Crew {
     private Integer likeCount;
     private Integer competitionPoint;
     private ChatRoom chatRoom;
-    private List<MemberDomain> members;
 
     public void increaseMemberCount() {
         if (status == CLOSED) {

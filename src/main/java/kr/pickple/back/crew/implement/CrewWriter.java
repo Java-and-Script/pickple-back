@@ -6,6 +6,8 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -23,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CrewWriter {
 
-    private final CrewMapper crewMapper;
+    private final AddressReader addressReader;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
 
@@ -32,10 +34,20 @@ public class CrewWriter {
             throw new CrewException(CREW_IS_EXISTED, newCrew.getName());
         }
 
-        final CrewEntity crewEntity = crewMapper.mapNewCrewDomainToEntity(newCrew);
+        final MainAddress mainAddress = addressReader.readMainAddressByNames(
+                newCrew.getAddressDepth1Name(),
+                newCrew.getAddressDepth2Name()
+        );
+
+        final CrewEntity crewEntity = CrewMapper.mapNewCrewDomainToEntity(newCrew, mainAddress);
         final CrewEntity savedCrewEntity = crewRepository.save(crewEntity);
 
-        return crewMapper.mapCrewEntityToDomain(savedCrewEntity, CONFIRMED);
+        return CrewMapper.mapCrewEntityToDomain(
+                savedCrewEntity,
+                mainAddress,
+                newCrew.getLeader(),
+                newCrew.getChatRoom()
+        );
     }
 
     public CrewMember register(final MemberDomain member, final Crew crew) {
@@ -52,7 +64,7 @@ public class CrewWriter {
                 .crew(crew)
                 .build();
 
-        final CrewMemberEntity crewMemberEntity = crewMapper.mapCrewMemberDomainToEntity(crewMember);
+        final CrewMemberEntity crewMemberEntity = CrewMapper.mapCrewMemberDomainToEntity(crewMember);
         final CrewMemberEntity savedCrewMemberEntity = crewMemberRepository.save(crewMemberEntity);
         crewMember.updateCrewMemberId(savedCrewMemberEntity.getId());
 

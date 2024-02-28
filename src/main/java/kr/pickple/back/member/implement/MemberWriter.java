@@ -14,7 +14,6 @@ import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.mapper.MemberMapper;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
 import kr.pickple.back.position.domain.Position;
