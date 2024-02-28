@@ -18,6 +18,11 @@ import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.NewCrew;
+import kr.pickple.back.crew.dto.mapper.CrewRequestMapper;
+import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
+import kr.pickple.back.crew.dto.request.CrewCreateRequest;
+import kr.pickple.back.crew.dto.response.CrewIdResponse;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
@@ -45,7 +50,9 @@ public class CrewService {
      * 크루 생성
      */
     @Transactional
-    public Long createCrew(final Long loggedInMemberId, final NewCrew newCrew) {
+    public CrewIdResponse createCrew(final Long loggedInMemberId, final CrewCreateRequest crewCreateRequest) {
+        final NewCrew newCrew = CrewRequestMapper.mapToNewCrewDomain(crewCreateRequest);
+
         final MemberDomain leader = memberReader.readByMemberId(loggedInMemberId);
         validateCreateCrewMoreThanMaxCount(loggedInMemberId);
 
@@ -60,7 +67,7 @@ public class CrewService {
         final CrewMember crewLeader = crewWriter.register(leader, crew);
         crewWriter.updateMemberRegistrationStatus(crewLeader, CONFIRMED);
 
-        return crew.getCrewId();
+        return CrewResponseMapper.mapToCrewIdResponseDto(crew.getCrewId());
     }
 
     private void validateCreateCrewMoreThanMaxCount(final Long leaderId) {
@@ -82,18 +89,23 @@ public class CrewService {
     /**
      * 크루 상세 조회
      */
-    public Crew findCrewById(final Long crewId) {
-        return crewReader.read(crewId, CONFIRMED);
+    public CrewProfileResponse findCrewById(final Long crewId) {
+        final Crew crew = crewReader.read(crewId, CONFIRMED);
+
+        return CrewResponseMapper.mapToCrewProfileResponseDto(crew);
     }
 
     /**
      *  사용자 근처 크루 목록 조회
      */
-    public List<Crew> findNearCrewsByAddress(
+    public List<CrewProfileResponse> findNearCrewsByAddress(
             final String addressDepth1Name,
             final String addressDepth2Name,
             final Pageable pageable
     ) {
-        return crewReader.readNearCrewsByAddress(addressDepth1Name, addressDepth2Name, pageable);
+        return crewReader.readNearCrewsByAddress(addressDepth1Name, addressDepth2Name, pageable)
+                .stream()
+                .map(CrewResponseMapper::mapToCrewProfileResponseDto)
+                .toList();
     }
 }

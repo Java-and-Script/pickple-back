@@ -14,6 +14,8 @@ import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
+import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
@@ -52,7 +54,7 @@ public class CrewMemberService {
     /**
      * 크루에 가입 신청된 혹은 확정된 사용자 정보 목록 조회
      */
-    public Crew findCrewMembersByStatus(
+    public CrewProfileResponse findCrewMembersByStatus(
             final Long loggedInMemberId,
             final Long crewId,
             final RegistrationStatus status
@@ -63,7 +65,7 @@ public class CrewMemberService {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
         }
 
-        return crew;
+        return CrewResponseMapper.mapToCrewProfileResponseDto(crew);
     }
 
     /**

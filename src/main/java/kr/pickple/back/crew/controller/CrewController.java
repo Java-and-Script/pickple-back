@@ -19,10 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
 import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.crew.domain.NewCrew;
-import kr.pickple.back.crew.dto.mapper.CrewRequestMapper;
-import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
 import kr.pickple.back.crew.dto.request.CrewCreateRequest;
 import kr.pickple.back.crew.dto.request.CrewMemberUpdateStatusRequest;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
@@ -44,23 +40,16 @@ public class CrewController {
             @Login final Long loggedInMemberId,
             @Valid @RequestBody final CrewCreateRequest crewCreateRequest
     ) {
-        final NewCrew newCrew = CrewRequestMapper.mapToNewCrewDomain(crewCreateRequest);
-        final Long crewId = crewService.createCrew(loggedInMemberId, newCrew);
-        final CrewIdResponse crewIdResponse = CrewResponseMapper.mapToCrewIdResponseDto(crewId);
-
         return ResponseEntity.status(CREATED)
-                .body(crewIdResponse);
+                .body(crewService.createCrew(loggedInMemberId, crewCreateRequest));
     }
 
     @GetMapping("/{crewId}")
     public ResponseEntity<CrewProfileResponse> findCrewById(
             @PathVariable final Long crewId
     ) {
-        final Crew crew = crewService.findCrewById(crewId);
-        final CrewProfileResponse crewProfileResponse = CrewResponseMapper.mapToCrewProfileResponseDto(crew);
-
         return ResponseEntity.status(OK)
-                .body(crewProfileResponse);
+                .body(crewService.findCrewById(crewId));
     }
 
     @PostMapping("/{crewId}/members")
@@ -80,11 +69,8 @@ public class CrewController {
             @PathVariable final Long crewId,
             @RequestParam final RegistrationStatus status
     ) {
-        final Crew crew = crewMemberService.findCrewMembersByStatus(loggedInMemberId, crewId, status);
-        final CrewProfileResponse crewProfileResponse = CrewResponseMapper.mapToCrewProfileResponseDto(crew);
-
         return ResponseEntity.status(OK)
-                .body(crewProfileResponse);
+                .body(crewMemberService.findCrewMembersByStatus(loggedInMemberId, crewId, status));
     }
 
     @PatchMapping("/{crewId}/members/{memberId}")
@@ -123,12 +109,7 @@ public class CrewController {
             @RequestParam final String addressDepth2,
             final Pageable pageable
     ) {
-        final List<Crew> nearCrews = crewService.findNearCrewsByAddress(addressDepth1, addressDepth2, pageable);
-        final List<CrewProfileResponse> crewProfileResponses = nearCrews.stream()
-                .map(CrewResponseMapper::mapToCrewProfileResponseDto)
-                .toList();
-
         return ResponseEntity.status(OK)
-                .body(crewProfileResponses);
+                .body(crewService.findNearCrewsByAddress(addressDepth1, addressDepth2, pageable));
     }
 }
