@@ -53,6 +53,17 @@ public final class MemberResponseMapper {
     }
 
     public static MemberResponse mapToMemberResponseDto(final MemberDomain member) {
-        return MemberResponse.of(member);
+        return MemberResponse.builder()
+                .id(member.getMemberId())
+                .email(member.getEmail())
+                .nickname(member.getNickname())
+                .introduction(member.getIntroduction())
+                .profileImageUrl(member.getProfileImageUrl())
+                .mannerScore(member.getMannerScore())
+                .mannerScoreCount(member.getMannerScoreCount())
+                .addressDepth1(member.getAddressDepth1Name())
+                .addressDepth2(member.getAddressDepth2Name())
+                .positions(member.getPositions())
+                .build();
     }
 }

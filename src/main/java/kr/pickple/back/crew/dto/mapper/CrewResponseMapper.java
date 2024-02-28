@@ -6,6 +6,7 @@ import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.dto.response.CrewResponse;
+import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.AccessLevel;
@@ -18,9 +19,8 @@ public final class CrewResponseMapper {
         return CrewIdResponse.from(crewId);
     }
 
-    public static CrewProfileResponse mapToCrewProfileResponseDto(final Crew crew) {
-        final List<MemberResponse> memberResponses = crew.getMembers()
-                .stream()
+    public static CrewProfileResponse mapToCrewProfileResponseDto(final Crew crew, final List<MemberDomain> members) {
+        final List<MemberResponse> memberResponses = members.stream()
                 .map(MemberResponseMapper::mapToMemberResponseDto)
                 .toList();
 

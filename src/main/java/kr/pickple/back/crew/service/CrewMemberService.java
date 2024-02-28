@@ -1,7 +1,8 @@
 package kr.pickple.back.crew.service;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+
+import java.util.List;
 
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -40,7 +41,7 @@ public class CrewMemberService {
      */
     @Transactional
     public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
-        final Crew crew = crewReader.read(crewId, CONFIRMED);
+        final Crew crew = crewReader.read(crewId);
         final MemberDomain member = memberReader.readByMemberId(loggedInMemberId);
 
         crewWriter.register(member, crew);
@@ -59,13 +60,15 @@ public class CrewMemberService {
             final Long crewId,
             final RegistrationStatus status
     ) {
-        final Crew crew = crewReader.read(crewId, status);
+        final Crew crew = crewReader.read(crewId);
 
         if (!crew.isLeader(loggedInMemberId)) {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
         }
 
-        return CrewResponseMapper.mapToCrewProfileResponseDto(crew);
+        final List<MemberDomain> members = crewReader.readAllMembersInStatus(crewId, status);
+
+        return CrewResponseMapper.mapToCrewProfileResponseDto(crew, members);
     }
 
     /**

@@ -90,9 +90,10 @@ public class CrewService {
      * 크루 상세 조회
      */
     public CrewProfileResponse findCrewById(final Long crewId) {
-        final Crew crew = crewReader.read(crewId, CONFIRMED);
+        final Crew crew = crewReader.read(crewId);
+        final List<MemberDomain> members = crewReader.readAllMembersInStatus(crewId, CONFIRMED);
 
-        return CrewResponseMapper.mapToCrewProfileResponseDto(crew);
+        return CrewResponseMapper.mapToCrewProfileResponseDto(crew, members);
     }
 
     /**
@@ -105,7 +106,11 @@ public class CrewService {
     ) {
         return crewReader.readNearCrewsByAddress(addressDepth1Name, addressDepth2Name, pageable)
                 .stream()
-                .map(CrewResponseMapper::mapToCrewProfileResponseDto)
+                .map(crew -> {
+                    final List<MemberDomain> members = crewReader.readAllMembersInStatus(crew.getCrewId(), CONFIRMED);
+
+                    return CrewResponseMapper.mapToCrewProfileResponseDto(crew, members);
+                })
                 .toList();
     }
 }

@@ -15,7 +15,6 @@ import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.mapper.MemberMapper;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
 import kr.pickple.back.position.domain.Position;
@@ -35,7 +34,17 @@ public class MemberReader {
         final Member memberEntity = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
 
-        return memberMapper.mapToMemberDomain(memberEntity);
+        final MainAddress mainAddress = addressReader.readMainAddressById(
+                memberEntity.getAddressDepth1Id(),
+                memberEntity.getAddressDepth2Id()
+        );
+
+        final List<Position> positions = memberPositionRepository.findAllByMemberId(memberId)
+                .stream()
+                .map(MemberPosition::getPosition)
+                .toList();
+
+        return memberMapper.mapToMemberDomain(memberEntity, mainAddress, positions);
     }
 
     public MemberProfile readProfileByMemberId(final Long memberId) {

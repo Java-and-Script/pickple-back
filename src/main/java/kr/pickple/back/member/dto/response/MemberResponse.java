@@ -4,7 +4,6 @@ import java.util.List;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -44,21 +43,6 @@ public class MemberResponse {
                 .addressDepth1(mainAddress.getAddressDepth1().getName())
                 .addressDepth2(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
-                .build();
-    }
-
-    public static MemberResponse of(final MemberDomain member) {
-        return MemberResponse.builder()
-                .id(member.getMemberId())
-                .email(member.getEmail())
-                .nickname(member.getNickname())
-                .introduction(member.getIntroduction())
-                .profileImageUrl(member.getProfileImageUrl())
-                .mannerScore(member.getMannerScore())
-                .mannerScoreCount(member.getMannerScoreCount())
-                .addressDepth1(member.getAddressDepth1Name())
-                .addressDepth2(member.getAddressDepth2Name())
-                .positions(member.getPositions())
                 .build();
     }
 }
