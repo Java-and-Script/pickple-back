@@ -10,11 +10,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
-import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
+import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
@@ -38,12 +38,9 @@ public class MemberCrewService {
      * 사용자가 가입한 크루 목록 조회
      */
     public List<CrewProfileResponse> findAllCrewsByMemberId(
-            final Long loggedInMemberId,
             final Long memberId,
             final RegistrationStatus memberStatus
     ) {
-        validateSelfMemberAccess(loggedInMemberId, memberId);
-
         final Member member = memberReader.readEntityByMemberId(memberId);
         final List<CrewEntity> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
                 .stream()
@@ -56,9 +53,7 @@ public class MemberCrewService {
     /**
      * 사용자가 만든 크루 목록 조회
      */
-    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long loggedInMemberId, final Long memberId) {
-        validateSelfMemberAccess(loggedInMemberId, memberId);
-
+    public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long memberId) {
         final Member member = memberReader.readEntityByMemberId(memberId);
         final List<CrewEntity> crews = crewRepository.findAllByLeaderId(member.getId());
 
@@ -69,12 +64,9 @@ public class MemberCrewService {
      * 회원의 크루 가입 신청 여부 조회
      */
     public CrewMemberRegistrationStatusResponse findMemberRegistrationStatusForCrew(
-            final Long loggedInMemberId,
             final Long memberId,
             final Long crewId
     ) {
-        validateSelfMemberAccess(loggedInMemberId, memberId);
-
         final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(crewId, memberId);
 
         return CrewMemberRegistrationStatusResponse.from(crewMember.getStatus());
@@ -95,7 +87,8 @@ public class MemberCrewService {
                 .toList();
     }
 
-    private List<MemberResponse> getMemberResponsesByCrew(final CrewEntity crew, final RegistrationStatus memberStatus) {
+    private List<MemberResponse> getMemberResponsesByCrew(final CrewEntity crew,
+            final RegistrationStatus memberStatus) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
                 .stream()
                 .map(crewMember -> memberReader.readEntityByMemberId(crewMember.getMemberId()))

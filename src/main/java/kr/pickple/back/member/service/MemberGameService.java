@@ -38,12 +38,9 @@ public class MemberGameService {
      * 사용자의 참여 확정 게스트 모집글 목록 조회
      */
     public List<MemberGameResponse> findAllMemberGames(
-            final Long loggedInMemberId,
             final Long memberId,
             final RegistrationStatus memberStatus
     ) {
-        validateSelfMemberAccess(loggedInMemberId, memberId);
-
         final Member member = memberReader.readEntityByMemberId(memberId);
         final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
                 memberStatus);
@@ -54,9 +51,7 @@ public class MemberGameService {
     /**
      * 사용자가 만든 게스트 모집글 목록 조회
      */
-    public List<MemberGameResponse> findAllCreatedGames(final Long loggedInMemberId, final Long memberId) {
-        validateSelfMemberAccess(loggedInMemberId, memberId);
-
+    public List<MemberGameResponse> findAllCreatedGames(final Long memberId) {
         final Member member = memberReader.readEntityByMemberId(memberId);
         final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
@@ -67,12 +62,9 @@ public class MemberGameService {
      * 회원의 게스트 모집 신청 여부 조회
      */
     public GameMemberRegistrationStatusResponse findMemberRegistrationStatusForGame(
-            final Long loggedInMemberId,
             final Long memberId,
             final Long gameId
     ) {
-        validateSelfMemberAccess(loggedInMemberId, memberId);
-
         final Member member = memberReader.readEntityByMemberId(memberId);
         final Game game = gameRepository.getGameById(gameId);
 
@@ -81,13 +73,7 @@ public class MemberGameService {
 
         return GameMemberRegistrationStatusResponse.of(gameMember.getStatus(), gameMember.isAlreadyReviewDone());
     }
-
-    private void validateSelfMemberAccess(Long loggedInMemberId, Long memberId) {
-        if (!loggedInMemberId.equals(memberId)) {
-            throw new MemberException(MEMBER_MISMATCH, loggedInMemberId, memberId);
-        }
-    }
-
+    
     private List<MemberGameResponse> convertToMemberGameResponses(
             final List<GameMember> memberGames,
             final RegistrationStatus memberStatus
