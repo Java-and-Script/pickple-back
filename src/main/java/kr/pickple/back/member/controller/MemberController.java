@@ -83,10 +83,8 @@ public class MemberController {
 
     @GetMapping("/{memberId}")
     public ResponseEntity<MemberProfileResponse> findMemberProfileById(@PathVariable final Long memberId) {
-        final MemberProfileResponse memberProfileResponse = memberService.findMemberProfileById(memberId);
-
         return ResponseEntity.status(OK)
-                .body(memberProfileResponse);
+                .body(memberService.findMemberProfileById(memberId));
     }
 
     @Identification
