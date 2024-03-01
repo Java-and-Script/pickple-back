@@ -1,9 +1,12 @@
 package kr.pickple.back.crew.implement;
 
+import java.util.List;
+
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
@@ -69,6 +72,30 @@ public final class CrewMapper {
                 .status(crewMemberEntity.getStatus())
                 .member(member)
                 .crew(crew)
+                .build();
+    }
+
+    public static CrewProfile mapCrewEntityToCrewProfile(
+            final CrewEntity crewEntity,
+            final MainAddress mainAddress,
+            final MemberDomain leader,
+            final List<MemberDomain> members
+    ) {
+        return CrewProfile.builder()
+                .crewId(crewEntity.getId())
+                .name(crewEntity.getName())
+                .content(crewEntity.getContent())
+                .memberCount(crewEntity.getMemberCount())
+                .maxMemberCount(crewEntity.getMaxMemberCount())
+                .profileImageUrl(crewEntity.getProfileImageUrl())
+                .backgroundImageUrl(crewEntity.getBackgroundImageUrl())
+                .status(crewEntity.getStatus())
+                .likeCount(crewEntity.getLikeCount())
+                .competitionPoint(crewEntity.getCompetitionPoint())
+                .leader(leader)
+                .addressDepth1(mainAddress.getAddressDepth1().getName())
+                .addressDepth2(mainAddress.getAddressDepth2().getName())
+                .members(members)
                 .build();
     }
 }

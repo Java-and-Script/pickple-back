@@ -1,5 +1,6 @@
 package kr.pickple.back.crew.implement;
 
+import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
@@ -17,6 +18,7 @@ import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
@@ -116,5 +118,41 @@ public class CrewReader {
                 .toList();
 
         return MemberMapper.mapToMemberDomain(memberEntity, mainAddress, positions);
+    }
+
+    public List<CrewProfile> readAllCrewProfilesByMemberIdAndStatus(
+            final Long memberId,
+            final RegistrationStatus memberStatus
+    ) {
+        final List<CrewEntity> crewEntities = crewMemberRepository.findAllByMemberIdAndStatus(memberId, memberStatus)
+                .stream()
+                .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
+                .toList();
+
+        return mapCrewEntitiesToCrewProfiles(crewEntities, memberStatus);
+    }
+
+    public List<CrewProfile> readAllCrewProfilesByLeaderId(final Long memberId) {
+        final List<CrewEntity> crewEntities = crewRepository.findAllByLeaderId(memberId);
+
+        return mapCrewEntitiesToCrewProfiles(crewEntities, CONFIRMED);
+    }
+
+    private List<CrewProfile> mapCrewEntitiesToCrewProfiles(
+            final List<CrewEntity> crewEntities,
+            final RegistrationStatus registrationStatus
+    ) {
+        return crewEntities.stream()
+                .map(crew -> {
+                    final List<MemberDomain> members = readAllMembersInStatus(crew.getId(), registrationStatus);
+                    final MainAddress mainAddress = addressReader.readMainAddressById(
+                            crew.getAddressDepth1Id(),
+                            crew.getAddressDepth2Id()
+                    );
+                    final MemberDomain leader = readMemberById(crew.getLeaderId());
+
+                    return CrewMapper.mapCrewEntityToCrewProfile(crew, mainAddress, leader, members);
+                })
+                .toList();
     }
 }

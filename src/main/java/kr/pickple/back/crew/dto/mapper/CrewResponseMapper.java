@@ -2,12 +2,15 @@ package kr.pickple.back.crew.dto.mapper;
 
 import java.util.List;
 
+import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
+import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -58,5 +61,37 @@ public final class CrewResponseMapper {
                 .addressDepth1(crew.getAddressDepth1Name())
                 .addressDepth2(crew.getAddressDepth2Name())
                 .build();
+    }
+
+    public static List<CrewProfileResponse> mapToCrewProfilesResponseDto(
+            final List<CrewProfile> crewProfiles
+    ) {
+
+        return crewProfiles.stream()
+                .map(crewProfile -> CrewProfileResponse.builder()
+                        .id(crewProfile.getCrewId())
+                        .name(crewProfile.getName())
+                        .content(crewProfile.getContent())
+                        .memberCount(crewProfile.getMemberCount())
+                        .maxMemberCount(crewProfile.getMaxMemberCount())
+                        .profileImageUrl(crewProfile.getProfileImageUrl())
+                        .backgroundImageUrl(crewProfile.getBackgroundImageUrl())
+                        .status(crewProfile.getStatus())
+                        .likeCount(crewProfile.getLikeCount())
+                        .competitionPoint(crewProfile.getCompetitionPoint())
+                        .leader(MemberResponseMapper.mapToMemberResponseDto(crewProfile.getLeader()))
+                        .addressDepth1(crewProfile.getAddressDepth1())
+                        .addressDepth2(crewProfile.getAddressDepth2())
+                        .members(MemberResponseMapper.mapToMemberResponseDtos(crewProfile.getMembers()))
+                        .build()
+                )
+                .toList();
+
+    }
+
+    public static CrewMemberRegistrationStatusResponse mapToCrewMemberRegistrationStatusResponse(
+            final RegistrationStatus status
+    ) {
+        return CrewMemberRegistrationStatusResponse.from(status);
     }
 }

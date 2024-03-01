@@ -1,27 +1,19 @@
 package kr.pickple.back.member.service;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
-
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
+import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.domain.CrewProfile;
+import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
-import kr.pickple.back.crew.repository.CrewMemberRepository;
-import kr.pickple.back.crew.repository.CrewRepository;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
-import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
-import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
+import kr.pickple.back.crew.implement.CrewReader;
+import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
-import kr.pickple.back.member.dto.response.MemberResponse;
-import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.implement.MemberReader;
-import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,10 +21,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class MemberCrewService {
 
-    private final AddressReader addressReader;
     private final MemberReader memberReader;
-    private final CrewMemberRepository crewMemberRepository;
-    private final CrewRepository crewRepository;
+    private final CrewReader crewReader;
 
     /**
      * 사용자가 가입한 크루 목록 조회
@@ -41,23 +31,23 @@ public class MemberCrewService {
             final Long memberId,
             final RegistrationStatus memberStatus
     ) {
-        final Member member = memberReader.readEntityByMemberId(memberId);
-        final List<CrewEntity> crews = crewMemberRepository.findAllByMemberIdAndStatus(member.getId(), memberStatus)
-                .stream()
-                .map(crewMember -> crewRepository.getCrewById(crewMember.getCrewId()))
-                .toList();
+        final MemberDomain memberDomain = memberReader.readByMemberId(memberId);
+        final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByMemberIdAndStatus(
+                memberDomain.getMemberId(),
+                memberStatus
+        );
 
-        return convertToCrewProfileResponses(crews, memberStatus);
+        return CrewResponseMapper.mapToCrewProfilesResponseDto(crewProfiles);
     }
 
     /**
      * 사용자가 만든 크루 목록 조회
      */
     public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long memberId) {
-        final Member member = memberReader.readEntityByMemberId(memberId);
-        final List<CrewEntity> crews = crewRepository.findAllByLeaderId(member.getId());
+        final MemberDomain memberDomain = memberReader.readByMemberId(memberId);
+        final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByLeaderId(memberDomain.getMemberId());
 
-        return convertToCrewProfileResponses(crews, CONFIRMED);
+        return CrewResponseMapper.mapToCrewProfilesResponseDto(crewProfiles);
     }
 
     /**
@@ -67,50 +57,8 @@ public class MemberCrewService {
             final Long memberId,
             final Long crewId
     ) {
-        final CrewMemberEntity crewMember = crewMemberRepository.getCrewMemberByCrewIdAndMemberId(crewId, memberId);
+        final CrewMember crewMember = crewReader.readCrewMember(crewId, memberId);
 
-        return CrewMemberRegistrationStatusResponse.from(crewMember.getStatus());
-    }
-
-    private List<CrewProfileResponse> convertToCrewProfileResponses(
-            final List<CrewEntity> crews,
-            final RegistrationStatus memberStatus
-    ) {
-
-        return crews.stream()
-                .map(crew -> CrewProfileResponse.of(
-                                crew,
-                                getMemberResponsesByCrew(crew, memberStatus),
-                                addressReader.readMainAddressById(crew.getAddressDepth1Id(), crew.getAddressDepth2Id())
-                        )
-                )
-                .toList();
-    }
-
-    private List<MemberResponse> getMemberResponsesByCrew(final CrewEntity crew,
-            final RegistrationStatus memberStatus) {
-        return crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), memberStatus)
-                .stream()
-                .map(crewMember -> memberReader.readEntityByMemberId(crewMember.getMemberId()))
-                .map(member -> MemberResponse.of(
-                                member,
-                                getPositions(member),
-                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id()
-                                )
-                        )
-                )
-                .toList();
-    }
-
-    private List<Position> getPositions(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionReader.readAll(member.getId());
-
-        return Position.fromMemberPositions(memberPositions);
-    }
-
-    private void validateSelfMemberAccess(final Long loggedInMemberId, final Long memberId) {
-        if (!loggedInMemberId.equals(memberId)) {
-            throw new MemberException(MEMBER_MISMATCH, loggedInMemberId, memberId);
-        }
+        return CrewResponseMapper.mapToCrewMemberRegistrationStatusResponse(crewMember.getStatus());
     }
 }

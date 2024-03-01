@@ -48,7 +48,7 @@ public class MemberWriter {
 
     private void setPositionsToMember(final List<Position> positions, final Long memberId) {
         validateIsDuplicatedPositions(positions);
-        
+
         final List<MemberPosition> memberPositions = MemberMapper.mapToMemberPositionEntities(positions, memberId);
 
         memberPositionRepository.saveAll(memberPositions);
