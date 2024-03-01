@@ -66,4 +66,10 @@ public final class MemberResponseMapper {
                 .positions(member.getPositions())
                 .build();
     }
+
+    public static List<MemberResponse> mapToMemberResponseDtos(final List<MemberDomain> members) {
+        return members.stream()
+                .map(MemberResponseMapper::mapToMemberResponseDto)
+                .toList();
+    }
 }

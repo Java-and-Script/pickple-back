@@ -3,6 +3,7 @@ package kr.pickple.back.member.implement;
 import java.util.List;
 
 import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.domain.MemberPosition;
@@ -44,8 +45,10 @@ public final class MemberMapper {
     public static MemberProfile mapToMemberProfileDomain(
             final Member member,
             final MainAddress mainAddress,
-            final List<Position> positions
+            final List<Position> positions,
+            final List<Crew> crews
     ) {
+
         return MemberProfile.builder()
                 .memberId(member.getId())
                 .email(member.getEmail())
@@ -56,6 +59,7 @@ public final class MemberMapper {
                 .addressDepth1Name(mainAddress.getAddressDepth1().getName())
                 .addressDepth2Name(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
+                .joinedCrews(crews)
                 .build();
     }
 
