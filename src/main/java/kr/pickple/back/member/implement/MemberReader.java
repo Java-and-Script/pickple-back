@@ -120,7 +120,7 @@ public class MemberReader {
     public Optional<Member> readByOauthId(final Long oauthId) {
         return memberRepository.findByOauthId(oauthId);
     }
-    
+
     private Member readEntityByMemberId(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));

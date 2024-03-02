@@ -1,25 +1,26 @@
 package kr.pickple.back.chat.service;
 
-import static java.text.MessageFormat.*;
 import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 
-import java.util.List;
+import java.text.MessageFormat;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.domain.ChatRoomMember;
-import kr.pickple.back.chat.domain.RoomType;
-import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
-import kr.pickple.back.chat.dto.response.ChatMemberResponse;
+import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.chat.dto.response.PersonalChatRoomExistedResponse;
 import kr.pickple.back.chat.exception.ChatException;
+import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -28,52 +29,32 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ChatRoomService {
 
+    private final MemberReader memberReader;
+    private final ChatWriter chatWriter;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final MemberRepository memberRepository;
-    private final ChatMessageService chatMessageService;
     private final ChatValidator chatValidator;
 
     /**
      * 새 1:1 채팅방 생성
      */
     @Transactional
-    public ChatRoomDetailResponse createPersonalRoom(
-            final Long senderId,
-            final PersonalChatRoomCreateRequest personalChatRoomCreateRequest
-    ) {
-        final Long receiverId = personalChatRoomCreateRequest.getReceiverId();
-        final Member receiver = memberRepository.getMemberById(receiverId);
-        final Member sender = memberRepository.getMemberById(senderId);
+    public ChatRoomDetailResponse createPersonalRoom(final Long senderId, final Long receiverId) {
+        if (senderId.equals(receiverId)) {
+            throw new ChatException(CHAT_MEMBER_CANNOT_CHAT_SELF, senderId);
+        }
 
-        chatValidator.validateIsSelfChat(receiver, sender);
+        final MemberDomain sender = memberReader.readByMemberId(senderId);
+        final MemberDomain receiver = memberReader.readByMemberId(receiverId);
 
-        final String personalRoomName = format("{0},{1}", sender.getNickname(), receiver.getNickname());
-        final ChatRoom savedChatRoom = saveNewChatRoom(sender, personalRoomName, PERSONAL);
-        chatMessageService.enterRoomAndSaveEnteringMessages(savedChatRoom, receiver);
+        final String roomName = MessageFormat.format("{0},{1}", sender.getNickname(), receiver.getNickname());
+        final ChatRoomDomain chatRoom = chatWriter.createNewRoom(PERSONAL, roomName);
 
-        return ChatRoomDetailResponse.of(savedChatRoom, receiver, getChatMemberResponses(savedChatRoom));
-    }
+        chatWriter.enterRoom(sender, chatRoom);
+        chatWriter.enterRoom(receiver, chatRoom);
 
-    private List<ChatMemberResponse> getChatMemberResponses(final ChatRoom chatRoom) {
-        return chatRoomMemberRepository.findAllByActiveTrueAndChatRoomId(chatRoom.getId())
-                .stream()
-                .map(chatRoomMember -> memberRepository.getMemberById(chatRoomMember.getMemberId()))
-                .map(ChatMemberResponse::from)
-                .toList();
-    }
-
-    @Transactional
-    public ChatRoom saveNewChatRoom(final Member member, final String roomName, final RoomType type) {
-        final ChatRoom newChatRoom = ChatRoom.builder()
-                .type(type)
-                .name(roomName)
-                .build();
-
-        final ChatRoom savedChatRoom = chatRoomRepository.save(newChatRoom);
-        chatMessageService.enterRoomAndSaveEnteringMessages(savedChatRoom, member);
-
-        return savedChatRoom;
+        return ChatResponseMapper.mapToPersonalChatRoomDetailResponseDto(sender, receiver, chatRoom);
     }
 
     /**
