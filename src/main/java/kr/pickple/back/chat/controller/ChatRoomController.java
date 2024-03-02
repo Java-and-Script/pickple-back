@@ -37,7 +37,7 @@ public class ChatRoomController {
             @RequestBody final PersonalChatRoomCreateRequest personalChatRoomCreateRequest
     ) {
         return ResponseEntity.status(CREATED)
-                .body(chatRoomService.createPersonalRoom(senderId, personalChatRoomCreateRequest));
+                .body(chatRoomService.createPersonalRoom(senderId, personalChatRoomCreateRequest.getReceiverId()));
     }
 
     @GetMapping("/personal")
