@@ -43,7 +43,7 @@ class ChatMessageDocumentTest extends IntegrationChatTest {
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());
         final ChatRoomDetailResponse personalChatRoom = chatRoomService.createPersonalRoom(sender.getId(),
-                personalChatRoomCreateRequest);
+                personalChatRoomCreateRequest.getReceiverId());
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(sender.getId()));
 

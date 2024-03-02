@@ -44,7 +44,7 @@ class ChatRoomDocumentTest extends IntegrationChatTest {
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());
-        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest);
+        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest.getReceiverId());
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(sender.getId()));
         final String requestBody = objectMapper.writeValueAsString(personalChatRoomCreateRequest);
@@ -123,7 +123,7 @@ class ChatRoomDocumentTest extends IntegrationChatTest {
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());
-        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest);
+        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest.getReceiverId());
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(sender.getId()));
 
@@ -175,11 +175,11 @@ class ChatRoomDocumentTest extends IntegrationChatTest {
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest1 = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver1.getId());
-        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest1);
+        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest1.getReceiverId());
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest2 = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver2.getId());
-        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest2);
+        chatRoomService.createPersonalRoom(sender.getId(), personalChatRoomCreateRequest2.getReceiverId());
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(sender.getId()));
 
@@ -248,7 +248,7 @@ class ChatRoomDocumentTest extends IntegrationChatTest {
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());
         final ChatRoomDetailResponse personalChatRoom = chatRoomService.createPersonalRoom(sender.getId(),
-                personalChatRoomCreateRequest);
+                personalChatRoomCreateRequest.getReceiverId());
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(sender.getId()));
 
