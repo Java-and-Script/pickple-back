@@ -8,7 +8,6 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
@@ -56,8 +55,8 @@ public class ChatRoomFindService {
     /**
      * 단일 채팅방 정보 상세 조회
      */
-    public ChatRoomDetailResponse findChatRoomById(final Long loggedInMemberId, final Long roomId) {
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
+    public ChatRoomDetailResponse findChatRoomById(final Long loggedInMemberId, final Long chatRoomId) {
+        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
 
         return getChatRoomDetailResponse(loggedInMemberId, chatRoom);
     }
