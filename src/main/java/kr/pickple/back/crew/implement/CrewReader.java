@@ -1,5 +1,6 @@
 package kr.pickple.back.crew.implement;
 
+import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
@@ -13,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.repository.ChatRoomRepository;
+import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -44,7 +44,6 @@ public class CrewReader {
     private final MemberPositionRepository memberPositionRepository;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
-    private final ChatRoomRepository chatRoomRepository;
 
     public Integer countByLeaderId(final Long leaderId) {
         return crewRepository.countByLeaderId(leaderId);
@@ -54,15 +53,25 @@ public class CrewReader {
         final CrewEntity crewEntity = crewRepository.findById(crewId)
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
+        return mapCrewEntityToDomain(crewEntity);
+    }
+
+    public Crew readByChatRoomId(final Long chatRoomId) {
+        final CrewEntity crewEntity = crewRepository.findByChatRoomId(chatRoomId)
+                .orElseThrow(() -> new ChatException(CHAT_CREW_NOT_FOUND, chatRoomId));
+
+        return mapCrewEntityToDomain(crewEntity);
+    }
+
+    private Crew mapCrewEntityToDomain(final CrewEntity crewEntity) {
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 crewEntity.getAddressDepth1Id(),
                 crewEntity.getAddressDepth2Id()
         );
 
         final MemberDomain leader = readMemberById(crewEntity.getLeaderId());
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(crewEntity.getChatRoomId());
 
-        return CrewMapper.mapCrewEntityToDomain(crewEntity, mainAddress, leader, chatRoom);
+        return CrewMapper.mapCrewEntityToDomain(crewEntity, mainAddress, leader);
     }
 
     public List<Crew> readNearCrewsByAddress(
@@ -78,13 +87,12 @@ public class CrewReader {
         );
 
         return crewEntities.stream()
-                .map(crewEntity -> {
-                    final MemberDomain leader = readMemberById(crewEntity.getLeaderId());
-                    final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(crewEntity.getChatRoomId());
-
-                    return CrewMapper.mapCrewEntityToDomain(crewEntity, mainAddress, leader, chatRoom);
-                })
-                .toList();
+                .map(crewEntity -> CrewMapper.mapCrewEntityToDomain(
+                                crewEntity,
+                                mainAddress,
+                                readMemberById(crewEntity.getLeaderId())
+                        )
+                ).toList();
     }
 
     public CrewMember readCrewMember(final Long memberId, final Long crewId) {

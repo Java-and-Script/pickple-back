@@ -34,8 +34,7 @@ public final class CrewMapper {
     public static Crew mapCrewEntityToDomain(
             final CrewEntity crewEntity,
             final MainAddress mainAddress,
-            final MemberDomain leader,
-            final ChatRoom chatRoom
+            final MemberDomain leader
     ) {
         return Crew.builder()
                 .crewId(crewEntity.getId())
@@ -50,7 +49,6 @@ public final class CrewMapper {
                 .backgroundImageUrl(crewEntity.getBackgroundImageUrl())
                 .likeCount(crewEntity.getLikeCount())
                 .competitionPoint(crewEntity.getCompetitionPoint())
-                .chatRoom(chatRoom)
                 .build();
     }
 

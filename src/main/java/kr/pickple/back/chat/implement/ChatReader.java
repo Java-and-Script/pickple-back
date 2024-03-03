@@ -2,30 +2,25 @@ package kr.pickple.back.chat.implement;
 
 import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.address.implement.AddressReader;
+import kr.pickple.back.chat.domain.ChatMessage;
+import kr.pickple.back.chat.domain.ChatMessageDomain;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.domain.ChatRoomMember;
 import kr.pickple.back.chat.domain.PersonalChatRoomStatus;
+import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.exception.ChatException;
+import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
-import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberDomain;
-import kr.pickple.back.member.domain.MemberPosition;
-import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.implement.MemberMapper;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
-import kr.pickple.back.position.domain.Position;
+import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -33,11 +28,10 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ChatReader {
 
-    private final AddressReader addressReader;
-    private final MemberRepository memberRepository;
-    private final MemberPositionRepository memberPositionRepository;
+    private final MemberReader memberReader;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
+    private final ChatMessageRepository chatMessageRepository;
 
     public ChatRoomDomain readRoom(final Long chatRoomId) {
         final ChatRoom chatRoomEntity = chatRoomRepository.findById(chatRoomId)
@@ -65,27 +59,34 @@ public class ChatReader {
                 .build();
     }
 
-    public List<MemberDomain> readRoomMembers(final ChatRoom chatRoom) {
-        return chatRoomMemberRepository.findAllByActiveTrueAndChatRoomId(chatRoom.getId())
+    public List<ChatRoomDomain> readEnteringRoomsByType(final Long memberId, final RoomType type) {
+        return chatRoomMemberRepository.findAllByActiveTrueAndMemberId(memberId)
                 .stream()
-                .map(chatRoomMember -> readMemberById(chatRoomMember.getMemberId()))
+                .map(chatRoomMemberEntity -> readRoom(chatRoomMemberEntity.getChatRoomId()))
+                .filter(chatRoom -> chatRoom.isMatchedRoomType(type))
                 .toList();
     }
 
-    private MemberDomain readMemberById(final Long memberId) {
-        final Member memberEntity = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    public MemberDomain readReceiver(final Long senderId, final Long chatRoomId) {
+        final ChatRoomMember receiverEntity = chatRoomMemberRepository.findByChatRoomIdAndMemberIdNot(
+                        chatRoomId, senderId)
+                .orElseThrow(() -> new ChatException(CHAT_RECEIVER_NOT_FOUND));
 
-        final MainAddress mainAddress = addressReader.readMainAddressById(
-                memberEntity.getAddressDepth1Id(),
-                memberEntity.getAddressDepth2Id()
-        );
+        return memberReader.readByMemberId(receiverEntity.getMemberId());
+    }
 
-        final List<Position> positions = memberPositionRepository.findAllByMemberId(memberId)
+    public List<MemberDomain> readRoomMembers(final Long chatRoomId) {
+        return chatRoomMemberRepository.findAllByActiveTrueAndChatRoomId(chatRoomId)
                 .stream()
-                .map(MemberPosition::getPosition)
+                .map(chatRoomMember -> memberReader.readByMemberId(chatRoomMember.getMemberId()))
                 .toList();
+    }
 
-        return MemberMapper.mapToMemberDomain(memberEntity, mainAddress, positions);
+    public ChatMessageDomain readLastMessage(final ChatRoomDomain chatRoom) {
+        final ChatMessage lastMessageEntity = chatMessageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(
+                chatRoom.getChatRoomId());
+        final MemberDomain sender = memberReader.readByMemberId(lastMessageEntity.getSenderId());
+
+        return ChatMapper.mapChatMessageEntityToDomain(lastMessageEntity, sender, chatRoom);
     }
 }

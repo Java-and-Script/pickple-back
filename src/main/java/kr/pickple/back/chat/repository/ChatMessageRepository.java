@@ -23,8 +23,10 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             """)
     Optional<ChatMessage> findLastEnteringChatMessageBySenderId(final Long senderId);
 
-    List<ChatMessage> findAllByChatRoomIdAndCreatedAtGreaterThanEqual(final Long chatRoomId,
-            final LocalDateTime createdAt);
+    List<ChatMessage> findAllByChatRoomIdAndCreatedAtGreaterThanEqual(
+            final Long chatRoomId,
+            final LocalDateTime createdAt
+    );
 
     ChatMessage findTopByChatRoomIdOrderByCreatedAtDesc(final Long chatRoomId);
 

@@ -25,24 +25,4 @@ public class ChatRoomResponse {
     private String lastMessageContent;
     private LocalDateTime lastMessageCreatedAt;
     private LocalDateTime createdAt;
-
-    public static ChatRoomResponse of(
-            final ChatRoomDetailResponse chatRoomDetail,
-            final String lastMessageContent,
-            final LocalDateTime lastMessageCreatedAt
-    ) {
-        return ChatRoomResponse.builder()
-                .id(chatRoomDetail.getId())
-                .roomName(chatRoomDetail.getRoomName())
-                .roomIconImageUrl(chatRoomDetail.getRoomIconImageUrl())
-                .type(chatRoomDetail.getType())
-                .memberCount(chatRoomDetail.getMemberCount())
-                .maxMemberCount(chatRoomDetail.getMaxMemberCount())
-                .playStartTime(chatRoomDetail.getPlayStartTime())
-                .playTimeMinutes(chatRoomDetail.getPlayTimeMinutes())
-                .lastMessageContent(lastMessageContent)
-                .lastMessageCreatedAt(lastMessageCreatedAt)
-                .createdAt(chatRoomDetail.getCreatedAt())
-                .build();
-    }
 }

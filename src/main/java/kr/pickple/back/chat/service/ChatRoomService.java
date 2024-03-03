@@ -1,6 +1,5 @@
 package kr.pickple.back.chat.service;
 
-import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 
 import java.text.MessageFormat;
@@ -40,7 +39,7 @@ public class ChatRoomService {
         final MemberDomain receiver = memberReader.readByMemberId(receiverId);
 
         final String roomName = MessageFormat.format("{0},{1}", sender.getNickname(), receiver.getNickname());
-        final ChatRoomDomain chatRoom = chatWriter.createNewRoom(PERSONAL, roomName);
+        final ChatRoomDomain chatRoom = chatWriter.createNewPersonalRoom(roomName);
 
         chatWriter.enterRoom(sender, chatRoom);
         chatWriter.enterRoom(receiver, chatRoom);

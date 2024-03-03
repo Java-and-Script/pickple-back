@@ -41,9 +41,10 @@ public class ChatRoom extends BaseEntity {
     private Integer maxMemberCount = 2;
 
     @Builder
-    private ChatRoom(final String name, final RoomType type) {
+    private ChatRoom(final String name, final RoomType type, final Integer maxMemberCount) {
         this.name = name;
         this.type = type;
+        this.maxMemberCount = maxMemberCount;
     }
 
     public void increaseMemberCount() {
@@ -68,10 +69,6 @@ public class ChatRoom extends BaseEntity {
 
     public Boolean isEmpty() {
         return memberCount == 0;
-    }
-
-    public Boolean isMatchedRoomType(final RoomType type) {
-        return this.type == type;
     }
 
     public void updateMaxMemberCount(final Integer maxMemberCount) {
