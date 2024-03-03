@@ -61,19 +61,19 @@ public class ChatMessageService {
      */
     @Transactional
     public ChatMessageResponse sendMessage(
-            final Long roomId,
+            final Long chatRoomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member sender = memberRepository.getMemberById(chatMessageCreateRequest.getSenderId());
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
+        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final MemberDomain sender = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final ChatMessageDomain chatMessage = chatWriter.sendMessage(
+                TALK,
+                chatMessageCreateRequest.getContent(),
+                sender,
+                chatRoom
+        );
 
-        chatValidator.validateIsExistedRoomMember(sender, chatRoom);
-
-        final String content = chatMessageCreateRequest.getContent();
-        final ChatMessage chatMessage = buildChatMessage(TALK, content, chatRoom, sender);
-        final ChatMessage sendingMessage = chatMessageRepository.save(chatMessage);
-
-        return ChatMessageResponse.of(sendingMessage, sender, chatRoom);
+        return ChatResponseMapper.mapToChatMessageResponseDto(chatMessage);
     }
 
     /**
