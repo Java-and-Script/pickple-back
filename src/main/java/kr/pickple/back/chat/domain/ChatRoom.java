@@ -47,30 +47,6 @@ public class ChatRoom extends BaseEntity {
         this.maxMemberCount = maxMemberCount;
     }
 
-    public void increaseMemberCount() {
-        if (isFullRoom()) {
-            throw new ChatException(CHAT_ROOM_IS_FULL, memberCount);
-        }
-
-        memberCount += 1;
-    }
-
-    private Boolean isFullRoom() {
-        return memberCount.equals(maxMemberCount);
-    }
-
-    public void decreaseMemberCount() {
-        if (isEmpty()) {
-            throw new ChatException(CHAT_ROOM_IS_EMPTY, memberCount);
-        }
-
-        memberCount -= 1;
-    }
-
-    public Boolean isEmpty() {
-        return memberCount == 0;
-    }
-
     public void updateMaxMemberCount(final Integer maxMemberCount) {
         if (maxMemberCount < memberCount) {
             throw new ChatException(CHAT_MAX_MEMBER_COUNT_SHOULD_BE_BIGGER_THAN_MEMBER_COUNT, maxMemberCount);

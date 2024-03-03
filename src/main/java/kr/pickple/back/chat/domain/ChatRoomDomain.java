@@ -32,6 +32,18 @@ public class ChatRoomDomain {
         memberCount += 1;
     }
 
+    public void decreaseMemberCount() {
+        if (isEmpty()) {
+            throw new ChatException(CHAT_ROOM_IS_EMPTY, memberCount);
+        }
+
+        memberCount -= 1;
+    }
+
+    public Boolean isEmpty() {
+        return memberCount == 0;
+    }
+
     public Boolean isMatchedRoomType(final RoomType type) {
         return this.type == type;
     }

@@ -11,8 +11,6 @@ import kr.pickple.back.chat.domain.ChatMessage;
 import kr.pickple.back.chat.domain.ChatMessageDomain;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.ChatRoomDomain;
-import kr.pickple.back.chat.domain.ChatRoomMember;
-import kr.pickple.back.chat.domain.MessageType;
 import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
@@ -50,10 +48,10 @@ public class ChatMessageService {
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
         final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
-        final MemberDomain sender = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
-        final ChatMessageDomain enteringMessage = chatWriter.enterRoom(sender, chatRoom);
+        final MemberDomain newMember = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final ChatMessageDomain enterMessage = chatWriter.enterRoom(newMember, chatRoom);
 
-        return ChatResponseMapper.mapToChatMessageResponseDto(enteringMessage);
+        return ChatResponseMapper.mapToChatMessageResponseDto(enterMessage);
     }
 
     /**
@@ -81,44 +79,14 @@ public class ChatMessageService {
      */
     @Transactional
     public ChatMessageResponse leaveChatRoom(
-            final Long roomId,
+            final Long chatRoomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member member = memberRepository.getMemberById(chatMessageCreateRequest.getSenderId());
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
+        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final MemberDomain member = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final ChatMessageDomain leaveMessage = chatWriter.leaveRoom(member, chatRoom);
 
-        chatValidator.validateIsExistedRoomMember(member, chatRoom);
-        chatValidator.validateChatRoomLeavingConditions(member, chatRoom);
-
-        final String content = MessageType.makeLeaveMessage(member.getNickname());
-        final ChatRoomMember chatRoomMember = chatRoomMemberRepository.getByMemberIdAndChatRoomId(member.getId(),
-                chatRoom.getId());
-
-        chatRoomMember.deactivate();
-        chatRoom.decreaseMemberCount();
-
-        if (chatRoom.isEmpty()) {
-            chatRoomRepository.delete(chatRoom);
-        }
-
-        final ChatMessage chatMessage = buildChatMessage(LEAVE, content, chatRoom, member);
-        final ChatMessage leavingMessage = chatMessageRepository.save(chatMessage);
-
-        return ChatMessageResponse.of(leavingMessage, member, chatRoom);
-    }
-
-    private ChatMessage buildChatMessage(
-            final MessageType type,
-            final String content,
-            final ChatRoom chatRoom,
-            final Member member
-    ) {
-        return ChatMessage.builder()
-                .type(type)
-                .content(content)
-                .chatRoomId(chatRoom.getId())
-                .senderId(member.getId())
-                .build();
+        return ChatResponseMapper.mapToChatMessageResponseDto(leaveMessage);
     }
 
     /**

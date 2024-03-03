@@ -44,12 +44,4 @@ public class ChatRoomMember extends BaseEntity {
         this.memberId = memberId;
         this.chatRoomId = chatRoomId;
     }
-
-    public void activate() {
-        active = TRUE;
-    }
-
-    public void deactivate() {
-        active = FALSE;
-    }
 }
