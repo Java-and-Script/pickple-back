@@ -6,6 +6,7 @@ import kr.pickple.back.chat.domain.ChatMessageDomain;
 import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.domain.PersonalChatRoomStatus;
 import kr.pickple.back.chat.dto.response.ChatMemberResponse;
+import kr.pickple.back.chat.dto.response.ChatMessageResponse;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.chat.dto.response.ChatRoomResponse;
 import kr.pickple.back.chat.dto.response.PersonalChatRoomStatusResponse;
@@ -119,6 +120,16 @@ public final class ChatResponseMapper {
         return PersonalChatRoomStatusResponse.builder()
                 .roomId(personalChatRoomStatus.getRoomId())
                 .isSenderActive(personalChatRoomStatus.getIsSenderActive())
+                .build();
+    }
+
+    public static ChatMessageResponse mapToChatMessageResponseDto(final ChatMessageDomain chatMessage) {
+        return ChatMessageResponse.builder()
+                .type(chatMessage.getType())
+                .content(chatMessage.getContent())
+                .sender(mapToChatMemberResponseDto(chatMessage.getSender()))
+                .roomId(chatMessage.getChatRoom().getChatRoomId())
+                .createdAt(chatMessage.getCreatedAt())
                 .build();
     }
 }

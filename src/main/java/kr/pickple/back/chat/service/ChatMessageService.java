@@ -8,15 +8,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.chat.domain.ChatMessage;
+import kr.pickple.back.chat.domain.ChatMessageDomain;
 import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.domain.ChatRoomMember;
 import kr.pickple.back.chat.domain.MessageType;
+import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
+import kr.pickple.back.chat.implement.ChatReader;
+import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
@@ -25,6 +32,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class ChatMessageService {
 
+    private final MemberReader memberReader;
+    private final ChatReader chatReader;
+    private final ChatWriter chatWriter;
     private final ChatMessageRepository chatMessageRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
@@ -36,39 +46,14 @@ public class ChatMessageService {
      */
     @Transactional
     public ChatMessageResponse enterChatRoom(
-            final Long roomId,
+            final Long chatRoomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final Member member = memberRepository.getMemberById(chatMessageCreateRequest.getSenderId());
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
-        final ChatMessage enteringMessage = enterRoomAndSaveEnteringMessages(chatRoom, member);
+        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final MemberDomain sender = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final ChatMessageDomain enteringMessage = chatWriter.enterRoom(sender, chatRoom);
 
-        return ChatMessageResponse.of(enteringMessage, member, chatRoom);
-    }
-
-    @Transactional
-    public ChatMessage enterRoomAndSaveEnteringMessages(final ChatRoom chatRoom, final Member member) {
-        chatValidator.validateIsNotExistedRoomMember(chatRoom, member);
-
-        final String content = MessageType.makeEnterMessage(member.getNickname());
-        final ChatRoomMember chatRoomMember = chatRoomMemberRepository.findByMemberIdAndChatRoomId(member.getId(),
-                        chatRoom.getId())
-                .orElseGet(() -> buildChatRoomMember(chatRoom, member));
-
-        chatRoomMember.activate();
-        chatRoomMemberRepository.save(chatRoomMember);
-        chatRoom.increaseMemberCount();
-
-        final ChatMessage enteringMessage = buildChatMessage(ENTER, content, chatRoom, member);
-
-        return chatMessageRepository.save(enteringMessage);
-    }
-
-    private ChatRoomMember buildChatRoomMember(final ChatRoom chatRoom, final Member member) {
-        return ChatRoomMember.builder()
-                .chatRoomId(chatRoom.getId())
-                .memberId(member.getId())
-                .build();
+        return ChatResponseMapper.mapToChatMessageResponseDto(enteringMessage);
     }
 
     /**

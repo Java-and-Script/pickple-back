@@ -11,9 +11,9 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.common.util.DateTimeUtil;
-import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
@@ -27,18 +27,6 @@ public class ChatValidator {
     private final CrewMemberRepository crewMemberRepository;
     private final GameRepository gameRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
-
-    public void validateIsSelfChat(Member receiver, Member sender) {
-        if (sender.equals(receiver)) {
-            throw new ChatException(CHAT_MEMBER_CANNOT_CHAT_SELF, sender.getId());
-        }
-    }
-
-    public void validateIsNotExistedRoomMember(final ChatRoom chatRoom, final Member member) {
-        if (isExistedRoomMember(chatRoom, member)) {
-            throw new ChatException(CHAT_MEMBER_IS_ALREADY_IN_ROOM, member.getId(), chatRoom.getId());
-        }
-    }
 
     public void validateIsExistedRoomMember(final Member member, final ChatRoom chatRoom) {
         if (!isExistedRoomMember(chatRoom, member)) {
