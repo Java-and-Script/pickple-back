@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.fixture.domain.GameFixtures;
 import kr.pickple.back.game.domain.Game;
@@ -37,7 +37,7 @@ public class GameSetup {
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
         final Game game = GameFixtures.gameBuild(addressDepth1, addressDepth2, host);
-        final ChatRoom savedChatRoom = chatRoomRepository.save(GameFixtures.gameChatRoomBuild());
+        final ChatRoomEntity savedChatRoom = chatRoomRepository.save(GameFixtures.gameChatRoomBuild());
 
         game.addGameMember(host);
         savedChatRoom.updateMaxMemberCount(game.getMaxMemberCount());

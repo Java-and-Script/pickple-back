@@ -8,14 +8,13 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.domain.ChatRoomDomain;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.chat.dto.response.ChatRoomResponse;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.implement.ChatReader;
-import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.game.domain.Game;
@@ -33,7 +32,6 @@ public class ChatRoomFindService {
     private final MemberReader memberReader;
     private final CrewReader crewReader;
     private final ChatReader chatReader;
-    private final ChatRoomRepository chatRoomRepository;
     private final GameRepository gameRepository;
 
     /**
@@ -56,12 +54,12 @@ public class ChatRoomFindService {
      * 단일 채팅방 정보 상세 조회
      */
     public ChatRoomDetailResponse findChatRoomById(final Long loggedInMemberId, final Long chatRoomId) {
-        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
 
         return getChatRoomDetailResponse(loggedInMemberId, chatRoom);
     }
 
-    private ChatRoomDetailResponse getChatRoomDetailResponse(final Long memberId, final ChatRoomDomain chatRoom) {
+    private ChatRoomDetailResponse getChatRoomDetailResponse(final Long memberId, final ChatRoom chatRoom) {
         return switch (chatRoom.getType()) {
             case PERSONAL -> getPersonalChatRoomDetailResponse(memberId, chatRoom);
             case CREW -> getCrewChatRoomDetailResponse(chatRoom);
@@ -71,7 +69,7 @@ public class ChatRoomFindService {
 
     private ChatRoomDetailResponse getPersonalChatRoomDetailResponse(
             final Long senderId,
-            final ChatRoomDomain chatRoom
+            final ChatRoom chatRoom
     ) {
         final MemberDomain sender = memberReader.readByMemberId(senderId);
         final MemberDomain receiver = chatReader.readReceiver(senderId, chatRoom.getChatRoomId());
@@ -79,14 +77,14 @@ public class ChatRoomFindService {
         return ChatResponseMapper.mapToPersonalChatRoomDetailResponseDto(sender, receiver, chatRoom);
     }
 
-    private ChatRoomDetailResponse getCrewChatRoomDetailResponse(final ChatRoomDomain chatRoom) {
+    private ChatRoomDetailResponse getCrewChatRoomDetailResponse(final ChatRoom chatRoom) {
         final Crew crew = crewReader.readByChatRoomId(chatRoom.getChatRoomId());
         final List<MemberDomain> members = chatReader.readRoomMembers(chatRoom.getChatRoomId());
 
         return ChatResponseMapper.mapToCrewChatRoomDetailResponseDto(crew, chatRoom, members);
     }
 
-    private ChatRoomDetailResponse getGameChatRoomDetailResponse(final ChatRoomDomain chatRoom) {
+    private ChatRoomDetailResponse getGameChatRoomDetailResponse(final ChatRoom chatRoom) {
         final Game game = gameRepository.findByChatRoomId(chatRoom.getChatRoomId())
                 .orElseThrow(() -> new ChatException(CHAT_GAME_NOT_FOUND, chatRoom.getChatRoomId()));
         final List<MemberDomain> members = chatReader.readRoomMembers(chatRoom.getChatRoomId());

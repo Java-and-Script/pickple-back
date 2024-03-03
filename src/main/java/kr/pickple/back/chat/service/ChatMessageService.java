@@ -7,19 +7,15 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.domain.ChatMessageDomain;
-import kr.pickple.back.chat.domain.ChatRoomDomain;
+import kr.pickple.back.chat.domain.ChatMessage;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
 import kr.pickple.back.chat.implement.ChatReader;
 import kr.pickple.back.chat.implement.ChatWriter;
-import kr.pickple.back.chat.repository.ChatMessageRepository;
-import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
-import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.implement.MemberReader;
-import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,11 +26,6 @@ public class ChatMessageService {
     private final MemberReader memberReader;
     private final ChatReader chatReader;
     private final ChatWriter chatWriter;
-    private final ChatMessageRepository chatMessageRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatRoomMemberRepository chatRoomMemberRepository;
-    private final MemberRepository memberRepository;
-    private final ChatValidator chatValidator;
 
     /**
      * 채팅방 입장
@@ -44,9 +35,9 @@ public class ChatMessageService {
             final Long chatRoomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
         final MemberDomain newMember = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
-        final ChatMessageDomain entranceMessage = chatWriter.enterRoom(newMember, chatRoom);
+        final ChatMessage entranceMessage = chatWriter.enterRoom(newMember, chatRoom);
 
         return ChatResponseMapper.mapToChatMessageResponseDto(entranceMessage);
     }
@@ -59,9 +50,9 @@ public class ChatMessageService {
             final Long chatRoomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
         final MemberDomain sender = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
-        final ChatMessageDomain chatMessage = chatWriter.sendMessage(
+        final ChatMessage chatMessage = chatWriter.sendMessage(
                 TALK,
                 chatMessageCreateRequest.getContent(),
                 sender,
@@ -79,9 +70,9 @@ public class ChatMessageService {
             final Long chatRoomId,
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
-        final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
+        final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
         final MemberDomain member = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
-        final ChatMessageDomain leaveMessage = chatWriter.leaveRoom(member, chatRoom);
+        final ChatMessage leaveMessage = chatWriter.leaveRoom(member, chatRoom);
 
         return ChatResponseMapper.mapToChatMessageResponseDto(leaveMessage);
     }

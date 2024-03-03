@@ -1,47 +1,24 @@
 package kr.pickple.back.chat.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.chat.util.MessageTypeAttributeConverter;
-import kr.pickple.back.common.domain.BaseEntity;
+import java.time.LocalDateTime;
+
+import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatMessage extends BaseEntity {
+@Builder
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class ChatMessage {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull
-    @Convert(converter = MessageTypeAttributeConverter.class)
+    private Long chatMessageId;
     private MessageType type;
-
-    @NotNull
-    @Column(length = 500)
     private String content;
-
-    @NotNull
-    private Long senderId;
-
-    @NotNull
-    private Long chatRoomId;
-
-    @Builder
-    private ChatMessage(final MessageType type, final String content, final Long senderId, final Long chatRoomId) {
-        this.type = type;
-        this.content = content;
-        this.senderId = senderId;
-        this.chatRoomId = chatRoomId;
-    }
+    private MemberDomain sender;
+    private ChatRoom chatRoom;
+    private LocalDateTime createdAt;
 }

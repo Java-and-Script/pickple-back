@@ -3,7 +3,6 @@ package kr.pickple.back.crew.domain;
 import static kr.pickple.back.crew.domain.CrewStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;

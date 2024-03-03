@@ -2,8 +2,8 @@ package kr.pickple.back.chat.dto.mapper;
 
 import java.util.List;
 
-import kr.pickple.back.chat.domain.ChatMessageDomain;
-import kr.pickple.back.chat.domain.ChatRoomDomain;
+import kr.pickple.back.chat.domain.ChatMessage;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.PersonalChatRoomStatus;
 import kr.pickple.back.chat.dto.response.ChatMemberResponse;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
@@ -20,7 +20,7 @@ import lombok.NoArgsConstructor;
 public final class ChatResponseMapper {
 
     public static ChatRoomResponse mapToChatRoomResponseDto(
-            final ChatMessageDomain lastChatMessage,
+            final ChatMessage lastChatMessage,
             final ChatRoomDetailResponse chatRoomDetailResponse
     ) {
         return ChatRoomResponse.builder()
@@ -41,7 +41,7 @@ public final class ChatResponseMapper {
     public static ChatRoomDetailResponse mapToPersonalChatRoomDetailResponseDto(
             final MemberDomain sender,
             final MemberDomain receiver,
-            final ChatRoomDomain chatRoom
+            final ChatRoom chatRoom
     ) {
         final List<ChatMemberResponse> chatMemberResponses = List.of(
                 mapToChatMemberResponseDto(sender),
@@ -63,7 +63,7 @@ public final class ChatResponseMapper {
 
     public static ChatRoomDetailResponse mapToCrewChatRoomDetailResponseDto(
             final Crew crew,
-            final ChatRoomDomain chatRoom,
+            final ChatRoom chatRoom,
             final List<MemberDomain> members
     ) {
         final List<ChatMemberResponse> chatMemberResponses = members.stream()
@@ -85,7 +85,7 @@ public final class ChatResponseMapper {
 
     public static ChatRoomDetailResponse mapToGameChatRoomDetailResponseDto(
             final Game game,
-            final ChatRoomDomain chatRoom,
+            final ChatRoom chatRoom,
             final List<MemberDomain> members
     ) {
         final List<ChatMemberResponse> chatMemberResponses = members.stream()
@@ -123,7 +123,7 @@ public final class ChatResponseMapper {
                 .build();
     }
 
-    public static ChatMessageResponse mapToChatMessageResponseDto(final ChatMessageDomain chatMessage) {
+    public static ChatMessageResponse mapToChatMessageResponseDto(final ChatMessage chatMessage) {
         return ChatMessageResponse.builder()
                 .type(chatMessage.getType())
                 .content(chatMessage.getContent())

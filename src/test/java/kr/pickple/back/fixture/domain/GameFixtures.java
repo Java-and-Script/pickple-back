@@ -13,8 +13,7 @@ import org.locationtech.jts.geom.PrecisionModel;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.domain.RoomType;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
@@ -47,8 +46,8 @@ public class GameFixtures {
                 .build();
     }
 
-    public static ChatRoom gameChatRoomBuild() {
-        return ChatRoom.builder()
+    public static ChatRoomEntity gameChatRoomBuild() {
+        return ChatRoomEntity.builder()
                 .name("11.10 영등포구")
                 .type(GAME)
                 .build();
