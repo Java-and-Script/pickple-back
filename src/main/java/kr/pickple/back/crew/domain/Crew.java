@@ -31,7 +31,6 @@ public class Crew {
     private String backgroundImageUrl;
     private Integer likeCount;
     private Integer competitionPoint;
-    private ChatRoom chatRoom;
 
     public void increaseMemberCount() {
         if (status == CLOSED) {

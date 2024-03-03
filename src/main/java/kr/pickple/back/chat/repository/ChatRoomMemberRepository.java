@@ -42,9 +42,4 @@ public interface ChatRoomMemberRepository extends JpaRepository<ChatRoomMember, 
         return findByMemberIdAndChatRoomId(memberId, chatRoomId)
                 .orElseThrow(() -> new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, memberId, chatRoomId));
     }
-
-    default ChatRoomMember getPersonalChatRoomReceiver(final Long chatRoomId, final Long senderId) {
-        return findByChatRoomIdAndMemberIdNot(chatRoomId, senderId)
-                .orElseThrow(() -> new ChatException(CHAT_RECEIVER_NOT_FOUND));
-    }
 }

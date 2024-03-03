@@ -43,6 +43,10 @@ public class MemberReader {
     private final MemberPositionRepository memberPositionRepository;
     private final ChatRoomRepository chatRoomRepository;
 
+    public Boolean existsByMemberId(final Long memberId) {
+        return memberRepository.existsById(memberId);
+    }
+
     public MemberDomain readByMemberId(final Long memberId) {
         final Member memberEntity = readEntityByMemberId(memberId);
 

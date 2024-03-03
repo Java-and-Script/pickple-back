@@ -45,8 +45,7 @@ public class CrewWriter {
         return CrewMapper.mapCrewEntityToDomain(
                 savedCrewEntity,
                 mainAddress,
-                newCrew.getLeader(),
-                newCrew.getChatRoom()
+                newCrew.getLeader()
         );
     }
 

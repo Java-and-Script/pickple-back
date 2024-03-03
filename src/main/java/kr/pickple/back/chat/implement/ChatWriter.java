@@ -2,6 +2,7 @@ package kr.pickple.back.chat.implement;
 
 import static java.lang.Boolean.*;
 import static kr.pickple.back.chat.domain.MessageType.*;
+import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 
 import org.springframework.stereotype.Component;
@@ -29,10 +30,21 @@ public class ChatWriter {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatMessageRepository chatMessageRepository;
 
-    public ChatRoomDomain createNewRoom(final RoomType type, final String name) {
+    public ChatRoomDomain createNewPersonalRoom(final String name) {
         final ChatRoom chatRoomEntity = ChatRoom.builder()
-                .type(type)
                 .name(name)
+                .type(PERSONAL)
+                .build();
+        final ChatRoom savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
+
+        return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
+    }
+
+    public ChatRoomDomain createNewGroupRoom(final String name, final RoomType type, final Integer maxMemberCount) {
+        final ChatRoom chatRoomEntity = ChatRoom.builder()
+                .name(name)
+                .type(type)
+                .maxMemberCount(maxMemberCount)
                 .build();
         final ChatRoom savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
 
