@@ -3,6 +3,7 @@ package kr.pickple.back.chat.implement;
 import static kr.pickple.back.chat.domain.RoomType.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Component;
@@ -88,5 +89,25 @@ public class ChatReader {
         final MemberDomain sender = memberReader.readByMemberId(lastMessageEntity.getSenderId());
 
         return ChatMapper.mapChatMessageEntityToDomain(lastMessageEntity, sender, chatRoom);
+    }
+
+    public List<ChatMessageDomain> readMessagesAfterEntrance(final Long memberId, final Long chatRoomId) {
+        final ChatRoomDomain chatRoom = readRoom(chatRoomId);
+
+        if (!chatRoomMemberRepository.existsByActiveTrueAndChatRoomIdAndMemberId(chatRoomId, memberId)) {
+            throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, chatRoomId, memberId);
+        }
+
+        final LocalDateTime entranceDatetime = chatMessageRepository.findLastEntranceDatetimeByMemberId(memberId);
+        final List<ChatMessage> chatMessageEntities = chatMessageRepository.findAllByChatRoomIdAndCreatedAtGreaterThanEqual(
+                chatRoomId, entranceDatetime);
+
+        return chatMessageEntities.stream()
+                .map(chatMessageEntity -> ChatMapper.mapChatMessageEntityToDomain(
+                        chatMessageEntity,
+                        memberReader.readByMemberId(chatMessageEntity.getSenderId()),
+                        chatRoom
+                ))
+                .toList();
     }
 }

@@ -7,9 +7,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.domain.ChatMessage;
 import kr.pickple.back.chat.domain.ChatMessageDomain;
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
@@ -19,7 +17,6 @@ import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
-import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberRepository;
@@ -49,9 +46,9 @@ public class ChatMessageService {
     ) {
         final ChatRoomDomain chatRoom = chatReader.readRoom(chatRoomId);
         final MemberDomain newMember = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
-        final ChatMessageDomain enterMessage = chatWriter.enterRoom(newMember, chatRoom);
+        final ChatMessageDomain entranceMessage = chatWriter.enterRoom(newMember, chatRoom);
 
-        return ChatResponseMapper.mapToChatMessageResponseDto(enterMessage);
+        return ChatResponseMapper.mapToChatMessageResponseDto(entranceMessage);
     }
 
     /**
@@ -92,27 +89,10 @@ public class ChatMessageService {
     /**
      * 특정 채팅방의 모든 메시지 목록 조회
      */
-    public List<ChatMessageResponse> findAllMessagesInRoom(final Long loggedInMemberId, final Long roomId) {
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(roomId);
-        final Member loggedInMember = memberRepository.getMemberById(loggedInMemberId);
-
-        chatValidator.validateIsExistedRoomMember(loggedInMember, chatRoom);
-
-        final ChatMessage lastEnteringMessage = chatMessageRepository.getLastEnteringChatMessageBySenderId(
-                loggedInMember.getId());
-
-        final List<ChatMessage> chatMessages = chatMessageRepository.findAllByChatRoomIdAndCreatedAtGreaterThanEqual(
-                chatRoom.getId(),
-                lastEnteringMessage.getCreatedAt()
-        );
-
-        return chatMessages.stream()
-                .map(chatMessage -> ChatMessageResponse.of(
-                                chatMessage,
-                                memberRepository.getMemberById(chatMessage.getSenderId()),
-                                chatRoom
-                        )
-                )
+    public List<ChatMessageResponse> findAllMessagesInRoom(final Long loggedInMemberId, final Long chatRoomId) {
+        return chatReader.readMessagesAfterEntrance(loggedInMemberId, chatRoomId)
+                .stream()
+                .map(ChatResponseMapper::mapToChatMessageResponseDto)
                 .toList();
     }
 }
