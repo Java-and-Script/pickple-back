@@ -30,7 +30,10 @@ public class ChatWriter {
     private final ChatMessageRepository chatMessageRepository;
 
     public ChatRoomDomain createNewRoom(final RoomType type, final String name) {
-        final ChatRoom chatRoomEntity = ChatMapper.mapToChatRoomEntity(type, name);
+        final ChatRoom chatRoomEntity = ChatRoom.builder()
+                .type(type)
+                .name(name)
+                .build();
         final ChatRoom savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
 
         return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
