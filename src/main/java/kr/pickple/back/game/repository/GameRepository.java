@@ -8,7 +8,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.exception.GameException;

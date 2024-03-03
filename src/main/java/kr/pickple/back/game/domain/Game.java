@@ -16,7 +16,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
@@ -164,7 +164,7 @@ public class Game extends BaseEntity {
         return hostId.equals(this.hostId);
     }
 
-    public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
+    public void makeNewCrewChatRoom(final ChatRoomEntity chatRoom) {
         chatRoom.updateMaxMemberCount(maxMemberCount);
         this.chatRoomId = chatRoom.getId();
     }

@@ -30,7 +30,7 @@ import kr.pickple.back.fixture.dto.ChatDtoFixtures;
 import kr.pickple.back.member.domain.Member;
 
 @Transactional
-class ChatRoomDocumentTest extends IntegrationChatTest {
+class ChatRoomEntityDocumentTest extends IntegrationChatTest {
 
     private static final String BASE_URL = "/rooms";
 

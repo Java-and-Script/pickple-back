@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
@@ -41,7 +41,7 @@ public class CrewSetup {
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
         final CrewEntity crew = CrewFixtures.crewBuild(addressDepth1, addressDepth2, leader);
-        final ChatRoom savedChatRoom = chatRoomRepository.save(CrewFixtures.crewChatRoomBuild());
+        final ChatRoomEntity savedChatRoom = chatRoomRepository.save(CrewFixtures.crewChatRoomBuild());
 
         final CrewMemberEntity crewLeader = CrewFixtures.crewMemberBuild(leader, crew);
         crewLeader.confirmRegistration();

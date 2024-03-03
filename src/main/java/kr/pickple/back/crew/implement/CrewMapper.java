@@ -3,7 +3,6 @@ package kr.pickple.back.crew.implement;
 import java.util.List;
 
 import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.CrewProfile;

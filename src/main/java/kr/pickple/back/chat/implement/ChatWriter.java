@@ -12,11 +12,11 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
 import kr.pickple.back.chat.domain.ChatMessage;
-import kr.pickple.back.chat.domain.ChatMessageDomain;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.domain.ChatRoomDomain;
-import kr.pickple.back.chat.domain.ChatRoomMember;
+import kr.pickple.back.chat.repository.entity.ChatRoomMemberEntity;
 import kr.pickple.back.chat.domain.MessageType;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.exception.ChatException;
@@ -44,28 +44,28 @@ public class ChatWriter {
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatMessageRepository chatMessageRepository;
 
-    public ChatRoomDomain createNewPersonalRoom(final String name) {
-        final ChatRoom chatRoomEntity = ChatRoom.builder()
+    public ChatRoom createNewPersonalRoom(final String name) {
+        final ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
                 .name(name)
                 .type(PERSONAL)
                 .build();
-        final ChatRoom savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
+        final ChatRoomEntity savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
 
         return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
     }
 
-    public ChatRoomDomain createNewGroupRoom(final String name, final RoomType type, final Integer maxMemberCount) {
-        final ChatRoom chatRoomEntity = ChatRoom.builder()
+    public ChatRoom createNewGroupRoom(final String name, final RoomType type, final Integer maxMemberCount) {
+        final ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
                 .name(name)
                 .type(type)
                 .maxMemberCount(maxMemberCount)
                 .build();
-        final ChatRoom savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
+        final ChatRoomEntity savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
 
         return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
     }
 
-    public ChatMessageDomain enterRoom(final MemberDomain member, final ChatRoomDomain chatRoom) {
+    public ChatMessage enterRoom(final MemberDomain member, final ChatRoom chatRoom) {
         final Long memberId = member.getMemberId();
         final Long chatRoomId = chatRoom.getChatRoomId();
 
@@ -87,17 +87,17 @@ public class ChatWriter {
             return;
         }
 
-        chatRoomMemberRepository.save(ChatRoomMember.builder()
+        chatRoomMemberRepository.save(ChatRoomMemberEntity.builder()
                 .memberId(memberId)
                 .chatRoomId(chatRoomId)
                 .build());
     }
 
-    public ChatMessageDomain sendMessage(
+    public ChatMessage sendMessage(
             final MessageType type,
             final String content,
             final MemberDomain sender,
-            final ChatRoomDomain chatRoom
+            final ChatRoom chatRoom
     ) {
         final Long chatRoomId = chatRoom.getChatRoomId();
         final Long senderId = sender.getMemberId();
@@ -106,18 +106,18 @@ public class ChatWriter {
             throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, chatRoomId, senderId);
         }
 
-        final ChatMessage chatMessageEntity = ChatMessage.builder()
+        final ChatMessageEntity chatMessageEntity = ChatMessageEntity.builder()
                 .type(type)
                 .content(content)
                 .senderId(senderId)
                 .chatRoomId(chatRoomId)
                 .build();
-        final ChatMessage savedChatMessageEntity = chatMessageRepository.save(chatMessageEntity);
+        final ChatMessageEntity savedChatMessageEntity = chatMessageRepository.save(chatMessageEntity);
 
         return ChatMapper.mapChatMessageEntityToDomain(savedChatMessageEntity, sender, chatRoom);
     }
 
-    public ChatMessageDomain leaveRoom(final MemberDomain member, final ChatRoomDomain chatRoom) {
+    public ChatMessage leaveRoom(final MemberDomain member, final ChatRoom chatRoom) {
         final Long memberId = member.getMemberId();
         final Long chatRoomId = chatRoom.getChatRoomId();
 
@@ -127,7 +127,7 @@ public class ChatWriter {
 
         validateCanLeaveChatRoom(memberId, chatRoom);
 
-        final ChatMessageDomain leaveMessage = sendMessage(
+        final ChatMessage leaveMessage = sendMessage(
                 LEAVE,
                 MessageType.makeLeaveMessage(member.getNickname()),
                 member,
@@ -145,7 +145,7 @@ public class ChatWriter {
         return leaveMessage;
     }
 
-    private void validateCanLeaveChatRoom(final Long memberId, final ChatRoomDomain chatRoom) {
+    private void validateCanLeaveChatRoom(final Long memberId, final ChatRoom chatRoom) {
         if (chatRoom.getType() == CREW) {
             validateCanLeaveCrewChatRoom(memberId, chatRoom);
         }
@@ -155,7 +155,7 @@ public class ChatWriter {
         }
     }
 
-    private void validateCanLeaveCrewChatRoom(final Long memberId, final ChatRoomDomain chatRoom) {
+    private void validateCanLeaveCrewChatRoom(final Long memberId, final ChatRoom chatRoom) {
         final Optional<CrewEntity> crewEntity = crewRepository.findByChatRoomId(chatRoom.getChatRoomId());
 
         if (crewEntity.isPresent() && existsMemberInCrew(crewEntity.get().getId(), memberId)) {
@@ -167,7 +167,7 @@ public class ChatWriter {
         return crewMemberRepository.existsByCrewIdAndMemberIdAndStatus(crewId, memberId, CONFIRMED);
     }
 
-    private void validateCanLeaveGameChatRoom(final ChatRoomDomain chatRoom) {
+    private void validateCanLeaveGameChatRoom(final ChatRoom chatRoom) {
         final Optional<Game> gameEntity = gameRepository.findByChatRoomId(chatRoom.getChatRoomId());
 
         if (gameEntity.isPresent() && isGameNotEnded(gameEntity.get().getPlayEndDatetime())) {

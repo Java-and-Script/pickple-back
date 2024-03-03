@@ -8,7 +8,7 @@ import java.util.stream.IntStream;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.Member;
@@ -39,8 +39,8 @@ public class CrewFixtures {
                 .build();
     }
 
-    public static ChatRoom crewChatRoomBuild() {
-        return ChatRoom.builder()
+    public static ChatRoomEntity crewChatRoomBuild() {
+        return ChatRoomEntity.builder()
                 .name("백둥크루1")
                 .type(CREW)
                 .build();

@@ -23,7 +23,7 @@ import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.auth.repository.RedisRepository;
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Category;
@@ -88,7 +88,7 @@ public class GameService {
 
         gameHost.confirmRegistration();
 
-        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(host, makeGameRoomName(game), GAME);
+        final ChatRoomEntity chatRoom = chatRoomService.saveNewChatRoom(host, makeGameRoomName(game), GAME);
         game.makeNewCrewChatRoom(chatRoom);
 
         final Game savedGame = gameRepository.save(game);

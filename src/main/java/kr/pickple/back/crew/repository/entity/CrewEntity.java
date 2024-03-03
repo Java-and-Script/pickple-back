@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.crew.domain.CrewStatus;
 import kr.pickple.back.crew.util.CrewStatusConverter;
@@ -99,7 +99,7 @@ public class CrewEntity extends BaseEntity {
         return memberId.equals(leaderId);
     }
 
-    public void makeNewCrewChatRoom(final ChatRoom chatRoom) {
+    public void makeNewCrewChatRoom(final ChatRoomEntity chatRoom) {
         chatRoom.updateMaxMemberCount(maxMemberCount);
         this.chatRoomId = chatRoom.getId();
     }

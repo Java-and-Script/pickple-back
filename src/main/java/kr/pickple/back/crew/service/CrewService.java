@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
@@ -56,7 +56,7 @@ public class CrewService {
         final MemberDomain leader = memberReader.readByMemberId(loggedInMemberId);
         validateCreateCrewMoreThanMaxCount(loggedInMemberId);
 
-        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(leader, newCrew.getName(), CREW);
+        final ChatRoomEntity chatRoom = chatRoomService.saveNewChatRoom(leader, newCrew.getName(), CREW);
         chatRoom.updateMaxMemberCount(newCrew.getMaxMemberCount());
 
         newCrew.assignLeader(leader);

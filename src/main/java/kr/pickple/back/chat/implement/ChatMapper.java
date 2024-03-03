@@ -1,9 +1,9 @@
 package kr.pickple.back.chat.implement;
 
+import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
 import kr.pickple.back.chat.domain.ChatMessage;
-import kr.pickple.back.chat.domain.ChatMessageDomain;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ChatMapper {
 
-    public static ChatRoomDomain mapChatRoomEntityToDomain(final ChatRoom chatRoomEntity) {
-        return ChatRoomDomain.builder()
+    public static ChatRoom mapChatRoomEntityToDomain(final ChatRoomEntity chatRoomEntity) {
+        return ChatRoom.builder()
                 .chatRoomId(chatRoomEntity.getId())
                 .type(chatRoomEntity.getType())
                 .name(chatRoomEntity.getName())
@@ -22,12 +22,12 @@ public final class ChatMapper {
                 .build();
     }
 
-    public static ChatMessageDomain mapChatMessageEntityToDomain(
-            final ChatMessage chatMessageEntity,
+    public static ChatMessage mapChatMessageEntityToDomain(
+            final ChatMessageEntity chatMessageEntity,
             final MemberDomain sender,
-            final ChatRoomDomain chatRoom
+            final ChatRoom chatRoom
     ) {
-        return ChatMessageDomain.builder()
+        return ChatMessage.builder()
                 .chatMessageId(chatMessageEntity.getId())
                 .type(chatMessageEntity.getType())
                 .content(chatMessageEntity.getContent())

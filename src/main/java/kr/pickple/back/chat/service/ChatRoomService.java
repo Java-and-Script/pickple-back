@@ -7,7 +7,7 @@ import java.text.MessageFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.domain.ChatRoomDomain;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.PersonalChatRoomStatus;
 import kr.pickple.back.chat.dto.mapper.ChatResponseMapper;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
@@ -39,7 +39,7 @@ public class ChatRoomService {
         final MemberDomain receiver = memberReader.readByMemberId(receiverId);
 
         final String roomName = MessageFormat.format("{0},{1}", sender.getNickname(), receiver.getNickname());
-        final ChatRoomDomain chatRoom = chatWriter.createNewPersonalRoom(roomName);
+        final ChatRoom chatRoom = chatWriter.createNewPersonalRoom(roomName);
 
         chatWriter.enterRoom(sender, chatRoom);
         chatWriter.enterRoom(receiver, chatRoom);

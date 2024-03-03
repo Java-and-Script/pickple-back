@@ -1,4 +1,4 @@
-package kr.pickple.back.chat.domain;
+package kr.pickple.back.chat.repository.entity;
 
 import static java.lang.Boolean.*;
 
@@ -22,7 +22,7 @@ import lombok.NoArgsConstructor;
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "chat_room_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"memberId", "chatRoomId"}, callSuper = false)
-public class ChatRoomMember extends BaseEntity {
+public class ChatRoomMemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public class ChatRoomMember extends BaseEntity {
     private Long chatRoomId;
 
     @Builder
-    private ChatRoomMember(final Long memberId, final Long chatRoomId) {
+    private ChatRoomMemberEntity(final Long memberId, final Long chatRoomId) {
         this.memberId = memberId;
         this.chatRoomId = chatRoomId;
     }
