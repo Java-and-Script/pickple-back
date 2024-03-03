@@ -80,17 +80,24 @@ public class ChatWriter {
                 .build());
     }
 
-    private ChatMessageDomain sendMessage(
+    public ChatMessageDomain sendMessage(
             final MessageType type,
             final String content,
             final MemberDomain sender,
             final ChatRoomDomain chatRoom
     ) {
+        final Long chatRoomId = chatRoom.getChatRoomId();
+        final Long senderId = sender.getMemberId();
+
+        if (!chatRoomMemberRepository.existsByActiveTrueAndChatRoomIdAndMemberId(chatRoomId, senderId)) {
+            throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, chatRoomId, senderId);
+        }
+
         final ChatMessage chatMessageEntity = ChatMessage.builder()
                 .type(type)
                 .content(content)
-                .senderId(sender.getMemberId())
-                .chatRoomId(chatRoom.getChatRoomId())
+                .senderId(senderId)
+                .chatRoomId(chatRoomId)
                 .build();
         final ChatMessage savedChatMessageEntity = chatMessageRepository.save(chatMessageEntity);
 
