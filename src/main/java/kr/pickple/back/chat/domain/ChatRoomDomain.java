@@ -31,4 +31,8 @@ public class ChatRoomDomain {
 
         memberCount += 1;
     }
+
+    public Boolean isMatchedRoomType(final RoomType type) {
+        return this.type == type;
+    }
 }

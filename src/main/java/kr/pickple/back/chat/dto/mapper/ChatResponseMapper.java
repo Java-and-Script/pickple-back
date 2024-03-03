@@ -3,8 +3,10 @@ package kr.pickple.back.chat.dto.mapper;
 import java.util.List;
 
 import kr.pickple.back.chat.domain.ChatRoomDomain;
+import kr.pickple.back.chat.domain.PersonalChatRoomStatus;
 import kr.pickple.back.chat.dto.response.ChatMemberResponse;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
+import kr.pickple.back.chat.dto.response.PersonalChatRoomStatusResponse;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -35,6 +37,15 @@ public final class ChatResponseMapper {
                 .id(member.getMemberId())
                 .nickname(member.getNickname())
                 .profileImageUrl(member.getProfileImageUrl())
+                .build();
+    }
+
+    public static PersonalChatRoomStatusResponse mapToPersonalChatRoomStatusResponseDto(
+            final PersonalChatRoomStatus personalChatRoomStatus
+    ) {
+        return PersonalChatRoomStatusResponse.builder()
+                .roomId(personalChatRoomStatus.getRoomId())
+                .isSenderActive(personalChatRoomStatus.getIsSenderActive())
                 .build();
     }
 }

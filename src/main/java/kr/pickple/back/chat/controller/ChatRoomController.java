@@ -18,7 +18,7 @@ import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.chat.dto.response.ChatRoomResponse;
-import kr.pickple.back.chat.dto.response.PersonalChatRoomExistedResponse;
+import kr.pickple.back.chat.dto.response.PersonalChatRoomStatusResponse;
 import kr.pickple.back.chat.service.ChatRoomFindService;
 import kr.pickple.back.chat.service.ChatRoomService;
 import lombok.RequiredArgsConstructor;
@@ -41,12 +41,12 @@ public class ChatRoomController {
     }
 
     @GetMapping("/personal")
-    public ResponseEntity<PersonalChatRoomExistedResponse> findActivePersonalChatRoomWithReceiver(
+    public ResponseEntity<PersonalChatRoomStatusResponse> findPersonalChatRoomStatus(
             @Login final Long senderId,
             @RequestParam("receiver") final Long receiverId
     ) {
         return ResponseEntity.status(OK)
-                .body(chatRoomService.findActivePersonalChatRoomWithReceiver(senderId, receiverId));
+                .body(chatRoomService.findPersonalChatRoomStatus(senderId, receiverId));
     }
 
     @GetMapping

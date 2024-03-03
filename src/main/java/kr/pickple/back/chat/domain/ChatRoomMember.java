@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "chat_room_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"memberId", "chatRoomId"}, callSuper = false)
@@ -30,12 +31,10 @@ public class ChatRoomMember extends BaseEntity {
     @NotNull
     private Boolean active = TRUE;
 
-    @Getter
     @NotNull
     @Column(name = "member_id")
     private Long memberId;
 
-    @Getter
     @NotNull
     @Column(name = "chat_room_id")
     private Long chatRoomId;
@@ -52,9 +51,5 @@ public class ChatRoomMember extends BaseEntity {
 
     public void deactivate() {
         active = FALSE;
-    }
-
-    public Boolean isActive() {
-        return active;
     }
 }
