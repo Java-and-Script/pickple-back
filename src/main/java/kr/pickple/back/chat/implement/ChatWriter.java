@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.chat.domain.ChatMessage;
+import kr.pickple.back.chat.domain.ChatMessageDomain;
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.domain.ChatRoomDomain;
 import kr.pickple.back.chat.domain.ChatRoomMember;
@@ -51,7 +52,7 @@ public class ChatWriter {
         return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
     }
 
-    public void enterRoom(final MemberDomain member, final ChatRoomDomain chatRoom) {
+    public ChatMessageDomain enterRoom(final MemberDomain member, final ChatRoomDomain chatRoom) {
         final Long memberId = member.getMemberId();
         final Long chatRoomId = chatRoom.getChatRoomId();
 
@@ -63,7 +64,7 @@ public class ChatWriter {
         chatRoom.increaseMemberCount();
         chatRoomRepository.updateMemberCount(chatRoomId, chatRoom.getMemberCount());
 
-        sendMessage(ENTER, MessageType.makeEnterMessage(member.getNickname()), member, chatRoom);
+        return sendMessage(ENTER, MessageType.makeEnterMessage(member.getNickname()), member, chatRoom);
     }
 
     private void activateRoom(final Long chatRoomId, final Long memberId) {
@@ -79,7 +80,7 @@ public class ChatWriter {
                 .build());
     }
 
-    private void sendMessage(
+    private ChatMessageDomain sendMessage(
             final MessageType type,
             final String content,
             final MemberDomain sender,
@@ -91,7 +92,8 @@ public class ChatWriter {
                 .senderId(sender.getMemberId())
                 .chatRoomId(chatRoom.getChatRoomId())
                 .build();
+        final ChatMessage savedChatMessageEntity = chatMessageRepository.save(chatMessageEntity);
 
-        chatMessageRepository.save(chatMessageEntity);
+        return ChatMapper.mapChatMessageEntityToDomain(savedChatMessageEntity, sender, chatRoom);
     }
 }
