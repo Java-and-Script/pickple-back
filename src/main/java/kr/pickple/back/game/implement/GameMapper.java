@@ -16,7 +16,7 @@ import kr.pickple.back.position.domain.Position;
 
 public class GameMapper {
 
-    public static GameDomain mapToGameDomain(
+    public static GameDomain mapGameEntityToDomain(
             final GameEntity gameEntity,
             final MainAddress mainAddress,
             final MemberDomain host,

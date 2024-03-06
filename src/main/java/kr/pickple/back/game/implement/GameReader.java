@@ -55,7 +55,7 @@ public class GameReader {
         );
 
         final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId());
-        return GameMapper.mapToGameDomain(gameEntity, mainAddress, host, chatRoom, positions);
+        return GameMapper.mapGameEntityToDomain(gameEntity, mainAddress, host, chatRoom, positions);
     }
 
     private GameEntity readGameEntity(final Long gameId) {
@@ -99,7 +99,7 @@ public class GameReader {
         );
 
         return gameEntities.stream()
-                .map(gameEntity -> GameMapper.mapToGameDomain(
+                .map(gameEntity -> GameMapper.mapGameEntityToDomain(
                         gameEntity,
                         mainAddress,
                         memberReader.readByMemberId(gameEntity.getHostId()),
@@ -115,7 +115,7 @@ public class GameReader {
         );
 
         return gameEntities.stream()
-                .map(gameEntity -> GameMapper.mapToGameDomain(
+                .map(gameEntity -> GameMapper.mapGameEntityToDomain(
                         gameEntity,
                         mainAddress,
                         memberReader.readByMemberId(gameEntity.getHostId()),
@@ -128,7 +128,7 @@ public class GameReader {
         final List<GameEntity> gameEntities = gameRepository.findGamesWithInDistance(latitude, longitude, distance);
 
         return gameEntities.stream()
-                .map(gameEntity -> GameMapper.mapToGameDomain(
+                .map(gameEntity -> GameMapper.mapGameEntityToDomain(
                         gameEntity,
                         addressReader.readMainAddressById(
                                 gameEntity.getAddressDepth1Id(),
