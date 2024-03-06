@@ -14,25 +14,27 @@ import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.service.ChatMessageService;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.game.repository.entity.GameMemberEntity;
-import kr.pickple.back.game.repository.entity.GamePosition;
+import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.GameMemberDomain;
+import kr.pickple.back.game.dto.mapper.GameResponseMapper;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
+import kr.pickple.back.game.implement.GameMemberReader;
+import kr.pickple.back.game.implement.GameMemberWriter;
+import kr.pickple.back.game.implement.GameReader;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
-import kr.pickple.back.member.dto.response.MemberResponse;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
+import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
-import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -50,49 +52,22 @@ public class GameMemberService {
     private final ApplicationEventPublisher eventPublisher;
     private final GameMemberRepository gameMemberRepository;
     private final GamePositionRepository gamePositionRepository;
+    private final GameReader gameReader;
+    private final MemberReader memberReader;
+    private final GameMemberWriter gameMemberWriter;
+    private final GameMemberReader gameMemberReader;
 
     @Transactional
     public void registerGameMember(final Long gameId, final Long loggedInMemberId) {
-        final GameEntity gameEntity = gameRepository.getGameById(gameId);
-        final Member member = memberRepository.getMemberById(loggedInMemberId);
+        final GameDomain gameDomain = gameReader.read(gameId);
+        final MemberDomain memberDomain = memberReader.readByMemberId(loggedInMemberId);
 
-        validateIsAlreadyRegisteredGameMember(gameEntity, member);
-        final GameMemberEntity gameMemberEntity = buildGameMember(gameEntity, member);
-        gameMemberRepository.save(gameMemberEntity);
+        gameMemberWriter.register(memberDomain, gameDomain);
 
         eventPublisher.publishEvent(GameJoinRequestNotificationEvent.builder()
                 .gameId(gameId)
-                .memberId(gameEntity.getHostId())
+                .memberId(loggedInMemberId)
                 .build());
-    }
-
-    private void validateIsAlreadyRegisteredGameMember(final GameEntity gameEntity, final Member member) {
-        if (isAlreadyRegistered(gameEntity, member)) {
-            throw new GameException(GAME_MEMBER_IS_EXISTED, member.getId());
-        }
-    }
-
-    private boolean isAlreadyRegistered(final GameEntity gameEntity, final Member member) {
-        return gameMemberRepository.findByMemberIdAndGameId(member.getId(), gameEntity.getId()).isPresent();
-    }
-
-    private GameMemberEntity buildGameMember(final GameEntity gameEntity, final Member member) {
-
-        return GameMemberEntity.builder()
-                .status(getRegistrationStatus(member, gameEntity))
-                .memberId(member.getId())
-                .gameId(gameEntity.getId())
-                .build();
-    }
-
-    private RegistrationStatus getRegistrationStatus(final Member member, final GameEntity gameEntity) {
-        final Member host = memberRepository.getMemberById(gameEntity.getHostId());
-
-        if (member.equals(host)) {
-            return CONFIRMED;
-        }
-
-        return WAITING;
     }
 
     public GameResponse findAllGameMembers(
@@ -100,51 +75,17 @@ public class GameMemberService {
             final Long gameId,
             final RegistrationStatus status
     ) {
-        final GameMemberEntity gameMemberEntity = findGameMemberByGameIdAndMemberId(gameId, loggedInMemberId);
-        final GameEntity gameEntity = gameRepository.getGameById(gameMemberEntity.getGameId());
-        final Member loggedInMember = memberRepository.getMemberById(gameMemberEntity.getMemberId());
+        final GameMemberDomain gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameDomain game = gameReader.read(gameId);
+        final MemberDomain member = memberReader.readByMemberId(loggedInMemberId);
 
-        if (!gameEntity.isHost(loggedInMember.getId()) && status == WAITING) {
+        if (!game.isHost(member.getMemberId()) && status == WAITING) {
             throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
         }
 
-        return GameResponse.of(
-                gameEntity,
-                getMemberResponsesByStatus(gameEntity, status),
-                getPositionsByGame(gameEntity),
-                addressReader.readMainAddressById(gameEntity.getAddressDepth1Id(), gameEntity.getAddressDepth2Id())
-        );
-    }
+        final List<MemberDomain> members = gameReader.readAllMembersByGameIdAndStatus(gameId, status);
 
-    private List<MemberResponse> getMemberResponsesByStatus(final GameEntity gameEntity, final RegistrationStatus status) {
-        return gameMemberRepository.findAllByGameIdAndStatus(gameEntity.getId(), status)
-                .stream()
-                .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))
-                .map(member -> MemberResponse.of(
-                                member,
-                                getPositionsByMember(member),
-                                addressReader.readMainAddressById(member.getAddressDepth1Id(), member.getAddressDepth2Id())
-                        )
-                )
-                .toList();
-    }
-
-    private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionRepository.findAllByMemberId(
-                member.getId());
-
-        return Position.fromMemberPositions(memberPositions);
-    }
-
-    private List<Position> getPositionsByGame(final GameEntity gameEntity) {
-        final List<GamePosition> gamePositions = gamePositionRepository.findAllByGameId(gameEntity.getId());
-
-        return Position.fromGamePositions(gamePositions);
-    }
-
-    private GameMemberEntity findGameMemberByGameIdAndMemberId(final Long gameId, final Long memberId) {
-        return gameMemberRepository.findByMemberIdAndGameId(memberId, gameId)
-                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
+        return GameResponseMapper.mapToGameResponseDto(game, members);
     }
 
     @Transactional
@@ -154,24 +95,16 @@ public class GameMemberService {
             final Long memberId,
             final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
     ) {
-        final GameMemberEntity gameMemberEntity = findGameMemberByGameIdAndMemberId(gameId, memberId);
-        final GameEntity gameEntity = gameRepository.getGameById(gameMemberEntity.getGameId());
+        final GameMemberDomain gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameDomain game = gameReader.read(gameId);
 
-        validateIsHost(loggedInMemberId, gameEntity);
-
+        validateIsHost(loggedInMemberId, game);
         final RegistrationStatus updateStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
-<<<<<<< HEAD
-        final ChatRoomEntity chatRoom = chatRoomRepository.getChatRoomById(game.getChatRoomId());
-        enterGameChatRoom(updateStatus, gameMember, chatRoom);
-=======
-        final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId());
-        enterGameChatRoom(updateStatus, gameMemberEntity, chatRoom);
->>>>>>> ab89fd2 (refactor: 바뀐 구현계층 세팅에 맞추어 게임service의 생성, 읽기 기능 수정)
 
-        gameMemberEntity.updateStatus(updateStatus);
-        if (gameMemberEntity.isStatusChangedFromWaitingToConfirmed(updateStatus)) {
-            gameEntity.increaseMemberCount();
-        }
+        final ChatRoomEntity chatRoom = chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId());
+        enterGameChatRoom(updateStatus, gameMemberEntity, chatRoom);
+
+        gameMemberWriter.updateMemberRegistrationStatus(gameMember, updateStatus);
 
         eventPublisher.publishEvent(GameMemberJoinedEvent.builder()
                 .gameId(gameId)
@@ -179,10 +112,8 @@ public class GameMemberService {
                 .build());
     }
 
-    private void validateIsHost(final Long loggedInMemberId, final GameEntity gameEntity) {
-        final Member loggedInMember = memberRepository.getMemberById(loggedInMemberId);
-
-        if (!gameEntity.isHost(loggedInMember.getId())) {
+    private void validateIsHost(final Long loggedInMemberId, final GameDomain gameDomain) {
+        if (!gameDomain.isHost(loggedInMemberId)) {
             throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
         }
     }
@@ -201,50 +132,43 @@ public class GameMemberService {
 
     @Transactional
     public void deleteGameMember(final Long loggedInMemberId, final Long gameId, final Long memberId) {
-        final GameMemberEntity gameMemberEntity = findGameMemberByGameIdAndMemberId(gameId, memberId);
-        final GameEntity gameEntity = gameRepository.getGameById(gameMemberEntity.getGameId());
-        final Member member = memberRepository.getMemberById(gameMemberEntity.getMemberId());
-        final Member loggedInMember = memberRepository.getMemberById(loggedInMemberId);
+        final GameMemberDomain gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(memberId, gameId);
+        final GameDomain game = gameReader.read(gameId);
+        final MemberDomain member = memberReader.readByMemberId(gameMember.getMember().getMemberId());
+        final MemberDomain loggedInMember = memberReader.readByMemberId(loggedInMemberId);
 
-        if (gameEntity.isHost(loggedInMember.getId())) {
+        if (game.isHost(loggedInMemberId)) {
             validateIsHostSelfDeleted(loggedInMember, member);
-
             eventPublisher.publishEvent(GameMemberRejectedEvent.builder()
                     .gameId(gameId)
                     .memberId(memberId)
                     .build());
 
-            deleteGameMember(gameMemberEntity);
-
+            gameMemberWriter.deleteGameMember(gameMember);
             return;
         }
 
-        if (loggedInMember.equals(member)) {
-            cancelGameMember(gameMemberEntity);
-
+        if (loggedInMember.getMemberId().equals(member.getMemberId())) {
+            cancelGameMember(gameMember);
             return;
         }
 
         throw new GameException(GAME_NOT_ALLOWED_TO_DELETE_GAME_MEMBER, loggedInMemberId);
     }
 
-    private void validateIsHostSelfDeleted(final Member loggedInMember, final Member member) {
-        if (loggedInMember.equals(member)) {
-            throw new GameException(GAME_HOST_CANNOT_BE_DELETED, loggedInMember.getId());
+    private void validateIsHostSelfDeleted(final MemberDomain loggedInMember, final MemberDomain member) {
+        if (loggedInMember.getMemberId().equals(member.getMemberId())) {
+            throw new GameException(GAME_HOST_CANNOT_BE_DELETED, loggedInMember.getMemberId());
         }
     }
 
-    private void cancelGameMember(final GameMemberEntity gameMemberEntity) {
-        RegistrationStatus status = gameMemberEntity.getStatus();
+    private void cancelGameMember(final GameMemberDomain gameMember) {
+        RegistrationStatus status = gameMember.getStatus();
 
         if (status != WAITING) {
             throw new GameException(GAME_MEMBER_STATUS_IS_NOT_WAITING, status);
         }
 
-        deleteGameMember(gameMemberEntity);
-    }
-
-    private void deleteGameMember(final GameMemberEntity gameMemberEntity) {
-        gameMemberRepository.delete(gameMemberEntity);
+        gameMemberWriter.deleteGameMember(gameMember);
     }
 }
