@@ -28,16 +28,16 @@ GET http://localhost:8080/members/1/created-crews
 Authorization:
 
 ### 사용자의 참여 확정 게스트 모집글 목록 조회
-GET http://localhost:8080/members/1/games?status=확정
+GET http://localhost:8080/members/1/gameEntities?status=확정
 Authorization:
 
 ### 사용자가 만든 게스트 모집글 목록 조회
-GET http://localhost:8080/members/1/created-games
+GET http://localhost:8080/members/1/created-gameEntities
 Authorization:
 
 
 ### 사용자의 게스트 모집 참여 여부 조회
-GET http://localhost:8080/members/5/games/1/registration-status
+GET http://localhost:8080/members/5/gameEntities/1/registration-status
 Authorization:
 
 ### 사용자의 크루 가입 여부 조회

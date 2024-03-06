@@ -11,12 +11,12 @@ operation::find-member[snippets='http-request,http-response']
 ---
 
 === 2.3. 사용자의 참여 확정 게스트 모집글 목록 조회
-operation::find-all-member-games[snippets='http-request,http-response']
+operation::find-all-member-gameEntities[snippets='http-request,http-response']
 
 ---
 
 === 2.4. 사용자가 만든 게스트 모집글 목록 조회
-operation::find-all-created-games[snippets='http-request,http-response']
+operation::find-all-created-gameEntities[snippets='http-request,http-response']
 
 ---
 

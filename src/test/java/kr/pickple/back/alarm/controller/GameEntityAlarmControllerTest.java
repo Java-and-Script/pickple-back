@@ -6,8 +6,9 @@ import kr.pickple.back.alarm.dto.request.GameAlarmUpdateStatusRequest;
 import kr.pickple.back.alarm.repository.GameAlarmRepository;
 import kr.pickple.back.fixture.domain.GameAlarmFixtures;
 import kr.pickple.back.fixture.setup.GameSetup;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.member.domain.Member;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Transactional
-public class GameAlarmControllerTest extends IntegrationAlarmTest {
+public class GameEntityAlarmControllerTest extends IntegrationAlarmTest {
 
     private static final String BASE_URL = "/game-alarms";
 
@@ -37,8 +38,8 @@ public class GameAlarmControllerTest extends IntegrationAlarmTest {
         //given
         final Member member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
-        final Game game = gameSetup.saveWithConfirmedMembers(1);
-        final GameAlarm gameAlarm = gameAlarmRepository.save(GameAlarmFixtures.gameAlarmBuild(member, game));
+        final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(1);
+        final GameAlarm gameAlarm = gameAlarmRepository.save(GameAlarmFixtures.gameAlarmBuild(member, gameEntity));
         final GameAlarmUpdateStatusRequest request = GameAlarmUpdateStatusRequest.from(true);
 
         //when

@@ -20,7 +20,7 @@ import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
 import kr.pickple.back.alarm.exception.AlarmException;
 import kr.pickple.back.alarm.repository.GameAlarmRepository;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
@@ -43,11 +43,11 @@ public class GameAlarmService {
         validateIsHost(gameJoinRequestNotificationEvent);
 
         final Long gameId = gameJoinRequestNotificationEvent.getGameId();
-        final Game game = getGameInfo(gameId);
-        final Member host = getMemberInfo(game.getHostId());
+        final GameEntity gameEntity = getGameInfo(gameId);
+        final Member host = getMemberInfo(gameEntity.getHostId());
 
         final GameAlarm gameAlarm = GameAlarm.builder()
-                .game(game)
+                .game(gameEntity)
                 .member(host)
                 .gameAlarmType(HOST_WAITING)
                 .build();
@@ -61,12 +61,12 @@ public class GameAlarmService {
     @Transactional
     public void createGuestApproveAlarm(final GameMemberJoinedEvent gameMemberJoinedEvent) {
         final Long gameId = gameMemberJoinedEvent.getGameId();
-        final Game game = getGameInfo(gameId);
+        final GameEntity gameEntity = getGameInfo(gameId);
         final Long memberId = gameMemberJoinedEvent.getMemberId();
         final Member member = getMemberInfo(memberId);
 
         final GameAlarm gameAlarm = GameAlarm.builder()
-                .game(game)
+                .game(gameEntity)
                 .member(member)
                 .gameAlarmType(GUEST_ACCEPT)
                 .build();
@@ -81,12 +81,12 @@ public class GameAlarmService {
     public void createGuestDeniedAlarm(final GameMemberRejectedEvent gameMemberRejectedEvent) {
 
         final Long gameId = gameMemberRejectedEvent.getGameId();
-        final Game game = getGameInfo(gameId);
+        final GameEntity gameEntity = getGameInfo(gameId);
         final Long memberId = gameMemberRejectedEvent.getMemberId();
         final Member member = getMemberInfo(memberId);
 
         final GameAlarm gameAlarm = GameAlarm.builder()
-                .game(game)
+                .game(gameEntity)
                 .member(member)
                 .gameAlarmType(GUEST_DENIED)
                 .build();
@@ -99,17 +99,17 @@ public class GameAlarmService {
 
     private void validateIsHost(final GameJoinRequestNotificationEvent gameJoinRequestNotificationEvent) {
         final Long gameId = gameJoinRequestNotificationEvent.getGameId();
-        final Game game = gameRepository.findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
+        final GameEntity gameEntity = gameRepository.findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
 
-        if (!game.isHost(gameJoinRequestNotificationEvent.getMemberId())) {
-            throw new GameException(GAME_MEMBER_IS_NOT_HOST, gameId, game.getHostId());
+        if (!gameEntity.isHost(gameJoinRequestNotificationEvent.getMemberId())) {
+            throw new GameException(GAME_MEMBER_IS_NOT_HOST, gameId, gameEntity.getHostId());
         }
     }
 
-    private Game getGameInfo(final Long gameId) {
-        final Game game = gameRepository.findById(gameId)
+    private GameEntity getGameInfo(final Long gameId) {
+        final GameEntity gameEntity = gameRepository.findById(gameId)
                 .orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
-        return game;
+        return gameEntity;
     }
 
     private Member getMemberInfo(final Long memberId) {
