@@ -33,8 +33,8 @@ public class GameResponseMapper {
                 .memberCount(gameDomain.getMemberCount())
                 .maxMemberCount(gameDomain.getMaxMemberCount())
                 .host(MemberResponseMapper.mapToMemberResponseDto(gameDomain.getHost()))
-                .addressDepth1(gameDomain.getAddressDepth1())
-                .addressDepth2(gameDomain.getAddressDepth2())
+                .addressDepth1(gameDomain.getAddressDepth1Name())
+                .addressDepth2(gameDomain.getAddressDepth2Name())
                 .positions(gameDomain.getPositions())
                 .members(memberResponses)
                 .build();

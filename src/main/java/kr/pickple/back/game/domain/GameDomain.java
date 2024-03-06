@@ -39,8 +39,8 @@ public class GameDomain {
     private Integer memberCount;
     private Integer maxMemberCount;
     private MemberDomain host;
-    private String addressDepth1;
-    private String addressDepth2;
+    private String addressDepth1Name;
+    private String addressDepth2Name;
     private List<Position> positions;
     private ChatRoom chatRoom;
 
@@ -59,8 +59,12 @@ public class GameDomain {
             this.status = CLOSED;
         }
     }
-    
+
     public LocalDateTime getPlayEndDatetime() {
         return LocalDateTime.of(playDate, playEndTime);
+    }
+
+    public Boolean isNotEndedGame() {
+        return status != ENDED;
     }
 }
