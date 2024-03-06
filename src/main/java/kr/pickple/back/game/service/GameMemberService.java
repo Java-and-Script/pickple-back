@@ -13,6 +13,7 @@ import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.chat.service.ChatMessageService;

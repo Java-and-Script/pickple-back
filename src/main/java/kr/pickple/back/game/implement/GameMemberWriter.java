@@ -23,6 +23,7 @@ public class GameMemberWriter {
 
     private final GameMemberRepository gameMemberRepository;
     private final GameRepository gameRepository;
+    private final GameMemberReader gameMemberReader;
 
     public GameMember register(final MemberDomain member, final GameDomain game) {
         final Long memberId = member.getMemberId();
@@ -54,4 +55,9 @@ public class GameMemberWriter {
         gameRepository.updateMemberCountAndStatus(game.getGameId(), game.getMemberCount(), game.getStatus());
     }
 
+    public void updateReviewDone(Long loggedInMemberId, Long gameId) {
+        GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+
+        gameMemberRepository.updateReviewDone(gameMember.getGameMemberId(), true);
+    }
 }
