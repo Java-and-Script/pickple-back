@@ -67,4 +67,8 @@ public class GameDomain {
     public Boolean isNotEndedGame() {
         return status != ENDED;
     }
+
+    public Boolean isHost(final Long hostId) {
+        return hostId.equals(this.host.getMemberId());
+    }
 }
