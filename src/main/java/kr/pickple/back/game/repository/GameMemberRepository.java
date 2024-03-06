@@ -4,23 +4,29 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
 
-public interface GameMemberRepository extends JpaRepository<GameMember, Long> {
+public interface GameMemberRepository extends JpaRepository<GameMemberEntity, Long> {
 
-    Optional<GameMember> findByMemberIdAndGameId(final Long memberId, final Long gameId);
+    Optional<GameMemberEntity> findByMemberIdAndGameId(final Long memberId, final Long gameId);
 
-    Optional<GameMember> findByMemberIdAndGameIdAndStatus(
+    Optional<GameMemberEntity> findByMemberIdAndGameIdAndStatus(
             final Long memberId,
             final Long gameId,
             final RegistrationStatus status
     );
 
-    List<GameMember> findAllByMemberIdAndStatus(final Long memberId, final RegistrationStatus memberStatus);
+    List<GameMemberEntity> findAllByMemberIdAndStatus(final Long memberId, final RegistrationStatus memberStatus);
 
-    List<GameMember> findAllByMemberId(final Long memberId);
+    List<GameMemberEntity> findAllByMemberId(final Long memberId);
 
-    List<GameMember> findAllByGameIdAndStatus(final Long gameId, final RegistrationStatus status);
+    List<GameMemberEntity> findAllByGameIdAndStatus(final Long gameId, final RegistrationStatus status);
+
+    Boolean existsByGameIdAndMemberId(final Long gameId, final Long memberId);
+
+    @Query("update GameMemberEntity gm set gm.status = :status where gm.id = :gameMemberId")
+    void updateRegistrationStatus(final Long gameMemberId, final RegistrationStatus status);
 }
