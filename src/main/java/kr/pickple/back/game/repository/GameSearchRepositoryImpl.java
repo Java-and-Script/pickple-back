@@ -12,7 +12,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -21,7 +21,7 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<Game> findGamesWithInDistance(
+    public List<GameEntity> findGamesWithInDistance(
             final Double latitude,
             final Double longitude,
             final Double distance
@@ -53,7 +53,7 @@ public class GameSearchRepositoryImpl implements GameSearchRepository {
     }
 
     @Override
-    public List<Game> findGamesWithInAddress(
+    public List<GameEntity> findGamesWithInAddress(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2
     ) {
