@@ -1,5 +1,5 @@
 ### 게스트 모집하기
-POST http://localhost:8080/games
+POST http://localhost:8080/gameEntities
 Content-Type: application/json
 Authorization:
 
@@ -19,15 +19,15 @@ Authorization:
 }
 
 ### 게스트 모집 상세 조회
-GET http://localhost:8080/games/1
+GET http://localhost:8080/gameEntities/1
 
 ### 게스트 모집 참여 신청
-POST http://localhost:8080/games/38/members
+POST http://localhost:8080/gameEntities/38/members
 Content-Type: application/json
 Authorization:
 
 ### 게스트 모집 참여 신청 수락
-PATCH http://localhost:8080/games/2/members/3
+PATCH http://localhost:8080/gameEntities/2/members/3
 Content-Type: application/json
 Authorization:
 
@@ -36,19 +36,19 @@ Authorization:
 }
 
 ### 게스트 모집 참여 신청 거절/취소
-DELETE http://localhost:8080/games/2/members/3
+DELETE http://localhost:8080/gameEntities/2/members/3
 Authorization:
 
 ### 게스트 모집에 참여 신청된 사용자 정보 목록 조회
-GET http://localhost:8080/games/2/members?status=대기
+GET http://localhost:8080/gameEntities/2/members?status=대기
 Authorization:
 
 ### 게스트 모집에 확정된 사용자 정보 목록 조회
-GET http://localhost:8080/games/2/members?status=확정
+GET http://localhost:8080/gameEntities/2/members?status=확정
 Authorization:
 
 ### 다른 사용자(호스트, 게스트) 매너 스코어 리뷰
-PATCH http://localhost:8080/games/1/members/manner-scores
+PATCH http://localhost:8080/gameEntities/1/members/manner-scores
 Content-Type: application/json
 Authorization:
 
@@ -66,10 +66,10 @@ Authorization:
 }
 
 ### 조건별 게스트 모집글 조회(장소)
-GET http://localhost:8080/games?category=location&value=서울시+영등포구&page=0&size=3
+GET http://localhost:8080/gameEntities?category=location&value=서울시+영등포구&page=0&size=3
 
 ### 위도, 경도, 거리를 통해 해당하는 게스트 모집글 조회
-GET http://localhost:8080/games/by-location?latitude=37.5066680941127&longitude=126.897412723839&distance=1000
+GET http://localhost:8080/gameEntities/by-location?latitude=37.5066680941127&longitude=126.897412723839&distance=1000
 
 ### 사용자의 주 활동지역에 해당하는 게스트 모집글 조회
-GET http://localhost:8080/games/by-address?addressDepth1=서울시&addressDepth2=영등포구
+GET http://localhost:8080/gameEntities/by-address?addressDepth1=서울시&addressDepth2=영등포구

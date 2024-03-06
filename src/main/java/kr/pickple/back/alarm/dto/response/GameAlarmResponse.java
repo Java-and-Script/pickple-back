@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import kr.pickple.back.alarm.domain.GameAlarm;
 import kr.pickple.back.alarm.domain.GameAlarmType;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -30,16 +30,16 @@ public class GameAlarmResponse implements AlarmResponse {
     private final GameAlarmType gameAlarmMessage;
 
     public static GameAlarmResponse from(final GameAlarm gameAlarm) {
-        final Game game = gameAlarm.getGame();
+        final GameEntity gameEntity = gameAlarm.getGameEntity();
 
         return GameAlarmResponse.builder()
                 .gameAlarmId(gameAlarm.getId())
-                .gameId(game.getId())
-                .mainAddress(gameAlarm.getGame().getMainAddress())
+                .gameId(gameEntity.getId())
+                .mainAddress(gameAlarm.getGameEntity().getMainAddress())
                 .createdAt(gameAlarm.getCreatedAt())
-                .playDate(gameAlarm.getGame().getPlayDate())
-                .playStartTime(gameAlarm.getGame().getPlayStartTime())
-                .playTimeMinutes(gameAlarm.getGame().getPlayTimeMinutes())
+                .playDate(gameAlarm.getGameEntity().getPlayDate())
+                .playStartTime(gameAlarm.getGameEntity().getPlayStartTime())
+                .playTimeMinutes(gameAlarm.getGameEntity().getPlayTimeMinutes())
                 .isRead(gameAlarm.getIsRead())
                 .gameAlarmMessage(gameAlarm.getGameAlarmType())
                 .build();

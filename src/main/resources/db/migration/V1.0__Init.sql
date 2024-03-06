@@ -92,7 +92,7 @@ CREATE TABLE IF NOT EXISTS `pickpledev`.`crew_member`
     REFERENCES `pickpledev`.`member` (`id`)
     );
 
-CREATE TABLE IF NOT EXISTS `pickpledev`.`game`
+CREATE TABLE IF NOT EXISTS `pickpledev`.`gameEntity`
 (
     `id`                BIGINT        NOT NULL AUTO_INCREMENT,
     `content`           VARCHAR(1000) NOT NULL,
@@ -137,7 +137,7 @@ CREATE TABLE IF NOT EXISTS `pickpledev`.`game_member`
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_game_TO_game_member_1`
     FOREIGN KEY (`game_id`)
-    REFERENCES `pickpledev`.`game` (`id`),
+    REFERENCES `pickpledev`.`gameEntity` (`id`),
     CONSTRAINT `FK_member_TO_game_member_1`
     FOREIGN KEY (`member_id`)
     REFERENCES `pickpledev`.`member` (`id`)
@@ -153,7 +153,7 @@ CREATE TABLE IF NOT EXISTS `pickpledev`.`game_position`
     PRIMARY KEY (`id`),
     CONSTRAINT `FK_game_TO_game_position_1`
     FOREIGN KEY (`game_id`)
-    REFERENCES `pickpledev`.`game` (`id`)
+    REFERENCES `pickpledev`.`gameEntity` (`id`)
     );
 
 CREATE TABLE IF NOT EXISTS `pickpledev`.`member_position`

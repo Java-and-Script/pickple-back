@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
@@ -42,7 +42,7 @@ public class MemberGameService {
             final RegistrationStatus memberStatus
     ) {
         final Member member = memberReader.readEntityByMemberId(memberId);
-        final List<GameMember> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
+        final List<GameMemberEntity> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
                 memberStatus);
 
         return convertToMemberGameResponses(memberGames, memberStatus);
@@ -53,7 +53,7 @@ public class MemberGameService {
      */
     public List<MemberGameResponse> findAllCreatedGames(final Long memberId) {
         final Member member = memberReader.readEntityByMemberId(memberId);
-        final List<GameMember> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
+        final List<GameMemberEntity> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
         return convertToMemberGameResponses(memberGames, CONFIRMED);
     }
@@ -66,39 +66,39 @@ public class MemberGameService {
             final Long gameId
     ) {
         final Member member = memberReader.readEntityByMemberId(memberId);
-        final Game game = gameRepository.getGameById(gameId);
+        final GameEntity gameEntity = gameRepository.getGameById(gameId);
 
-        final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameId(member.getId(), game.getId())
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, member.getId(), game.getId()));
+        final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameId(member.getId(), gameEntity.getId())
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, member.getId(), gameEntity.getId()));
 
-        return GameMemberRegistrationStatusResponse.of(gameMember.getStatus(), gameMember.isAlreadyReviewDone());
+        return GameMemberRegistrationStatusResponse.of(gameMemberEntity.getStatus(), gameMemberEntity.isAlreadyReviewDone());
     }
-    
+
     private List<MemberGameResponse> convertToMemberGameResponses(
-            final List<GameMember> memberGames,
+            final List<GameMemberEntity> memberGames,
             final RegistrationStatus memberStatus
     ) {
         return memberGames.stream()
                 .map(memberGame -> {
-                    Game game = gameRepository.getGameById(memberGame.getGameId());
+                    GameEntity gameEntity = gameRepository.getGameById(memberGame.getGameId());
                     Member member = memberRepository.getMemberById(memberGame.getMemberId());
 
                     return MemberGameResponse.of(
                             memberGame,
-                            game,
-                            getMemberResponsesByGame(game, memberStatus),
+                            gameEntity,
+                            getMemberResponsesByGame(gameEntity, memberStatus),
                             getPositionsByMember(member),
                             addressReader.readMainAddressById(
-                                    game.getAddressDepth1Id(),
-                                    game.getAddressDepth2Id()
+                                    gameEntity.getAddressDepth1Id(),
+                                    gameEntity.getAddressDepth2Id()
                             )
                     );
                 })
                 .toList();
     }
 
-    private List<MemberResponse> getMemberResponsesByGame(final Game game, final RegistrationStatus memberStatus) {
-        return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), memberStatus)
+    private List<MemberResponse> getMemberResponsesByGame(final GameEntity gameEntity, final RegistrationStatus memberStatus) {
+        return gameMemberRepository.findAllByGameIdAndStatus(gameEntity.getId(), memberStatus)
                 .stream()
                 .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))
                 .map(member -> MemberResponse.of(

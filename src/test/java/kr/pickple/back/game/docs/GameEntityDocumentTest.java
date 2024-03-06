@@ -26,14 +26,14 @@ import com.epages.restdocs.apispec.SimpleType;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.fixture.dto.GameDtoFixtures;
 import kr.pickple.back.game.IntegrationGameTest;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
 import kr.pickple.back.member.domain.Member;
 
 @Transactional
-class GameDocumentTest extends IntegrationGameTest {
+class GameEntityDocumentTest extends IntegrationGameTest {
 
     private static final String BASE_URL = "/games";
 
@@ -104,7 +104,7 @@ class GameDocumentTest extends IntegrationGameTest {
     @DisplayName("조건별(장소) 게스트 모집글 조회")
     void findGamesByCategory_ReturnGameResponses() throws Exception {
         // given
-        final Game game = gameSetup.saveWithConfirmedMembers(3);
+        final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(3);
 
         // when
         final ResultActions resultActions = mockMvc.perform(
@@ -215,10 +215,10 @@ class GameDocumentTest extends IntegrationGameTest {
     @DisplayName("게스트 모집글 상세 조회")
     void findGameById_ReturnGameResponse() throws Exception {
         // given
-        final Game game = gameSetup.saveWithConfirmedMembers(3);
+        final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(3);
 
         // when
-        final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{gameId}", game.getId()))
+        final ResultActions resultActions = mockMvc.perform(get(BASE_URL + "/{gameId}", gameEntity.getId()))
                 .andExpect(status().isOk());
 
         // then
@@ -312,14 +312,14 @@ class GameDocumentTest extends IntegrationGameTest {
         final List<Member> members = memberSetup.save(2);
         final Member host = members.get(0);
         final Member guest = members.get(1);
-        final Game game = gameSetup.save(host);
+        final GameEntity gameEntity = gameSetup.save(host);
 
         final String subject = String.valueOf(guest.getId());
         final AuthTokens authTokens = jwtProvider.createLoginToken(subject);
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        post(BASE_URL + "/{gameId}/members", game.getId())
+                        post(BASE_URL + "/{gameId}/members", gameEntity.getId())
                                 .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                 )
                 .andExpect(status().isNoContent());
@@ -350,15 +350,15 @@ class GameDocumentTest extends IntegrationGameTest {
     @DisplayName("게스트 모집에 참여 신청된 혹은 확정된 사용자 정보 목록 조회")
     void findAllGameMembers_ReturnGameResponseWithWaitingMembers() throws Exception {
         // given
-        final Game game = gameSetup.saveWithWaitingMembers(3);
-        final Member host = game.getHost();
+        final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(3);
+        final Member host = gameEntity.getHost();
 
         final String subject = String.valueOf(host.getId());
         final AuthTokens authTokens = jwtProvider.createLoginToken(subject);
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        get(BASE_URL + "/{gameId}/members", game.getId())
+                        get(BASE_URL + "/{gameId}/members", gameEntity.getId())
                                 .param("status", WAITING.getDescription())
                                 .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken()))
                 .andExpect(status().isOk());
@@ -458,9 +458,9 @@ class GameDocumentTest extends IntegrationGameTest {
     @DisplayName("게스트 모집 참여 신청 수락")
     void updateGameMemberRegistrationStatus_ReturnVoid() throws Exception {
         // given
-        final Game game = gameSetup.saveWithWaitingMembers(2);
-        final Member host = game.getHost();
-        final Member guest = game.getGameMembers()
+        final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(2);
+        final Member host = gameEntity.getHost();
+        final Member guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -473,7 +473,7 @@ class GameDocumentTest extends IntegrationGameTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        patch(BASE_URL + "/{gameId}/members/{memberId}", game.getId(), guest.getId())
+                        patch(BASE_URL + "/{gameId}/members/{memberId}", gameEntity.getId(), guest.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                                 .content(requestBody)
@@ -512,9 +512,9 @@ class GameDocumentTest extends IntegrationGameTest {
     @DisplayName("게스트 모집 참여 신청 거절/취소")
     void deleteGameMember_ReturnVoid() throws Exception {
         // given
-        final Game game = gameSetup.saveWithWaitingMembers(2);
-        final Member host = game.getHost();
-        final Member guest = game.getGameMembers()
+        final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(2);
+        final Member host = gameEntity.getHost();
+        final Member guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -523,7 +523,7 @@ class GameDocumentTest extends IntegrationGameTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        delete(BASE_URL + "/{gameId}/members/{memberId}", game.getId(), guest.getId())
+                        delete(BASE_URL + "/{gameId}/members/{memberId}", gameEntity.getId(), guest.getId())
                                 .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                 )
                 .andExpect(status().isNoContent());
@@ -555,12 +555,12 @@ class GameDocumentTest extends IntegrationGameTest {
     @DisplayName("다른 사용자 매너 스코어 리뷰")
     void reviewMannerScores_ReturnVoid() throws Exception {
         // given
-        final Game game = gameSetup.saveWithConfirmedMembers(3);
-        final Member host = game.getHost();
-        final List<GameMember> gameMembers = game.getGameMembers();
-        final List<Member> guests = gameMembers.subList(1, gameMembers.size())
+        final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(3);
+        final Member host = gameEntity.getHost();
+        final List<GameMemberEntity> gameMemberEntities = gameEntity.getGameMembers();
+        final List<Member> guests = gameMemberEntities.subList(1, gameMemberEntities.size())
                 .stream()
-                .map(GameMember::getMember)
+                .map(GameMemberEntity::getMember)
                 .toList();
 
         final String subject = String.valueOf(host.getId());
@@ -572,7 +572,7 @@ class GameDocumentTest extends IntegrationGameTest {
 
         // when
         final ResultActions resultActions = mockMvc.perform(
-                        patch(BASE_URL + "/{gameId}/members/manner-scores", game.getId())
+                        patch(BASE_URL + "/{gameId}/members/manner-scores", gameEntity.getId())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .header(AUTHORIZATION, "Bearer " + authTokens.getAccessToken())
                                 .content(requestBody)

@@ -17,13 +17,13 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.fixture.domain.GameFixtures;
 import kr.pickple.back.fixture.domain.MemberFixtures;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.Member;
 
 @ExtendWith(MockitoExtension.class)
-public class GameServiceTest {
+public class GameEntityServiceTest {
 
     @InjectMocks
     private GameService gameService;
@@ -45,9 +45,9 @@ public class GameServiceTest {
 
         final Member host = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
 
-        final Game game = GameFixtures.gameBuild(addressDepth1, addressDepth2, host);
+        final GameEntity gameEntity = GameFixtures.gameBuild(addressDepth1, addressDepth2, host);
 
-        given(gameRepository.findById(anyLong())).willReturn(Optional.ofNullable(game));
+        given(gameRepository.findById(anyLong())).willReturn(Optional.ofNullable(gameEntity));
 
         // when
         final GameResponse gameResponse = gameService.findGameById(1L);

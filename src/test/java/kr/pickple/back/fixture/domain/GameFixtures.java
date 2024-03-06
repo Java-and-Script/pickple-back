@@ -14,13 +14,13 @@ import org.locationtech.jts.geom.PrecisionModel;
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 
 public class GameFixtures {
 
-    public static Game gameBuild(
+    public static GameEntity gameBuild(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
             final Member host
@@ -28,7 +28,7 @@ public class GameFixtures {
         final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         final Point point = geometryFactory.createPoint(new Coordinate(37.125, 126.75));
 
-        return Game.builder()
+        return GameEntity.builder()
                 .content("하이하이 즐겜 한 판해요")
                 .playDate(LocalDate.now().minusDays(1))
                 .playStartTime(LocalTime.of(11, 30))

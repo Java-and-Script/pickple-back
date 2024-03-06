@@ -17,7 +17,6 @@ import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.implement.ChatReader;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.implement.CrewReader;
-import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.member.domain.MemberDomain;
 import kr.pickple.back.member.exception.MemberException;

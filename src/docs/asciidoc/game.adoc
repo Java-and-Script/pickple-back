@@ -9,27 +9,27 @@
 ---
 
 === 4.3. 게스트 모집글 상세 조회
-operation::find-game[snippets='http-request,http-response']
+operation::find-gameEntity[snippets='http-request,http-response']
 
 ---
 
 === 4.4. 게스트 모집 참여 신청
-operation::register-gameMember[snippets='http-request,http-response']
+operation::register-gameMemberEntity[snippets='http-request,http-response']
 
 ---
 
 === 4.5. 게스트 모집에 참여 신청된 혹은 확정된 사용자 정보 목록 조회
-operation::find-all-waiting-or-confirmed-gameMembers[snippets='http-request,http-response']
+operation::find-all-waiting-or-confirmed-gameMemberEntities[snippets='http-request,http-response']
 
 ---
 
 === 4.6. 게스트 모집 참여 신청 수락
-operation::confirm-gameMember[snippets='http-request,http-response']
+operation::confirm-gameMemberEntity[snippets='http-request,http-response']
 
 ---
 
 === 4.7. 게스트 모집 참여 신청 거절/취소
-operation::delete-gameMember[snippets='http-request,http-response']
+operation::delete-gameMemberEntity[snippets='http-request,http-response']
 
 ---
 

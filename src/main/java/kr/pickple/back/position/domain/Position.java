@@ -12,7 +12,7 @@ import java.util.stream.Stream;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
-import kr.pickple.back.game.domain.GamePosition;
+import kr.pickple.back.game.repository.entity.GamePosition;
 import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.position.exception.PositionException;
 import lombok.Getter;

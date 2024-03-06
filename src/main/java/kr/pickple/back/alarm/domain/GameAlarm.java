@@ -12,7 +12,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.alarm.util.GameAlarmTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
-import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -38,7 +38,7 @@ public class GameAlarm extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
-    private Game game;
+    private GameEntity gameEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -47,11 +47,11 @@ public class GameAlarm extends BaseEntity {
     @Builder
     private GameAlarm(
             final GameAlarmType gameAlarmType,
-            final Game game,
+            final GameEntity gameEntity,
             final Member member
     ) {
         this.gameAlarmType = gameAlarmType;
-        this.game = game;
+        this.gameEntity = gameEntity;
         this.member = member;
     }
 

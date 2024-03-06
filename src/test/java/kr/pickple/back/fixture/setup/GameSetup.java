@@ -9,12 +9,12 @@ import org.springframework.stereotype.Component;
 
 import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.fixture.domain.GameFixtures;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.repository.GameRepository;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.member.domain.Member;
 
 @Component
@@ -32,45 +32,45 @@ public class GameSetup {
     @Autowired
     private AddressSetup addressSetup;
 
-    public Game save(final Member host) {
+    public GameEntity save(final Member host) {
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
-        final Game game = GameFixtures.gameBuild(addressDepth1, addressDepth2, host);
-        final ChatRoomEntity savedChatRoom = chatRoomRepository.save(GameFixtures.gameChatRoomBuild());
+        final GameEntity gameEntity = GameFixtures.gameBuild(addressDepth1, addressDepth2, host);
+        final ChatRoom savedChatRoom = chatRoomRepository.save(GameFixtures.gameChatRoomBuild());
 
-        game.addGameMember(host);
-        savedChatRoom.updateMaxMemberCount(game.getMaxMemberCount());
-        game.makeNewCrewChatRoom(savedChatRoom);
+        gameEntity.addGameMember(host);
+        savedChatRoom.updateMaxMemberCount(gameEntity.getMaxMemberCount());
+        gameEntity.makeNewGameChatRoom(savedChatRoom);
 
-        final GameMember gameHost = game.getGameMembers().get(0);
+        final GameMemberEntity gameHost = gameEntity.getGameMembers().get(0);
         host.addMemberGame(gameHost);
         gameHost.updateStatus(CONFIRMED);
 
-        return gameRepository.save(game);
+        return gameRepository.save(gameEntity);
     }
 
-    public Game saveWithWaitingMembers(final Integer memberCount) {
+    public GameEntity saveWithWaitingMembers(final Integer memberCount) {
         final List<Member> members = memberSetup.save(memberCount);
-        final Game game = save(members.get(0));
+        final GameEntity gameEntity = save(members.get(0));
         final List<Member> guests = members.subList(1, members.size());
 
-        guests.forEach(game::addGameMember);
+        guests.forEach(gameEntity::addGameMember);
 
-        return game;
+        return gameEntity;
     }
 
-    public Game saveWithConfirmedMembers(final Integer memberCount) {
-        final Game game = saveWithWaitingMembers(memberCount);
-        final Member host = game.getHost();
-        final List<GameMember> gameMembers = game.getGameMembers();
+    public GameEntity saveWithConfirmedMembers(final Integer memberCount) {
+        final GameEntity gameEntity = saveWithWaitingMembers(memberCount);
+        final Member host = gameEntity.getHost();
+        final List<GameMemberEntity> gameMemberEntities = gameEntity.getGameMembers();
 
-        gameMembers.forEach(gameMember -> {
+        gameMemberEntities.forEach(gameMember -> {
             if (!host.equals(gameMember.getMember())) {
                 gameMember.updateStatus(CONFIRMED);
             }
         });
 
-        return game;
+        return gameEntity;
     }
 }

@@ -5,8 +5,8 @@ import java.time.LocalTime;
 import java.util.List;
 
 import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
@@ -41,26 +41,26 @@ public class MemberGameResponse {
     private List<Position> positions;
     private List<MemberResponse> members;
 
-    public static MemberGameResponse of(final GameMember gameMember, final Game game, final List<MemberResponse> memberResponses,
+    public static MemberGameResponse of(final GameMemberEntity gameMemberEntity, final GameEntity gameEntity, final List<MemberResponse> memberResponses,
             final List<Position> positions, final MainAddress mainAddress) {
         return MemberGameResponse.builder()
-                .id(game.getId())
-                .content(game.getContent())
-                .playDate(game.getPlayDate())
-                .playStartTime(game.getPlayStartTime())
-                .playEndTime(game.getPlayEndTime())
-                .playTimeMinutes(game.getPlayTimeMinutes())
-                .mainAddress(game.getMainAddress())
-                .detailAddress(game.getDetailAddress())
-                .latitude(game.getPoint().getY())
-                .longitude(game.getPoint().getX())
-                .status(game.getStatus())
-                .isReviewDone(gameMember.isAlreadyReviewDone())
-                .viewCount(game.getViewCount())
-                .cost(game.getCost())
-                .memberCount(game.getMemberCount())
-                .maxMemberCount(game.getMaxMemberCount())
-                .host(getHostResponse(memberResponses, game.getHostId()))
+                .id(gameEntity.getId())
+                .content(gameEntity.getContent())
+                .playDate(gameEntity.getPlayDate())
+                .playStartTime(gameEntity.getPlayStartTime())
+                .playEndTime(gameEntity.getPlayEndTime())
+                .playTimeMinutes(gameEntity.getPlayTimeMinutes())
+                .mainAddress(gameEntity.getMainAddress())
+                .detailAddress(gameEntity.getDetailAddress())
+                .latitude(gameEntity.getPoint().getY())
+                .longitude(gameEntity.getPoint().getX())
+                .status(gameEntity.getStatus())
+                .isReviewDone(gameMemberEntity.isAlreadyReviewDone())
+                .viewCount(gameEntity.getViewCount())
+                .cost(gameEntity.getCost())
+                .memberCount(gameEntity.getMemberCount())
+                .maxMemberCount(gameEntity.getMaxMemberCount())
+                .host(getHostResponse(memberResponses, gameEntity.getHostId()))
                 .addressDepth1(mainAddress.getAddressDepth1().getName())
                 .addressDepth2(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
