@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.common.util.DateTimeUtil;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
@@ -37,32 +37,32 @@ public class GameReviewMannerScoresService {
             final Long gameId,
             final List<MannerScoreReview> mannerScoreReviews
     ) {
-        final GameMember gameMember = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
+        final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
                         loggedInMemberId,
                         gameId,
                         CONFIRMED
                 )
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, loggedInMemberId));
 
-        if (gameMember.isAlreadyReviewDone()) {
+        if (gameMemberEntity.isAlreadyReviewDone()) {
             throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
         }
 
-        final Game game = gameRepository.getGameById(gameMember.getGameId());
-        final Member loggedInMember = memberRepository.getMemberById(gameMember.getMemberId());
+        final GameEntity gameEntity = gameRepository.getGameById(gameMemberEntity.getGameId());
+        final Member loggedInMember = memberRepository.getMemberById(gameMemberEntity.getMemberId());
 
-        if (isNotReviewPeriod(game)) {
-            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, game.getPlayDate(),
-                    game.getPlayEndTime());
+        if (isNotReviewPeriod(gameEntity)) {
+            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, gameEntity.getPlayDate(),
+                    gameEntity.getPlayEndTime());
         }
 
         mannerScoreReviews.forEach(review -> {
-            final Member reviewedMember = getReviewedMember(game, review.getMemberId());
+            final Member reviewedMember = getReviewedMember(gameEntity, review.getMemberId());
             validateIsSelfReview(loggedInMember, reviewedMember);
             reviewedMember.updateMannerScore(review.getMannerScore());
         });
 
-        gameMember.updateReviewDone();
+        gameMemberEntity.updateReviewDone();
     }
 
     private void validateIsSelfReview(final Member loggedInMember, final Member reviewedMember) {
@@ -71,30 +71,30 @@ public class GameReviewMannerScoresService {
         }
     }
 
-    private Boolean isNotReviewPeriod(final Game game) {
-        return isBeforeThanPlayEndTime(game) || isAfterReviewPossibleTime(game);
+    private Boolean isNotReviewPeriod(final GameEntity gameEntity) {
+        return isBeforeThanPlayEndTime(gameEntity) || isAfterReviewPossibleTime(gameEntity);
     }
 
-    private Boolean isBeforeThanPlayEndTime(final Game game) {
-        return DateTimeUtil.isAfterThanNow(game.getPlayEndDatetime());
+    private Boolean isBeforeThanPlayEndTime(final GameEntity gameEntity) {
+        return DateTimeUtil.isAfterThanNow(gameEntity.getPlayEndDatetime());
     }
 
-    private Boolean isAfterReviewPossibleTime(final Game game) {
-        final LocalDateTime reviewDeadlineDatetime = game.getPlayEndDatetime().plusDays(REVIEW_POSSIBLE_DAYS);
+    private Boolean isAfterReviewPossibleTime(final GameEntity gameEntity) {
+        final LocalDateTime reviewDeadlineDatetime = gameEntity.getPlayEndDatetime().plusDays(REVIEW_POSSIBLE_DAYS);
 
         return DateTimeUtil.isEqualOrAfter(reviewDeadlineDatetime, LocalDateTime.now());
     }
 
-    private Member getReviewedMember(final Game game, final Long reviewedMemberId) {
-        return getConfirmedMembers(game)
+    private Member getReviewedMember(final GameEntity gameEntity, final Long reviewedMemberId) {
+        return getConfirmedMembers(gameEntity)
                 .stream()
                 .filter(confirmedMember -> confirmedMember.getId() == reviewedMemberId)
                 .findFirst()
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
     }
 
-    private List<Member> getConfirmedMembers(Game game) {
-        return gameMemberRepository.findAllByGameIdAndStatus(game.getId(), CONFIRMED)
+    private List<Member> getConfirmedMembers(GameEntity gameEntity) {
+        return gameMemberRepository.findAllByGameIdAndStatus(gameEntity.getId(), CONFIRMED)
                 .stream()
                 .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))
                 .toList();

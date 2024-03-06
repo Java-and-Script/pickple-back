@@ -16,8 +16,7 @@ import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GamePosition;
+import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -66,12 +65,12 @@ public class GameCreateRequest {
     @NotNull(message = "포지션 목록은 null일 수 없음")
     private List<Position> positions;
 
-    public Game toEntity(
+    public GameEntity toEntity(
             final Long hostId,
             final MainAddress mainAddress,
             final Point point
     ) {
-        return Game.builder()
+        return GameEntity.builder()
                 .content(content)
                 .playDate(playDate)
                 .playStartTime(playStartTime)
@@ -86,14 +85,5 @@ public class GameCreateRequest {
                 .addressDepth1Id(mainAddress.getAddressDepth1().getId())
                 .addressDepth2Id(mainAddress.getAddressDepth2().getId())
                 .build();
-    }
-
-    public List<GamePosition> toGamePositionEntities(final Game game) {
-        return positions.stream()
-                .map(position -> GamePosition.builder()
-                        .game(game)
-                        .position(position)
-                        .build()
-                ).toList();
     }
 }

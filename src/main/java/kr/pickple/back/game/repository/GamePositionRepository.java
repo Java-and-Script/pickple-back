@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import kr.pickple.back.game.domain.GamePosition;
+import kr.pickple.back.game.repository.entity.GamePosition;
 
 public interface GamePositionRepository extends JpaRepository<GamePosition, Long> {
 

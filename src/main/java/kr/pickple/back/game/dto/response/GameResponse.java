@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.position.domain.Position;
@@ -39,41 +37,4 @@ public class GameResponse {
     private String addressDepth2;
     private List<Position> positions;
     private List<MemberResponse> members;
-
-    public static GameResponse of(
-            final Game game,
-            final List<MemberResponse> memberResponses,
-            final List<Position> positions,
-            final MainAddress mainAddress
-    ) {
-        return GameResponse.builder()
-                .id(game.getId())
-                .content(game.getContent())
-                .playDate(game.getPlayDate())
-                .playStartTime(game.getPlayStartTime())
-                .playEndTime(game.getPlayEndTime())
-                .playTimeMinutes(game.getPlayTimeMinutes())
-                .mainAddress(game.getMainAddress())
-                .detailAddress(game.getDetailAddress())
-                .latitude(game.getPoint().getY())
-                .longitude(game.getPoint().getX())
-                .status(game.getStatus())
-                .viewCount(game.getViewCount())
-                .cost(game.getCost())
-                .memberCount(game.getMemberCount())
-                .maxMemberCount(game.getMaxMemberCount())
-                .host(getHostResponse(memberResponses, game.getHostId()))
-                .addressDepth1(mainAddress.getAddressDepth1().getName())
-                .addressDepth2(mainAddress.getAddressDepth2().getName())
-                .positions(positions)
-                .members(memberResponses)
-                .build();
-    }
-
-    private static MemberResponse getHostResponse(final List<MemberResponse> memberResponses, final Long hostId) {
-        return memberResponses.stream()
-                .filter(memberResponse -> memberResponse.getId().equals(hostId))
-                .findFirst()
-                .orElseThrow();
-    }
 }
