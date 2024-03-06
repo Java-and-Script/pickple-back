@@ -1,70 +1,29 @@
 package kr.pickple.back.game.domain;
 
-import static java.lang.Boolean.*;
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.common.util.RegistrationStatusAttributeConverter;
+import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GameMember extends BaseEntity {
+@Builder
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class GameMember {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long gameMemberId;
+    private RegistrationStatus status;
+    private MemberDomain member;
+    private GameDomain game;
 
-    @NotNull
-    @Convert(converter = RegistrationStatusAttributeConverter.class)
-    @Column(length = 10)
-    private RegistrationStatus status = WAITING;
+    public void updateGameMemberId(final Long gameMemberId) {
+        this.gameMemberId = gameMemberId;
+    }
 
-    @NotNull
-    private Boolean isReview = FALSE;
-
-    @NotNull
-    private Long memberId;
-
-    @NotNull
-    private Long gameId;
-
-    @Builder
-    private GameMember(final Long memberId, final Long gameId, final RegistrationStatus status) {
+    public void updateRegistrationStatus(final RegistrationStatus status) {
         this.status = status;
-        this.memberId = memberId;
-        this.gameId = gameId;
-    }
-
-    public void confirmRegistration() {
-        this.status = CONFIRMED;
-    }
-
-    public void updateStatus(final RegistrationStatus status) {
-        this.status = status;
-    }
-
-    public Boolean isStatusChangedFromWaitingToConfirmed(RegistrationStatus updateStatus) {
-        return this.status == WAITING && updateStatus == CONFIRMED;
-    }
-
-    public Boolean isAlreadyReviewDone() {
-        return isReview;
-    }
-
-    public void updateReviewDone() {
-        this.isReview = TRUE;
     }
 }
