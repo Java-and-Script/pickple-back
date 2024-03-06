@@ -12,6 +12,7 @@ import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
@@ -71,5 +72,9 @@ public class GameWriter {
         if (distinctPositionsSize != positions.size()) {
             throw new GameException(GAME_POSITIONS_IS_DUPLICATED, positions);
         }
+    }
+
+    public void updateMemberRegistrationStatus(final GameStatus status, final Long gameId) {
+        gameRepository.updateRegistrationStatus(status, gameId);
     }
 }

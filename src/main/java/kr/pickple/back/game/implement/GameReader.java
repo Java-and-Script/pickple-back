@@ -4,6 +4,10 @@ import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +17,7 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GamePositionRepository;
@@ -69,6 +74,37 @@ public class GameReader {
         return gameMemberRepository.findAllByGameIdAndStatus(gameId, status)
                 .stream()
                 .map(gameMemberEntity -> memberReader.readByMemberId(gameMemberEntity.getMemberId()))
+                .toList();
+    }
+
+    public List<GameDomain> findGamesByAddress(final String address, final Pageable pageable) {
+
+        final PageRequest pageRequest = PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(
+                        Sort.Order.asc("playDate"),
+                        Sort.Order.asc("playStartTime"),
+                        Sort.Order.asc("id")
+                )
+        );
+        
+        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(address);
+
+        final Page<GameEntity> games = gameRepository.findByAddressDepth1IdAndAddressDepth2IdAndStatusNot(
+                mainAddress.getAddressDepth1().getId(),
+                mainAddress.getAddressDepth2().getId(),
+                GameStatus.ENDED,
+                pageRequest
+        );
+
+        return games.stream()
+                .map(gameEntity -> GameMapper.mapToGameDomain(
+                        gameEntity,
+                        mainAddress,
+                        memberReader.readByMemberId(gameEntity.getHostId()),
+                        chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId()),
+                        readPositionsByGameId(gameEntity.getId())))
                 .toList();
     }
 }

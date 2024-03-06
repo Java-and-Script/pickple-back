@@ -11,10 +11,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,14 +71,6 @@ public class GameService {
     private final GameWriter gameWriter;
     private final GameMemberWriter gameMemberWriter;
 
-    private static long getSecondsBetween(
-            final LocalDateTime gameCreatedDateTime,
-            final LocalDateTime gamePlayDateTime
-    ) {
-        return Duration.between(gameCreatedDateTime, gamePlayDateTime)
-                .getSeconds();
-    }
-
     /**
      * 게임 생성
      */
@@ -103,7 +92,6 @@ public class GameService {
         final GameMember gameHost = gameMemberWriter.register(host, game);
         gameMemberWriter.updateMemberRegistrationStatus(gameHost, CONFIRMED);
 
-        //9. 게임 상태 업데이트 이벤트를 레디스에 저장(엔티티를 도메인으로 대체하면 됨)
         saveGameStatusUpdateEventToRedis(game);
 
         return GameIdResponse.from(game.getGameId());
@@ -144,6 +132,14 @@ public class GameService {
         return getSecondsBetween(gameCreatedDateTime, gameEndDateTime);
     }
 
+    private static long getSecondsBetween(
+            final LocalDateTime gameCreatedDateTime,
+            final LocalDateTime gamePlayDateTime
+    ) {
+        return Duration.between(gameCreatedDateTime, gamePlayDateTime)
+                .getSeconds();
+    }
+
     private String makeGameStatusUpdateKey(final GameStatus gameStatus, final Long id) {
         return String.format("game:%s:%d", gameStatus.toString(), id);
     }
@@ -153,8 +149,7 @@ public class GameService {
      */
     @Transactional
     public void updateGameStatus(final GameStatus gameStatus, final Long gameId) {
-        final GameEntity gameEntity = gameRepository.getGameById(gameId);
-        gameEntity.updateGameStatus(gameStatus);
+        gameWriter.updateMemberRegistrationStatus(gameStatus, gameId);
     }
 
     /**
@@ -187,33 +182,10 @@ public class GameService {
      * 주소별 게스트 모집글 조회
      */
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
-        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(address);
+        final List<GameDomain> gameDomains = gameReader.findGamesByAddress(address, pageable);
 
-        final PageRequest pageRequest = PageRequest.of(
-                pageable.getPageNumber(),
-                pageable.getPageSize(),
-                Sort.by(
-                        Sort.Order.asc("playDate"),
-                        Sort.Order.asc("playStartTime"),
-                        Sort.Order.asc("id")
-                )
-        );
-
-        final Page<GameEntity> games = gameRepository.findByAddressDepth1IdAndAddressDepth2IdAndStatusNot(
-                mainAddress.getAddressDepth1().getId(),
-                mainAddress.getAddressDepth2().getId(),
-                GameStatus.ENDED,
-                pageRequest
-        );
-
-        return games.stream()
-                .map(game -> GameResponse.of(
-                                game,
-                                getMemberResponsesByStatus(game, CONFIRMED),
-                                getPositionsByGame(game),
-                                addressReader.readMainAddressById(game.getAddressDepth1Id(), game.getAddressDepth2Id())
-                        )
-                )
+        return gameDomains.stream()
+                .map(gameDomain -> GameResponseMapper.mapToGameResponseDto(gameDomain, gameReader.readAllMembersByGameIdAndStatus(gameDomain.getGameId(), CONFIRMED)))
                 .toList();
     }
 
