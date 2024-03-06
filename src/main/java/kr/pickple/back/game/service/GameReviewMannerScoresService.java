@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.domain.GameMemberDomain;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.implement.GameMemberReader;
@@ -45,9 +45,9 @@ public class GameReviewMannerScoresService {
             final Long gameId,
             final List<MannerScoreReview> mannerScoreReviews
     ) {
-        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameMemberDomain gameMemberDomain = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
 
-        if (gameMember.isAlreadyReviewDone()) {
+        if (gameMemberDomain.isAlreadyReviewDone()) {
             throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
         }
 

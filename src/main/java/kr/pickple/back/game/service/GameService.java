@@ -23,7 +23,7 @@ import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.chat.service.ChatRoomService;
 import kr.pickple.back.game.domain.Category;
 import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.domain.GameMemberDomain;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.dto.mapper.GameRequestMapper;
@@ -64,14 +64,6 @@ public class GameService {
     private final GameWriter gameWriter;
     private final GameMemberWriter gameMemberWriter;
 
-    private static long getSecondsBetween(
-            final LocalDateTime gameCreatedDateTime,
-            final LocalDateTime gamePlayDateTime
-    ) {
-        return Duration.between(gameCreatedDateTime, gamePlayDateTime)
-                .getSeconds();
-    }
-
     /**
      * 게임 생성
      */
@@ -90,7 +82,7 @@ public class GameService {
 
         final GameDomain game = gameWriter.create(newGame);
 
-        final GameMember gameHost = gameMemberWriter.register(host, game);
+        final GameMemberDomain gameHost = gameMemberWriter.register(host, game);
         gameMemberWriter.updateMemberRegistrationStatus(gameHost, CONFIRMED);
 
         saveGameStatusUpdateEventToRedis(game);
@@ -131,6 +123,14 @@ public class GameService {
         final LocalDateTime gameEndDateTime = gameDomain.getPlayEndDatetime();
 
         return getSecondsBetween(gameCreatedDateTime, gameEndDateTime);
+    }
+
+    private static long getSecondsBetween(
+            final LocalDateTime gameCreatedDateTime,
+            final LocalDateTime gamePlayDateTime
+    ) {
+        return Duration.between(gameCreatedDateTime, gamePlayDateTime)
+                .getSeconds();
     }
 
     private String makeGameStatusUpdateKey(final GameStatus gameStatus, final Long id) {

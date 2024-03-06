@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.domain.GameMemberDomain;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.entity.GameMemberEntity;
@@ -24,7 +24,7 @@ public class GameMemberReader {
     private final MemberReader memberReader;
     private final GameReader gameReader;
 
-    public GameMember readGameMemberByMemberIdAndGameId(Long loggedInMemberId, Long gameId) {
+    public GameMemberDomain readGameMemberByMemberIdAndGameId(Long loggedInMemberId, Long gameId) {
         final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
                         loggedInMemberId,
                         gameId,
