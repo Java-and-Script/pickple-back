@@ -1,5 +1,7 @@
 package kr.pickple.back.game.domain;
 
+import static java.lang.Boolean.*;
+
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.member.domain.MemberDomain;
 import lombok.AccessLevel;
@@ -18,6 +20,7 @@ public class GameMember {
     private RegistrationStatus status;
     private MemberDomain member;
     private GameDomain game;
+    private Boolean isReview = FALSE;
 
     public void updateGameMemberId(final Long gameMemberId) {
         this.gameMemberId = gameMemberId;
@@ -25,5 +28,9 @@ public class GameMember {
 
     public void updateRegistrationStatus(final RegistrationStatus status) {
         this.status = status;
+    }
+
+    public Boolean isAlreadyReviewDone() {
+        return isReview;
     }
 }

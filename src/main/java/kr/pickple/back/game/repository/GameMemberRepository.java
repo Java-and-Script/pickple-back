@@ -29,4 +29,7 @@ public interface GameMemberRepository extends JpaRepository<GameMemberEntity, Lo
 
     @Query("update GameMemberEntity gm set gm.status = :status where gm.id = :gameMemberId")
     void updateRegistrationStatus(final Long gameMemberId, final RegistrationStatus status);
+
+    @Query("update GameMemberEntity gm set gm.isReview = :isReview where gm.id = :gameMemberId")
+    void updateReviewDone(Long gameMemberId, Boolean isReview);
 }
