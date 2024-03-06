@@ -1,4 +1,4 @@
-package kr.pickple.back.game.domain;
+package kr.pickple.back.game.repository.entity;
 
 import static kr.pickple.back.game.domain.GameStatus.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
@@ -18,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.common.domain.BaseEntity;
+import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
 import lombok.AccessLevel;
@@ -28,7 +29,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Game extends BaseEntity {
+public class GameEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -90,7 +91,7 @@ public class Game extends BaseEntity {
     private Long chatRoomId;
 
     @Builder
-    private Game(
+    private GameEntity(
             final String content,
             final LocalDate playDate,
             final LocalTime playStartTime,
@@ -103,7 +104,8 @@ public class Game extends BaseEntity {
             final Long hostId,
             final Point point,
             final Long addressDepth1Id,
-            final Long addressDepth2Id
+            final Long addressDepth2Id,
+            final Long chatRoomId
     ) {
         this.content = content;
         this.playDate = playDate;
@@ -118,6 +120,7 @@ public class Game extends BaseEntity {
         this.point = point;
         this.addressDepth1Id = addressDepth1Id;
         this.addressDepth2Id = addressDepth2Id;
+        this.chatRoomId = chatRoomId;
     }
 
     public void updateGameStatus(final GameStatus gameStatus) {
