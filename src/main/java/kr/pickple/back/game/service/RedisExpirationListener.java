@@ -7,6 +7,7 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.stereotype.Component;
 
 import kr.pickple.back.game.domain.GameStatus;
+import kr.pickple.back.game.implement.GameWriter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -14,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @RequiredArgsConstructor
 public class RedisExpirationListener implements MessageListener {
-
-    private final GameService gameService;
+    
+    private final GameWriter gameWriter;
 
     @Override
     public void onMessage(final Message message, final byte[] pattern) {
@@ -26,7 +27,7 @@ public class RedisExpirationListener implements MessageListener {
             final GameStatus gameStatus = GameStatus.valueOf(stringTokenizer.nextToken());
             final Long gameId = Long.parseLong(stringTokenizer.nextToken());
 
-            gameService.updateGameStatus(gameStatus, gameId);
+            gameWriter.updateMemberRegistrationStatus(gameStatus, gameId);
         }
     }
 }
