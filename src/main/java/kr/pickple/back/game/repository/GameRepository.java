@@ -30,4 +30,7 @@ public interface GameRepository extends JpaRepository<GameEntity, Long>, GameSea
 
     @Query("update GameEntity g set g.memberCount = :memberCount, g.status = :status where g.id = :gameId")
     void updateMemberCountAndStatus(final Long gameId, final Integer memberCount, final GameStatus status);
+
+    @Query("update GameEntity g set g.status = :status where g.id = :gameId")
+    void updateRegistrationStatus(final GameStatus status, final Long gameId);
 }
