@@ -40,8 +40,8 @@ public class GameMapper {
                 .memberCount(gameEntity.getMemberCount())
                 .maxMemberCount(gameEntity.getMaxMemberCount())
                 .host(host)
-                .addressDepth1(mainAddress.getAddressDepth1().getName())
-                .addressDepth2(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
+                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
                 .chatRoom(chatRoom)
                 .build();

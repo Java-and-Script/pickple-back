@@ -88,20 +88,52 @@ public class GameReader {
                         Sort.Order.asc("id")
                 )
         );
-        
+
         final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(address);
 
-        final Page<GameEntity> games = gameRepository.findByAddressDepth1IdAndAddressDepth2IdAndStatusNot(
+        final Page<GameEntity> gameEntities = gameRepository.findByAddressDepth1IdAndAddressDepth2IdAndStatusNot(
                 mainAddress.getAddressDepth1().getId(),
                 mainAddress.getAddressDepth2().getId(),
                 GameStatus.ENDED,
                 pageRequest
         );
 
-        return games.stream()
+        return gameEntities.stream()
                 .map(gameEntity -> GameMapper.mapToGameDomain(
                         gameEntity,
                         mainAddress,
+                        memberReader.readByMemberId(gameEntity.getHostId()),
+                        chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId()),
+                        readPositionsByGameId(gameEntity.getId())))
+                .toList();
+    }
+
+    public List<GameDomain> findGamesWithInAddress(MainAddress mainAddress) {
+        final List<GameEntity> gameEntities = gameRepository.findGamesWithInAddress(
+                mainAddress.getAddressDepth1(),
+                mainAddress.getAddressDepth2()
+        );
+
+        return gameEntities.stream()
+                .map(gameEntity -> GameMapper.mapToGameDomain(
+                        gameEntity,
+                        mainAddress,
+                        memberReader.readByMemberId(gameEntity.getHostId()),
+                        chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId()),
+                        readPositionsByGameId(gameEntity.getId())))
+                .toList();
+    }
+
+    public List<GameDomain> findGamesWithInDistance(Double latitude, Double longitude, Double distance) {
+        final List<GameEntity> gameEntities = gameRepository.findGamesWithInDistance(latitude, longitude, distance);
+
+        return gameEntities.stream()
+                .map(gameEntity -> GameMapper.mapToGameDomain(
+                        gameEntity,
+                        addressReader.readMainAddressById(
+                                gameEntity.getAddressDepth1Id(),
+                                gameEntity.getAddressDepth2Id()
+                        ),
                         memberReader.readByMemberId(gameEntity.getHostId()),
                         chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId()),
                         readPositionsByGameId(gameEntity.getId())))
