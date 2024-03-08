@@ -6,10 +6,8 @@ import org.locationtech.jts.geom.Point;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.repository.entity.GamePosition;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
@@ -78,19 +76,5 @@ public final class GameMapper {
                         .position(position)
                         .build()
                 ).toList();
-    }
-
-    public static GameMember mapGameMemberEntityToDomain(
-            final GameMemberEntity gameMemberEntity,
-            final Member member,
-            final Game game
-    ) {
-        return GameMember.builder()
-                .gameMemberId(gameMemberEntity.getId())
-                .status(gameMemberEntity.getStatus())
-                .member(member)
-                .game(game)
-                .isReview(gameMemberEntity.isReviewDone())
-                .build();
     }
 }

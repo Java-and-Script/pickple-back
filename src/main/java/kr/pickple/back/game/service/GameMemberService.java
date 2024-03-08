@@ -58,7 +58,7 @@ public class GameMemberService {
             final Long gameId,
             final RegistrationStatus status
     ) {
-        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(loggedInMemberId, gameId);
         final Game game = gameMember.getGame();
         final Member member = gameMember.getMember();
 
@@ -66,7 +66,7 @@ public class GameMemberService {
             throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
         }
 
-        final List<Member> members = gameReader.readAllMembersByGameIdAndStatus(gameId, status);
+        final List<Member> members = gameMemberReader.readMembersByGameIdAndStatus(gameId, status);
 
         return GameResponseMapper.mapToGameResponseDto(game, members);
     }
@@ -78,7 +78,7 @@ public class GameMemberService {
             final Long memberId,
             final RegistrationStatus newRegistrationStatus
     ) {
-        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(loggedInMemberId, gameId);
         final Game game = gameMember.getGame();
 
         if (!game.isHost(loggedInMemberId)) {
@@ -96,7 +96,7 @@ public class GameMemberService {
 
     @Transactional
     public void deleteGameMember(final Long loggedInMemberId, final Long gameId, final Long memberId) {
-        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(memberId, gameId);
+        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(memberId, gameId);
         final Game game = gameMember.getGame();
 
         if (game.isHost(loggedInMemberId)) {

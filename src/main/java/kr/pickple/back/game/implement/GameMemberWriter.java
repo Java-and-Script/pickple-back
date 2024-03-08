@@ -58,7 +58,7 @@ public class GameMemberWriter {
     }
 
     public void updateReviewDone(final Long memberId, final Long gameId) {
-        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(memberId, gameId);
+        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(memberId, gameId);
 
         gameMemberRepository.updateReviewDone(gameMember.getGameMemberId(), true);
     }

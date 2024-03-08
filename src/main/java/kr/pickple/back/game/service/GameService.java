@@ -30,6 +30,7 @@ import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.response.GameIdResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
+import kr.pickple.back.game.implement.GameMemberReader;
 import kr.pickple.back.game.implement.GameMemberWriter;
 import kr.pickple.back.game.implement.GameReader;
 import kr.pickple.back.game.implement.GameWriter;
@@ -45,6 +46,7 @@ public class GameService {
     private final AddressReader addressReader;
     private final MemberReader memberReader;
     private final GameReader gameReader;
+    private final GameMemberReader gameMemberReader;
     private final GameWriter gameWriter;
     private final GameMemberWriter gameMemberWriter;
     private final ChatWriter chatWriter;
@@ -111,7 +113,7 @@ public class GameService {
     @Transactional
     public GameResponse findGameById(final Long gameId) {
         final Game game = gameReader.read(gameId);
-        final List<Member> members = gameReader.readAllMembersByGameIdAndStatus(gameId, CONFIRMED);
+        final List<Member> members = gameMemberReader.readMembersByGameIdAndStatus(gameId, CONFIRMED);
 
         return GameResponseMapper.mapToGameResponseDto(game, members);
     }
@@ -135,12 +137,12 @@ public class GameService {
      * 주소별 게스트 모집글 조회
      */
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
-        final List<Game> games = gameReader.findGamesByAddress(address, pageable);
+        final List<Game> games = gameReader.readAllByAddress(address, pageable);
 
         return games.stream()
                 .map(game -> GameResponseMapper.mapToGameResponseDto(
                                 game,
-                                gameReader.readAllMembersByGameIdAndStatus(game.getGameId(), CONFIRMED)
+                                gameMemberReader.readMembersByGameIdAndStatus(game.getGameId(), CONFIRMED)
                         )
                 ).toList();
     }
@@ -153,13 +155,13 @@ public class GameService {
             final Double longitude,
             final Double distance
     ) {
-        final List<Game> games = gameReader.findGamesWithInDistance(latitude, longitude, distance);
+        final List<Game> games = gameReader.readAllWithInDistance(latitude, longitude, distance);
 
         return games.stream()
                 .filter(Game::isNotEndedGame)
                 .map(game -> GameResponseMapper.mapToGameResponseDto(
                                 game,
-                                gameReader.readAllMembersByGameIdAndStatus(game.getGameId(), CONFIRMED)
+                                gameMemberReader.readMembersByGameIdAndStatus(game.getGameId(), CONFIRMED)
                         )
                 ).toList();
     }
