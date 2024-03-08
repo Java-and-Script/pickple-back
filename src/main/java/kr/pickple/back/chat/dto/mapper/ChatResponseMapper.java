@@ -12,7 +12,7 @@ import kr.pickple.back.chat.dto.response.ChatRoomResponse;
 import kr.pickple.back.chat.dto.response.PersonalChatRoomStatusResponse;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -39,8 +39,8 @@ public final class ChatResponseMapper {
     }
 
     public static ChatRoomDetailResponse mapToPersonalChatRoomDetailResponseDto(
-            final MemberDomain sender,
-            final MemberDomain receiver,
+            final Member sender,
+            final Member receiver,
             final ChatRoom chatRoom
     ) {
         final List<ChatMemberResponse> chatMemberResponses = List.of(
@@ -64,7 +64,7 @@ public final class ChatResponseMapper {
     public static ChatRoomDetailResponse mapToCrewChatRoomDetailResponseDto(
             final Crew crew,
             final ChatRoom chatRoom,
-            final List<MemberDomain> members
+            final List<Member> members
     ) {
         final List<ChatMemberResponse> chatMemberResponses = members.stream()
                 .map(ChatResponseMapper::mapToChatMemberResponseDto)
@@ -86,7 +86,7 @@ public final class ChatResponseMapper {
     public static ChatRoomDetailResponse mapToGameChatRoomDetailResponseDto(
             final Game game,
             final ChatRoom chatRoom,
-            final List<MemberDomain> members
+            final List<Member> members
     ) {
         final List<ChatMemberResponse> chatMemberResponses = members.stream()
                 .map(ChatResponseMapper::mapToChatMemberResponseDto)
@@ -96,7 +96,7 @@ public final class ChatResponseMapper {
                 .id(chatRoom.getChatRoomId())
                 .roomName(chatRoom.getName())
                 .type(chatRoom.getType())
-                .domainId(game.getId())
+                .domainId(game.getGameId())
                 .memberCount(chatRoom.getMemberCount())
                 .maxMemberCount(chatRoom.getMaxMemberCount())
                 .playStartTime(game.getPlayStartTime())
@@ -106,7 +106,7 @@ public final class ChatResponseMapper {
                 .build();
     }
 
-    public static ChatMemberResponse mapToChatMemberResponseDto(final MemberDomain member) {
+    public static ChatMemberResponse mapToChatMemberResponseDto(final Member member) {
         return ChatMemberResponse.builder()
                 .id(member.getMemberId())
                 .nickname(member.getNickname())

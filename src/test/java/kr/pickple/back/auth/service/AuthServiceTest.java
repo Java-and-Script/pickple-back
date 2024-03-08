@@ -31,7 +31,7 @@ import kr.pickple.back.auth.service.memberclient.OauthMemberClientComposite;
 import kr.pickple.back.fixture.domain.AddressFixtures;
 import kr.pickple.back.fixture.domain.AuthFixtures;
 import kr.pickple.back.fixture.domain.MemberFixtures;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.repository.MemberRepository;
 
@@ -88,7 +88,7 @@ class AuthServiceTest {
         final OauthMember oauthMember = AuthFixtures.oauthMemberBuild();
         final AddressDepth1 addressDepth1 = AddressFixtures.addressDepth1Build();
         final AddressDepth2 addressDepth2 = AddressFixtures.addressDepth2Build();
-        final Member member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
+        final MemberEntity member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
         final AuthTokens loginTokens = AuthFixtures.authTokensBuild();
         final Long refreshTokenExpirationTime = 10000L;
 
@@ -125,7 +125,7 @@ class AuthServiceTest {
         // given
         final String authCode = "authCode";
         final OauthMember oauthMember = AuthFixtures.oauthMemberBuild();
-        final Member member = null;
+        final MemberEntity member = null;
         final AuthTokens registerToken = AuthFixtures.authTokensBuild();
 
         given(memberRepository.findByOauthId(anyLong())).willReturn(Optional.ofNullable(member));

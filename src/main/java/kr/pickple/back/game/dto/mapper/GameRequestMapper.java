@@ -9,7 +9,7 @@ import kr.pickple.back.game.dto.request.GameCreateRequest;
 public class GameRequestMapper {
 
     public static NewGame mapToNewGameDomain(final GameCreateRequest gameCreateRequest, final MainAddress mainAddress) {
-        LocalTime playEndTime = gameCreateRequest.getPlayStartTime()
+        final LocalTime playEndTime = gameCreateRequest.getPlayStartTime()
                 .plusMinutes(gameCreateRequest.getPlayTimeMinutes());
 
         return NewGame.builder()
@@ -23,8 +23,8 @@ public class GameRequestMapper {
                 .cost(gameCreateRequest.getCost())
                 .maxMemberCount(gameCreateRequest.getMaxMemberCount())
                 .positions(gameCreateRequest.getPositions())
-                .addressDepth1(mainAddress.getAddressDepth1().getName())
-                .addressDepth2(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
+                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
                 .build();
     }
 }

@@ -5,7 +5,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class NewGame {
     private List<Position> positions;
     private String addressDepth1Name;
     private String addressDepth2Name;
-    private MemberDomain host;
+    private Member host;
     private ChatRoom chatRoom;
 
     @Builder
@@ -60,7 +60,7 @@ public class NewGame {
         this.addressDepth2Name = addressDepth2Name;
     }
 
-    public void assignHost(final MemberDomain host) {
+    public void assignHost(final Member host) {
         this.host = host;
     }
 

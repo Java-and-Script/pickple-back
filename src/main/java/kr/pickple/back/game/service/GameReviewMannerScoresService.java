@@ -9,18 +9,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.common.util.DateTimeUtil;
-import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMemberDomain;
+import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.implement.GameMemberReader;
 import kr.pickple.back.game.implement.GameMemberWriter;
-import kr.pickple.back.game.implement.GameReader;
 import kr.pickple.back.game.implement.GameWriter;
-import kr.pickple.back.game.repository.GameMemberRepository;
-import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.implement.MemberReader;
-import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -30,13 +25,8 @@ public class GameReviewMannerScoresService {
 
     private static final int REVIEW_POSSIBLE_DAYS = 7;
 
-    private final GameMemberRepository gameMemberRepository;
-    private final GameRepository gameRepository;
-    private final MemberRepository memberRepository;
-    private final GameMemberReader gameMemberReader;
-    private final GameReader gameReader;
-    private final MemberReader memberReader;
     private final GameWriter gameWriter;
+    private final GameMemberReader gameMemberReader;
     private final GameMemberWriter gameMemberWriter;
 
     @Transactional
@@ -45,35 +35,37 @@ public class GameReviewMannerScoresService {
             final Long gameId,
             final List<MannerScoreReview> mannerScoreReviews
     ) {
-        final GameMemberDomain gameMemberDomain = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
 
-        if (gameMemberDomain.isAlreadyReviewDone()) {
+        if (gameMember.isAlreadyReviewDone()) {
             throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
         }
 
-        // --
+        final Game game = gameMember.getGame();
+        final LocalDateTime gamePlayEndDateTime = game.getPlayEndDatetime();
 
-        final GameDomain gameDomain = gameReader.read(gameId);
-        if (isNotReviewPeriod(gameDomain)) {
-            throw new GameException(GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD, gameDomain.getPlayDate(),
-                    gameDomain.getPlayEndTime());
+        if (isNotReviewPeriod(gamePlayEndDateTime)) {
+            throw new GameException(
+                    GAME_MEMBERS_CAN_REVIEW_DURING_POSSIBLE_PERIOD,
+                    game.getPlayDate(),
+                    game.getPlayEndTime()
+            );
         }
 
-        // --
         gameWriter.reviewMannerScores(loggedInMemberId, gameId, mannerScoreReviews);
         gameMemberWriter.updateReviewDone(loggedInMemberId, gameId);
     }
 
-    private Boolean isNotReviewPeriod(final GameDomain gameDomain) {
-        return isBeforeThanPlayEndTime(gameDomain) || isAfterReviewPossibleTime(gameDomain);
+    private Boolean isNotReviewPeriod(final LocalDateTime gamePlayEndDateTime) {
+        return isBeforeThanPlayEndTime(gamePlayEndDateTime) || isAfterReviewPossibleTime(gamePlayEndDateTime);
     }
 
-    private Boolean isBeforeThanPlayEndTime(final GameDomain gameDomain) {
-        return DateTimeUtil.isAfterThanNow(gameDomain.getPlayEndDatetime());
+    private Boolean isBeforeThanPlayEndTime(final LocalDateTime gamePlayEndDateTime) {
+        return DateTimeUtil.isAfterThanNow(gamePlayEndDateTime);
     }
 
-    private Boolean isAfterReviewPossibleTime(final GameDomain gameDomain) {
-        final LocalDateTime reviewDeadlineDatetime = gameDomain.getPlayEndDatetime().plusDays(REVIEW_POSSIBLE_DAYS);
+    private Boolean isAfterReviewPossibleTime(final LocalDateTime gamePlayEndDateTime) {
+        final LocalDateTime reviewDeadlineDatetime = gamePlayEndDateTime.plusDays(REVIEW_POSSIBLE_DAYS);
 
         return DateTimeUtil.isEqualOrAfter(reviewDeadlineDatetime, LocalDateTime.now());
     }

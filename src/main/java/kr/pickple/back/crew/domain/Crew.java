@@ -3,8 +3,9 @@ package kr.pickple.back.crew.domain;
 import static kr.pickple.back.crew.domain.CrewStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
+import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.exception.CrewException;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,13 +24,14 @@ public class Crew {
     private Integer memberCount;
     private Integer maxMemberCount;
     private CrewStatus status = OPEN;
-    private MemberDomain leader;
+    private Member leader;
     private String addressDepth1Name;
     private String addressDepth2Name;
     private String profileImageUrl;
     private String backgroundImageUrl;
     private Integer likeCount;
     private Integer competitionPoint;
+    private ChatRoom chatRoom;
 
     public void increaseMemberCount() {
         if (status == CLOSED) {

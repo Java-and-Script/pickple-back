@@ -20,7 +20,7 @@ import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 @ExtendWith(MockitoExtension.class)
 public class GameEntityServiceTest {
@@ -43,7 +43,7 @@ public class GameEntityServiceTest {
                 .addressDepth1(addressDepth1)
                 .build();
 
-        final Member host = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
+        final MemberEntity host = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
 
         final GameEntity gameEntity = GameFixtures.gameBuild(addressDepth1, addressDepth2, host);
 

@@ -27,7 +27,7 @@ import kr.pickple.back.chat.IntegrationChatTest;
 import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.fixture.dto.ChatDtoFixtures;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 @Transactional
 class ChatRoomEntityDocumentTest extends IntegrationChatTest {
@@ -38,9 +38,9 @@ class ChatRoomEntityDocumentTest extends IntegrationChatTest {
     @DisplayName("새 1:1 채팅방 생성")
     void createPersonalRoom_ReturnChatRoomDetailResponse() throws Exception {
         // given
-        final List<Member> members = memberSetup.save(2);
-        final Member sender = members.get(0);
-        final Member receiver = members.get(1);
+        final List<MemberEntity> members = memberSetup.save(2);
+        final MemberEntity sender = members.get(0);
+        final MemberEntity receiver = members.get(1);
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());
@@ -117,9 +117,9 @@ class ChatRoomEntityDocumentTest extends IntegrationChatTest {
     @DisplayName("특정 사용자와의 1:1 채팅방 존재 여부 조회")
     void findActivePersonalChatRoomWithReceiver_ReturnPersonalChatRoomExistedResponse() throws Exception {
         // given
-        final List<Member> members = memberSetup.save(2);
-        final Member sender = members.get(0);
-        final Member receiver = members.get(1);
+        final List<MemberEntity> members = memberSetup.save(2);
+        final MemberEntity sender = members.get(0);
+        final MemberEntity receiver = members.get(1);
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());
@@ -168,10 +168,10 @@ class ChatRoomEntityDocumentTest extends IntegrationChatTest {
     @DisplayName("채팅방 타입에 따른 참여중인 모든 채팅방 목록 조회")
     void findAllActiveChatRoomsByType_ReturnChatRoomResponses() throws Exception {
         // given
-        final List<Member> members = memberSetup.save(3);
-        final Member sender = members.get(0);
-        final Member receiver1 = members.get(1);
-        final Member receiver2 = members.get(2);
+        final List<MemberEntity> members = memberSetup.save(3);
+        final MemberEntity sender = members.get(0);
+        final MemberEntity receiver1 = members.get(1);
+        final MemberEntity receiver2 = members.get(2);
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest1 = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver1.getId());
@@ -241,9 +241,9 @@ class ChatRoomEntityDocumentTest extends IntegrationChatTest {
     @DisplayName("단일 채팅방 정보 상세 조회")
     void findChatRoomById_ReturnChatRoomDetailResponse() throws Exception {
         // given
-        final List<Member> members = memberSetup.save(2);
-        final Member sender = members.get(0);
-        final Member receiver = members.get(1);
+        final List<MemberEntity> members = memberSetup.save(2);
+        final MemberEntity sender = members.get(0);
+        final MemberEntity receiver = members.get(1);
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());

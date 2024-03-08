@@ -13,7 +13,7 @@ import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.alarm.util.CrewAlarmTypeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -42,13 +42,13 @@ public class CrewAlarm extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
-    private Member member;
+    private MemberEntity member;
 
     @Builder
     private CrewAlarm(
             final CrewAlarmType crewAlarmType,
             final CrewEntity crew,
-            final Member member
+            final MemberEntity member
     ) {
         this.crewAlarmType = crewAlarmType;
         this.crew = crew;

@@ -21,7 +21,7 @@ import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 @Transactional
 class GameEntityControllerTest extends IntegrationGameTest {
@@ -33,8 +33,8 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void findGameDetailsById_ReturnGameResponse() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(2);
-        final Member host = gameEntity.getHost();
-        final Member guest = gameEntity.getGameMembers()
+        final MemberEntity host = gameEntity.getHost();
+        final MemberEntity guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -79,9 +79,9 @@ class GameEntityControllerTest extends IntegrationGameTest {
     @DisplayName("사용자는 게스트 모집글에 참여 신청을 할 수 있다.")
     void registerGameMember_Success() throws Exception {
         // given
-        final List<Member> members = memberSetup.save(2);
-        final Member host = members.get(0);
-        final Member guest = members.get(1);
+        final List<MemberEntity> members = memberSetup.save(2);
+        final MemberEntity host = members.get(0);
+        final MemberEntity guest = members.get(1);
         final GameEntity gameEntity = gameSetup.save(host);
 
         final String subject = String.valueOf(guest.getId());
@@ -102,8 +102,8 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void findAllGameMembers_WaitingStatus_ReturnGameResponse() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(2);
-        final Member host = gameEntity.getHost();
-        final Member guest = gameEntity.getGameMembers()
+        final MemberEntity host = gameEntity.getHost();
+        final MemberEntity guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -155,8 +155,8 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void findAllGameMembers_ConfirmedStatus_ReturnGameResponse() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(2);
-        final Member host = gameEntity.getHost();
-        final Member guest = gameEntity.getGameMembers()
+        final MemberEntity host = gameEntity.getHost();
+        final MemberEntity guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -209,8 +209,8 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void updateGameMemberRegistrationStatus_Success() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(2);
-        final Member host = gameEntity.getHost();
-        final Member guest = gameEntity.getGameMembers()
+        final MemberEntity host = gameEntity.getHost();
+        final MemberEntity guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -238,8 +238,8 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void deleteGameMember_Host_Success() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(2);
-        final Member host = gameEntity.getHost();
-        final Member guest = gameEntity.getGameMembers()
+        final MemberEntity host = gameEntity.getHost();
+        final MemberEntity guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -261,7 +261,7 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void deleteGameMember_GuestSelf_Success() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithWaitingMembers(2);
-        final Member guest = gameEntity.getGameMembers()
+        final MemberEntity guest = gameEntity.getGameMembers()
                 .get(1)
                 .getMember();
 
@@ -283,9 +283,9 @@ class GameEntityControllerTest extends IntegrationGameTest {
     void reviewMannerScores_Success() throws Exception {
         // given
         final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(3);
-        final Member host = gameEntity.getHost();
+        final MemberEntity host = gameEntity.getHost();
         final List<GameMemberEntity> gameMemberEntities = gameEntity.getGameMembers();
-        final List<Member> guests = gameMemberEntities.subList(1, gameMemberEntities.size())
+        final List<MemberEntity> guests = gameMemberEntities.subList(1, gameMemberEntities.size())
                 .stream()
                 .map(GameMemberEntity::getMember)
                 .toList();

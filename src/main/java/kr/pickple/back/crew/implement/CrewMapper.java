@@ -9,7 +9,7 @@ import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.domain.NewCrew;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -26,14 +26,14 @@ public final class CrewMapper {
                 .backgroundImageUrl(newCrew.getBackgroundImageUrl())
                 .addressDepth1Id(mainAddress.getAddressDepth1().getId())
                 .addressDepth2Id(mainAddress.getAddressDepth2().getId())
-                .chatRoomId(newCrew.getChatRoom().getId())
+                .chatRoomId(newCrew.getChatRoom().getChatRoomId())
                 .build();
     }
 
     public static Crew mapCrewEntityToDomain(
             final CrewEntity crewEntity,
             final MainAddress mainAddress,
-            final MemberDomain leader
+            final Member leader
     ) {
         return Crew.builder()
                 .crewId(crewEntity.getId())
@@ -61,7 +61,7 @@ public final class CrewMapper {
 
     public static CrewMember mapCrewMemberEntityToDomain(
             final CrewMemberEntity crewMemberEntity,
-            final MemberDomain member,
+            final Member member,
             final Crew crew
     ) {
         return CrewMember.builder()
@@ -75,8 +75,8 @@ public final class CrewMapper {
     public static CrewProfile mapCrewEntityToCrewProfile(
             final CrewEntity crewEntity,
             final MainAddress mainAddress,
-            final MemberDomain leader,
-            final List<MemberDomain> members
+            final Member leader,
+            final List<Member> members
     ) {
         return CrewProfile.builder()
                 .crewId(crewEntity.getId())

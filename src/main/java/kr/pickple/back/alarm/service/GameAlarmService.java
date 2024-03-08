@@ -23,7 +23,7 @@ import kr.pickple.back.alarm.repository.GameAlarmRepository;
 import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class GameAlarmService {
 
         final Long gameId = gameJoinRequestNotificationEvent.getGameId();
         final GameEntity gameEntity = getGameInfo(gameId);
-        final Member host = getMemberInfo(gameEntity.getHostId());
+        final MemberEntity host = getMemberInfo(gameEntity.getHostId());
 
         final GameAlarm gameAlarm = GameAlarm.builder()
                 .game(gameEntity)
@@ -63,7 +63,7 @@ public class GameAlarmService {
         final Long gameId = gameMemberJoinedEvent.getGameId();
         final GameEntity gameEntity = getGameInfo(gameId);
         final Long memberId = gameMemberJoinedEvent.getMemberId();
-        final Member member = getMemberInfo(memberId);
+        final MemberEntity member = getMemberInfo(memberId);
 
         final GameAlarm gameAlarm = GameAlarm.builder()
                 .game(gameEntity)
@@ -83,7 +83,7 @@ public class GameAlarmService {
         final Long gameId = gameMemberRejectedEvent.getGameId();
         final GameEntity gameEntity = getGameInfo(gameId);
         final Long memberId = gameMemberRejectedEvent.getMemberId();
-        final Member member = getMemberInfo(memberId);
+        final MemberEntity member = getMemberInfo(memberId);
 
         final GameAlarm gameAlarm = GameAlarm.builder()
                 .game(gameEntity)
@@ -112,7 +112,7 @@ public class GameAlarmService {
         return gameEntity;
     }
 
-    private Member getMemberInfo(final Long memberId) {
+    private MemberEntity getMemberInfo(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
@@ -155,13 +155,13 @@ public class GameAlarmService {
             final Long gameAlarmId,
             final GameAlarmUpdateStatusRequest gameAlarmUpdateStatusRequest
     ) {
-        final Member member = findMemberById(loggedInMemberId);
+        final MemberEntity member = findMemberById(loggedInMemberId);
         final GameAlarm gameAlarm = checkExistGameAlarm(loggedInMemberId, gameAlarmId);
 
         gameAlarm.updateStatus(gameAlarmUpdateStatusRequest.getIsRead());
     }
 
-    private Member findMemberById(final Long memberId) {
+    private MemberEntity findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }

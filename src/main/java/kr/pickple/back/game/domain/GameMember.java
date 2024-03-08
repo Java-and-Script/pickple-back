@@ -4,7 +4,7 @@ import static java.lang.Boolean.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,12 +15,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class GameMemberDomain {
+public class GameMember {
 
     private Long gameMemberId;
     private RegistrationStatus status;
-    private MemberDomain member;
-    private GameDomain game;
+    private Member member;
+    private Game game;
     private Boolean isReview = FALSE;
 
     public void updateGameMemberId(final Long gameMemberId) {

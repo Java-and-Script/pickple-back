@@ -2,7 +2,8 @@ package kr.pickple.back.alarm.docs;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import kr.pickple.back.alarm.IntegrationAlarmTest;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -28,7 +29,7 @@ public class AlarmDocumentTest extends IntegrationAlarmTest {
     @DisplayName("사용자의 재접속 시 읽지 않은 알람이 있는지 확인")
     void findUnreadAlarm_ReturnAlarmExistStatusResponse() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
@@ -66,7 +67,7 @@ public class AlarmDocumentTest extends IntegrationAlarmTest {
     @DisplayName("해당 사용자에게 온 모든 알람 목록을 조회")
     void findAllAlarms_ReturnAlarmResponse() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
@@ -113,7 +114,7 @@ public class AlarmDocumentTest extends IntegrationAlarmTest {
     @DisplayName("해당 사용자에게 온 모든 알람을 모두 삭제")
     void deleteAllAlarms_ReturnVoid() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);

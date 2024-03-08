@@ -17,7 +17,7 @@ import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -49,7 +49,7 @@ public class CrewWriter {
         );
     }
 
-    public CrewMember register(final MemberDomain member, final Crew crew) {
+    public CrewMember register(final Member member, final Crew crew) {
         final Long memberId = member.getMemberId();
         final Long crewId = crew.getCrewId();
 

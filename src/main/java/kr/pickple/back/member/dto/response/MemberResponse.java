@@ -3,7 +3,7 @@ package kr.pickple.back.member.dto.response;
 import java.util.List;
 
 import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -28,7 +28,7 @@ public class MemberResponse {
 
     //TODO: member -> memberDomain 으로 변환 완료되면 삭제 예정 (김영주)
     public static MemberResponse of(
-            final Member member,
+            final MemberEntity member,
             final List<Position> positions,
             final MainAddress mainAddress
     ) {

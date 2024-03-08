@@ -12,8 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewMapper;
@@ -22,12 +20,12 @@ import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberDomain;
-import kr.pickple.back.member.domain.MemberPosition;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
@@ -37,18 +35,21 @@ import lombok.RequiredArgsConstructor;
 public class MemberReader {
 
     private final AddressReader addressReader;
-    private final CrewRepository crewRepository;
-    private final CrewMemberRepository crewMemberRepository;
     private final MemberRepository memberRepository;
     private final MemberPositionRepository memberPositionRepository;
-    private final ChatRoomRepository chatRoomRepository;
+    private final CrewRepository crewRepository;
+    private final CrewMemberRepository crewMemberRepository;
 
     public Boolean existsByMemberId(final Long memberId) {
         return memberRepository.existsById(memberId);
     }
 
-    public MemberDomain readByMemberId(final Long memberId) {
-        final Member memberEntity = readEntityByMemberId(memberId);
+    public Optional<MemberEntity> readByOauthId(final Long oauthId) {
+        return memberRepository.findByOauthId(oauthId);
+    }
+
+    public Member readByMemberId(final Long memberId) {
+        final MemberEntity memberEntity = readEntityByMemberId(memberId);
 
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 memberEntity.getAddressDepth1Id(),
@@ -57,14 +58,14 @@ public class MemberReader {
 
         final List<Position> positions = memberPositionRepository.findAllByMemberId(memberId)
                 .stream()
-                .map(MemberPosition::getPosition)
+                .map(MemberPositionEntity::getPosition)
                 .toList();
 
         return MemberMapper.mapToMemberDomain(memberEntity, mainAddress, positions);
     }
 
     public MemberProfile readProfileByMemberId(final Long memberId) {
-        final Member member = readEntityByMemberId(memberId);
+        final MemberEntity member = readEntityByMemberId(memberId);
         final MainAddress mainAddress = addressReader.readMainAddressById(
                 member.getAddressDepth1Id(),
                 member.getAddressDepth2Id()
@@ -76,6 +77,18 @@ public class MemberReader {
         return MemberMapper.mapToMemberProfileDomain(member, mainAddress, positions, crews);
     }
 
+    private MemberEntity readEntityByMemberId(final Long memberId) {
+        return memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
+    }
+
+    private List<Position> readPositionsByMemberId(final Long memberId) {
+        return memberPositionRepository.findAllByMemberId(memberId)
+                .stream()
+                .map(MemberPositionEntity::getPosition)
+                .toList();
+    }
+
     private List<Crew> readCrewsByMemberId(final Long memberId) {
         return crewMemberRepository.findAllByMemberIdAndStatus(memberId, CONFIRMED)
                 .stream()
@@ -85,48 +98,15 @@ public class MemberReader {
                             crewEntity.getAddressDepth1Id(),
                             crewEntity.getAddressDepth2Id()
                     );
-                    final MemberDomain leader = readMemberById(crewEntity.getLeaderId());
-                    final ChatRoom chatRoom = chatRoomRepository.getChatRoomById(crewEntity.getChatRoomId());
+                    final Member leader = readByMemberId(crewEntity.getLeaderId());
 
-                    return CrewMapper.mapCrewEntityToDomain(crewEntity, mainAddress, leader, chatRoom);
+                    return CrewMapper.mapCrewEntityToDomain(crewEntity, mainAddress, leader);
                 })
                 .toList();
-    }
-
-    private MemberDomain readMemberById(final Long memberId) {
-        final Member memberEntity = readEntityByMemberId(memberId);
-
-        final MainAddress mainAddress = addressReader.readMainAddressById(
-                memberEntity.getAddressDepth1Id(),
-                memberEntity.getAddressDepth2Id()
-        );
-
-        final List<Position> positions = memberPositionRepository.findAllByMemberId(memberId)
-                .stream()
-                .map(MemberPosition::getPosition)
-                .toList();
-
-        return MemberMapper.mapToMemberDomain(memberEntity, mainAddress, positions);
     }
 
     private CrewEntity readCrewEntityByCrewId(final CrewMemberEntity crewMember) {
         return crewRepository.findById(crewMember.getCrewId())
                 .orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewMember.getCrewId()));
-    }
-
-    private List<Position> readPositionsByMemberId(final Long memberId) {
-        return memberPositionRepository.findAllByMemberId(memberId)
-                .stream()
-                .map(MemberPosition::getPosition)
-                .toList();
-    }
-
-    public Optional<Member> readByOauthId(final Long oauthId) {
-        return memberRepository.findByOauthId(oauthId);
-    }
-
-    private Member readEntityByMemberId(final Long memberId) {
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }
 }

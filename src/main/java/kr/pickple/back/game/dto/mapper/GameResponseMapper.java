@@ -2,15 +2,15 @@ package kr.pickple.back.game.dto.mapper;
 
 import java.util.List;
 
-import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.dto.response.GameResponse;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
 import kr.pickple.back.member.dto.response.MemberResponse;
 
 public class GameResponseMapper {
 
-    public static GameResponse mapToGameResponseDto(final GameDomain gameDomain, final List<MemberDomain> members) {
+    public static GameResponse mapToGameResponseDto(final Game gameDomain, final List<Member> members) {
         final List<MemberResponse> memberResponses = members
                 .stream()
                 .map(MemberResponseMapper::mapToMemberResponseDto)

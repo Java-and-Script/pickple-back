@@ -8,10 +8,9 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
-import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.game.exception.GameException;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,7 +20,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class GameDomain {
+public class Game {
 
     private Long gameId;
     private String content;
@@ -38,11 +37,10 @@ public class GameDomain {
     private Integer cost;
     private Integer memberCount;
     private Integer maxMemberCount;
-    private MemberDomain host;
+    private Member host;
     private String addressDepth1Name;
     private String addressDepth2Name;
     private List<Position> positions;
-    private ChatRoom chatRoom;
 
     public void increaseMemberCount() {
         if (status != OPEN) {
@@ -58,6 +56,10 @@ public class GameDomain {
         if (memberCount.equals(maxMemberCount)) {
             this.status = CLOSED;
         }
+    }
+
+    public LocalDateTime getPlayStartDatetime() {
+        return LocalDateTime.of(playDate, playStartTime);
     }
 
     public LocalDateTime getPlayEndDatetime() {

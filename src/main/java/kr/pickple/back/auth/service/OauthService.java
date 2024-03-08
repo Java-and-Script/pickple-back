@@ -22,7 +22,7 @@ import kr.pickple.back.auth.exception.AuthException;
 import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.auth.service.authcode.AuthCodeRequestUrlProviderComposite;
 import kr.pickple.back.auth.service.memberclient.OauthMemberClientComposite;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
@@ -53,11 +53,11 @@ public class OauthService {
             final String authCode
     ) {
         final OauthMember oauthMember = oauthMemberClientComposite.fetch(oauthProvider, authCode);
-        final Optional<Member> member = memberReader.readByOauthId(oauthMember.getOauthId());
+        final Optional<MemberEntity> member = memberReader.readByOauthId(oauthMember.getOauthId());
 
         // 사용자가 로그인 하는 경우
         if (member.isPresent()) {
-            final Member loginMember = member.get();
+            final MemberEntity loginMember = member.get();
             final AuthTokens loginTokens = jwtProvider.createLoginToken(String.valueOf(loginMember.getId()));
 
             final RefreshToken refreshToken = RefreshToken.builder()

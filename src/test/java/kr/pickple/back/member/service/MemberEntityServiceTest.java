@@ -24,14 +24,14 @@ import kr.pickple.back.auth.domain.token.RefreshToken;
 import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.repository.MemberRepository;
 
 @ExtendWith(MockitoExtension.class)
-class MemberServiceTest {
+class MemberEntityServiceTest {
 
     @InjectMocks
     private MemberService memberService;
@@ -73,10 +73,10 @@ class MemberServiceTest {
                 .refreshToken("refreshToken")
                 .build();
 
-        final Member member = memberCreateRequest.toEntity(mainAddress);
+        final MemberEntity member = memberCreateRequest.toEntity(mainAddress);
 
         given(addressReader.readMainAddressByNames(anyString(), anyString())).willReturn(mainAddress);
-        given(memberRepository.save(any(Member.class))).willReturn(member);
+        given(memberRepository.save(any(MemberEntity.class))).willReturn(member);
         given(jwtProvider.createLoginToken(anyString())).willReturn(authTokens);
         given(jwtProperties.getRefreshTokenExpirationTime()).willReturn(1000L);
 
@@ -93,7 +93,7 @@ class MemberServiceTest {
     void findMemberById_ReturnMemberProfileResponse() {
         // given
         final Long memberId = 1L;
-        final Member member = buildMember();
+        final MemberEntity member = buildMember();
         given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
 
         // when
@@ -103,7 +103,7 @@ class MemberServiceTest {
         assertThat(memberProfileResponse).isNotNull();
     }
 
-    private Member buildMember() {
+    private MemberEntity buildMember() {
         final AddressDepth1 addressDepth1 = AddressDepth1.builder()
                 .name("서울시")
                 .build();

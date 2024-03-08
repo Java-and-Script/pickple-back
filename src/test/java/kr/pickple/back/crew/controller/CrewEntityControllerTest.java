@@ -9,7 +9,8 @@ import kr.pickple.back.crew.IntegrationCrewTest;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.fixture.dto.CrewDtoFixtures;
 import kr.pickple.back.fixture.setup.AddressSetup;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,8 +42,8 @@ public class CrewEntityControllerTest extends IntegrationCrewTest {
     void findCrewDetailsById_ReturnCrewResponse() throws Exception {
         //given
         final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
-        final Member crewLeader = crew.getLeader();
-        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
+        final MemberEntity crewLeader = crew.getLeader();
+        final MemberEntity crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
                 .get(1)
                 .getMember();
 
@@ -82,9 +83,9 @@ public class CrewEntityControllerTest extends IntegrationCrewTest {
     @DisplayName("사용자는 크루 모집글에 참여 신청을 할 수 있다.")
     void applyForCrewMemberShip_Success() throws Exception {
         //given
-        final List<Member> members = memberSetup.save(2);
-        final Member crewLeader = members.get(0);
-        final Member crewApplyMember = members.get(1);
+        final List<MemberEntity> members = memberSetup.save(2);
+        final MemberEntity crewLeader = members.get(0);
+        final MemberEntity crewApplyMember = members.get(1);
         final CrewEntity crew = crewSetup.save(crewLeader);
 
         final String subject = String.valueOf(crewApplyMember.getId());
@@ -105,8 +106,8 @@ public class CrewEntityControllerTest extends IntegrationCrewTest {
     void findAllCrewMembers_WaitingStatus_ReturnCrewResponse() throws Exception {
         //given
         final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
-        final Member crewLeader = crew.getLeader();
-        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+        final MemberEntity crewLeader = crew.getLeader();
+        final MemberEntity crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
                 .getMember();
 
@@ -153,8 +154,8 @@ public class CrewEntityControllerTest extends IntegrationCrewTest {
     void updateCrewMemberRegistrationStatus_Success() throws Exception {
         //given
         final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
-        final Member crewLeader = crew.getLeader();
-        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+        final MemberEntity crewLeader = crew.getLeader();
+        final MemberEntity crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
                 .getMember();
 
@@ -182,8 +183,8 @@ public class CrewEntityControllerTest extends IntegrationCrewTest {
     void deleteCrewMember_CrewLeader_Success() throws Exception {
         //given
         final CrewEntity crew = crewSetup.saveWithWaitingMembers(2);
-        final Member crewLeader = crew.getLeader();
-        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
+        final MemberEntity crewLeader = crew.getLeader();
+        final MemberEntity crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), WAITING)
                 .get(0)
                 .getMember();
 
@@ -207,8 +208,8 @@ public class CrewEntityControllerTest extends IntegrationCrewTest {
         final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
-        final Member crewLeader = crew.getLeader();
-        final Member crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
+        final MemberEntity crewLeader = crew.getLeader();
+        final MemberEntity crewMember = crewMemberRepository.findAllByCrewIdAndStatus(crew.getId(), CONFIRMED)
                 .get(1)
                 .getMember();
 

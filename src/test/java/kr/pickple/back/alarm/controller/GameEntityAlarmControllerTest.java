@@ -7,7 +7,7 @@ import kr.pickple.back.alarm.repository.GameAlarmRepository;
 import kr.pickple.back.fixture.domain.GameAlarmFixtures;
 import kr.pickple.back.fixture.setup.GameSetup;
 import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,7 @@ public class GameEntityAlarmControllerTest extends IntegrationAlarmTest {
     @DisplayName("사용자는 보내진 게임 알람에 대하여 읽음 처리를 할 수 있다.")
     void updateGameAlarmStatus_Success() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final GameEntity gameEntity = gameSetup.saveWithConfirmedMembers(1);
         final GameAlarm gameAlarm = gameAlarmRepository.save(GameAlarmFixtures.gameAlarmBuild(member, gameEntity));

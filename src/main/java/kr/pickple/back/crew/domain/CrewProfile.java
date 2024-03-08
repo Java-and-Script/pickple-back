@@ -2,7 +2,7 @@ package kr.pickple.back.crew.domain;
 
 import java.util.List;
 
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +23,8 @@ public class CrewProfile {
     private CrewStatus status;
     private Integer likeCount;
     private Integer competitionPoint;
-    private MemberDomain leader;
+    private Member leader;
     private String addressDepth1;
     private String addressDepth2;
-    private List<MemberDomain> members;
+    private List<Member> members;
 }

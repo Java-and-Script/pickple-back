@@ -15,7 +15,7 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.position.domain.Position;
 
 public class GameFixtures {
@@ -23,7 +23,7 @@ public class GameFixtures {
     public static GameEntity gameBuild(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
-            final Member host
+            final MemberEntity host
     ) {
         final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
         final Point point = geometryFactory.createPoint(new Coordinate(37.125, 126.75));

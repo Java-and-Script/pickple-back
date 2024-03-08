@@ -4,7 +4,7 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.exception.CrewException;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +19,7 @@ public class CrewMember {
 
     private Long crewMemberId;
     private RegistrationStatus status;
-    private MemberDomain member;
+    private Member member;
     private Crew crew;
 
     public void updateCrewMemberId(final Long crewMemberId) {
