@@ -38,7 +38,7 @@ public class GameAlarm extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "game_id")
-    private GameEntity gameEntity;
+    private GameEntity game;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -47,11 +47,11 @@ public class GameAlarm extends BaseEntity {
     @Builder
     private GameAlarm(
             final GameAlarmType gameAlarmType,
-            final GameEntity gameEntity,
+            final GameEntity game,
             final MemberEntity member
     ) {
         this.gameAlarmType = gameAlarmType;
-        this.gameEntity = gameEntity;
+        this.game = game;
         this.member = member;
     }
 
