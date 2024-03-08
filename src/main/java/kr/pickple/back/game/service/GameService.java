@@ -17,14 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.auth.repository.RedisRepository;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.service.ChatRoomService;
+import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.game.domain.Category;
-import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMemberDomain;
-import kr.pickple.back.game.domain.GameStatus;
+import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.dto.mapper.GameRequestMapper;
 import kr.pickple.back.game.dto.mapper.GameResponseMapper;
@@ -35,13 +33,8 @@ import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.implement.GameMemberWriter;
 import kr.pickple.back.game.implement.GameReader;
 import kr.pickple.back.game.implement.GameWriter;
-import kr.pickple.back.game.repository.GameMemberRepository;
-import kr.pickple.back.game.repository.GamePositionRepository;
-import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -50,91 +43,66 @@ import lombok.RequiredArgsConstructor;
 public class GameService {
 
     private final AddressReader addressReader;
-
-    private final GameRepository gameRepository;
-    private final MemberPositionRepository memberPositionRepository;
-    private final MemberRepository memberRepository;
-    private final KakaoAddressSearchClient kakaoAddressSearchClient;
-    private final ChatRoomService chatRoomService;
-    private final RedisRepository redisRepository;
-    private final GamePositionRepository gamePositionRepository;
-    private final GameMemberRepository gameMemberRepository;
-    private final GameReader gameReader;
     private final MemberReader memberReader;
+    private final GameReader gameReader;
     private final GameWriter gameWriter;
     private final GameMemberWriter gameMemberWriter;
+    private final ChatWriter chatWriter;
+    private final RedisRepository redisRepository;
 
     /**
      * 게임 생성
      */
     @Transactional
     public GameIdResponse createGame(final GameCreateRequest gameCreateRequest, final Long loggedInMemberId) {
-        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(gameCreateRequest.getMainAddress());
+        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(
+                gameCreateRequest.getMainAddress());
         final NewGame newGame = GameRequestMapper.mapToNewGameDomain(gameCreateRequest, mainAddress);
-
-        final MemberDomain host = memberReader.readByMemberId(loggedInMemberId);
-
-        final ChatRoom chatRoom = chatRoomService.saveNewChatRoom(host, makeGameRoomName(newGame), GAME);
-        chatRoom.updateMaxMemberCount(newGame.getMaxMemberCount());
+        final Member host = memberReader.readByMemberId(loggedInMemberId);
+        final ChatRoom chatRoom = chatWriter.createNewGroupRoom(
+                GAME,
+                makeGameChatRoomName(newGame),
+                newGame.getMaxMemberCount()
+        );
 
         newGame.assignHost(host);
         newGame.assignChatRoom(chatRoom);
 
-        final GameDomain game = gameWriter.create(newGame);
-
-        final GameMemberDomain gameHost = gameMemberWriter.register(host, game);
+        final Game game = gameWriter.create(newGame);
+        final GameMember gameHost = gameMemberWriter.register(host, game);
         gameMemberWriter.updateMemberRegistrationStatus(gameHost, CONFIRMED);
+        chatWriter.enterRoom(host, chatRoom);
 
         saveGameStatusUpdateEventToRedis(game);
 
         return GameIdResponse.from(game.getGameId());
     }
 
-    private String makeGameRoomName(final NewGame newGame) {
+    private String makeGameChatRoomName(final NewGame newGame) {
         final String playDateFormat = newGame.getPlayDate().format(DateTimeFormatter.ofPattern("MM.dd"));
         final String addressDepth2Name = newGame.getAddressDepth2Name();
 
         return MessageFormat.format("{0} {1}", playDateFormat, addressDepth2Name);
     }
 
-    private void saveGameStatusUpdateEventToRedis(final GameDomain gameDomain) {
+    private void saveGameStatusUpdateEventToRedis(final Game game) {
         final LocalDateTime gameCreatedDateTime = LocalDateTime.now();
 
         // 경기를 생성한 시각과 경기 시작 시간의 차
-        final Long secondsOfBetweenCreatedAndPlay = getSecondsBetweenCreatedAndPlay(gameCreatedDateTime, gameDomain);
+        final Long secondsBetweenCreatedAndPlay = getSecondsBetween(gameCreatedDateTime, game.getPlayStartDatetime());
 
         // 경기를 생성한 시각과 경기 종료 시간의 차
-        final Long secondsOfBetweenCreatedAndEnd = getSecondsBetweenCreatedAndEnd(gameCreatedDateTime, gameDomain);
+        final Long secondsBetweenCreatedAndEnd = getSecondsBetween(gameCreatedDateTime, game.getPlayEndDatetime());
 
-        final String closedGameStatusUpdateKey = makeGameStatusUpdateKey(CLOSED, gameDomain.getGameId());
-        final String endedGameStatusUpdateKey = makeGameStatusUpdateKey(ENDED, gameDomain.getGameId());
+        final String closedGameStatusUpdateKey = MessageFormat.format("game:{0}:{1}", CLOSED, game.getGameId());
+        final String endedGameStatusUpdateKey = MessageFormat.format("game:{0}:{1}", ENDED, game.getGameId());
 
-        redisRepository.saveHash(closedGameStatusUpdateKey, "", "", secondsOfBetweenCreatedAndPlay);
-        redisRepository.saveHash(endedGameStatusUpdateKey, "", "", secondsOfBetweenCreatedAndEnd);
+        redisRepository.saveHash(closedGameStatusUpdateKey, "", "", secondsBetweenCreatedAndPlay);
+        redisRepository.saveHash(endedGameStatusUpdateKey, "", "", secondsBetweenCreatedAndEnd);
     }
 
-    private Long getSecondsBetweenCreatedAndPlay(final LocalDateTime gameCreatedDateTime, final GameDomain gameDomain) {
-        final LocalDateTime gamePlayDateTime = LocalDateTime.of(gameDomain.getPlayDate(), gameDomain.getPlayStartTime());
-
-        return getSecondsBetween(gameCreatedDateTime, gamePlayDateTime);
-    }
-
-    private Long getSecondsBetweenCreatedAndEnd(final LocalDateTime gameCreatedDateTime, final GameDomain gameDomain) {
-        final LocalDateTime gameEndDateTime = gameDomain.getPlayEndDatetime();
-
-        return getSecondsBetween(gameCreatedDateTime, gameEndDateTime);
-    }
-
-    private static long getSecondsBetween(
-            final LocalDateTime gameCreatedDateTime,
-            final LocalDateTime gamePlayDateTime
-    ) {
-        return Duration.between(gameCreatedDateTime, gamePlayDateTime)
-                .getSeconds();
-    }
-
-    private String makeGameStatusUpdateKey(final GameStatus gameStatus, final Long id) {
-        return String.format("game:%s:%d", gameStatus.toString(), id);
+    private Long getSecondsBetween(final LocalDateTime start, final LocalDateTime end) {
+        return Duration.between(start, end).getSeconds();
     }
 
     /**
@@ -142,10 +110,10 @@ public class GameService {
      */
     @Transactional
     public GameResponse findGameById(final Long gameId) {
-        final GameDomain gameDomain = gameReader.read(gameId);
-        final List<MemberDomain> members = gameReader.readAllMembersByGameIdAndStatus(gameId, CONFIRMED);
+        final Game game = gameReader.read(gameId);
+        final List<Member> members = gameReader.readAllMembersByGameIdAndStatus(gameId, CONFIRMED);
 
-        return GameResponseMapper.mapToGameResponseDto(gameDomain, members);
+        return GameResponseMapper.mapToGameResponseDto(game, members);
     }
 
     /**
@@ -167,30 +135,14 @@ public class GameService {
      * 주소별 게스트 모집글 조회
      */
     private List<GameResponse> findGamesByAddress(final String address, final Pageable pageable) {
-        final List<GameDomain> gameDomains = gameReader.findGamesByAddress(address, pageable);
+        final List<Game> games = gameReader.findGamesByAddress(address, pageable);
 
-        return gameDomains.stream()
-                .map(gameDomain -> GameResponseMapper.mapToGameResponseDto(
-                                gameDomain,
-                                gameReader.readAllMembersByGameIdAndStatus(gameDomain.getGameId(), CONFIRMED)
+        return games.stream()
+                .map(game -> GameResponseMapper.mapToGameResponseDto(
+                                game,
+                                gameReader.readAllMembersByGameIdAndStatus(game.getGameId(), CONFIRMED)
                         )
-                )
-                .toList();
-    }
-
-    /**
-     * 특정 지역의 게스트 모집글 조회
-     */
-    public List<GameResponse> findGamesWithInAddress(final MainAddress mainAddress) {
-        final List<GameDomain> gameDomains = gameReader.findGamesWithInAddress(mainAddress);
-
-        return gameDomains.stream()
-                .map(gameDomain -> GameResponseMapper.mapToGameResponseDto(
-                                gameDomain,
-                                gameReader.readAllMembersByGameIdAndStatus(gameDomain.getGameId(), CONFIRMED)
-                        )
-                )
-                .toList();
+                ).toList();
     }
 
     /**
@@ -201,15 +153,14 @@ public class GameService {
             final Double longitude,
             final Double distance
     ) {
-        final List<GameDomain> gameDomains = gameReader.findGamesWithInDistance(latitude, longitude, distance);
+        final List<Game> games = gameReader.findGamesWithInDistance(latitude, longitude, distance);
 
-        return gameDomains.stream()
-                .filter(GameDomain::isNotEndedGame)
-                .map(gameDomain -> GameResponseMapper.mapToGameResponseDto(
-                                gameDomain,
-                                gameReader.readAllMembersByGameIdAndStatus(gameDomain.getGameId(), CONFIRMED)
+        return games.stream()
+                .filter(Game::isNotEndedGame)
+                .map(game -> GameResponseMapper.mapToGameResponseDto(
+                                game,
+                                gameReader.readAllMembersByGameIdAndStatus(game.getGameId(), CONFIRMED)
                         )
-                )
-                .toList();
+                ).toList();
     }
 }

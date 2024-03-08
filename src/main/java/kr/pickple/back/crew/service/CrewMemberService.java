@@ -11,7 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.alarm.event.crew.CrewJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberJoinedEvent;
 import kr.pickple.back.alarm.event.crew.CrewMemberRejectedEvent;
-import kr.pickple.back.chat.service.ChatMessageService;
+import kr.pickple.back.chat.implement.ChatReader;
+import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
@@ -20,7 +21,7 @@ import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -32,8 +33,8 @@ public class CrewMemberService {
     private final MemberReader memberReader;
     private final CrewReader crewReader;
     private final CrewWriter crewWriter;
-
-    private final ChatMessageService chatMessageService;
+    private final ChatReader chatReader;
+    private final ChatWriter chatWriter;
     private final ApplicationEventPublisher eventPublisher;
 
     /**
@@ -42,7 +43,7 @@ public class CrewMemberService {
     @Transactional
     public void registerCrewMember(final Long crewId, final Long loggedInMemberId) {
         final Crew crew = crewReader.read(crewId);
-        final MemberDomain member = memberReader.readByMemberId(loggedInMemberId);
+        final Member member = memberReader.readByMemberId(loggedInMemberId);
 
         crewWriter.register(member, crew);
 
@@ -66,7 +67,7 @@ public class CrewMemberService {
             throw new CrewException(CREW_IS_NOT_LEADER, loggedInMemberId);
         }
 
-        final List<MemberDomain> members = crewReader.readAllMembersInStatus(crewId, status);
+        final List<Member> members = crewReader.readAllMembersInStatus(crewId, status);
 
         return CrewResponseMapper.mapToCrewProfileResponseDto(crew, members);
     }
@@ -89,7 +90,7 @@ public class CrewMemberService {
         }
 
         crewWriter.updateMemberRegistrationStatus(crewMember, newRegistrationStatus);
-        chatMessageService.enterRoomAndSaveEnteringMessages(crew.getChatRoom(), crewMember.getMember());
+        chatWriter.enterRoom(crewMember.getMember(), chatReader.readRoomByCrewId(crewId));
 
         eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()
                 .crewId(crewId)
