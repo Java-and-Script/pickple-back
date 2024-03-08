@@ -1,10 +1,11 @@
-package kr.pickple.back.member.dto.response;
+package kr.pickple.back.game.dto.response;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
 import kr.pickple.back.game.domain.GameStatus;
+import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;

@@ -18,7 +18,9 @@ import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.mapper.GameResponseMapper;
+import kr.pickple.back.game.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.game.dto.response.GameResponse;
+import kr.pickple.back.game.dto.response.MemberGameResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.implement.GameMemberReader;
 import kr.pickple.back.game.implement.GameMemberWriter;
@@ -40,6 +42,9 @@ public class GameMemberService {
     private final ChatWriter chatWriter;
     private final ApplicationEventPublisher eventPublisher;
 
+    /**
+     * 게스트 모집 참여 신청
+     */
     @Transactional
     public void registerGameMember(final Long gameId, final Long loggedInMemberId) {
         final Game gameDomain = gameReader.read(gameId);
@@ -53,7 +58,10 @@ public class GameMemberService {
                 .build());
     }
 
-    public GameResponse findAllGameMembers(
+    /**
+     * 게스트 모집에 참여 신청된 혹은 확정된 사용자 정보 목록 조회
+     */
+    public GameResponse findAllGameMembersByStatus(
             final Long loggedInMemberId,
             final Long gameId,
             final RegistrationStatus status
@@ -71,6 +79,9 @@ public class GameMemberService {
         return GameResponseMapper.mapToGameResponseDto(game, members);
     }
 
+    /**
+     * 게스트 모집 참여 신청 수락
+     */
     @Transactional
     public void updateGameMemberRegistrationStatus(
             final Long loggedInMemberId,
@@ -94,6 +105,9 @@ public class GameMemberService {
                 .build());
     }
 
+    /**
+     * 게스트 모집 참여 신청 거절/취소
+     */
     @Transactional
     public void deleteGameMember(final Long loggedInMemberId, final Long gameId, final Long memberId) {
         final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(memberId, gameId);
@@ -135,5 +149,49 @@ public class GameMemberService {
         }
 
         gameMemberWriter.deleteGameMember(gameMember);
+    }
+
+    /**
+     * 사용자의 참여 확정 게스트 모집글 목록 조회
+     */
+    public List<MemberGameResponse> findAllJoinedGames(final Long memberId, final RegistrationStatus status) {
+        return gameMemberReader.readAllByMemberIdAndStatus(memberId, status)
+                .stream()
+                .map(memberGame -> GameResponseMapper.mapToMemberGameResponseDto(
+                                memberGame.getGame(),
+                                gameMemberReader.readMembersByGameIdAndStatus(memberGame.getGame().getGameId(), CONFIRMED),
+                                memberGame.isReviewDone()
+                        )
+                ).toList();
+    }
+
+    /**
+     * 사용자가 만든 게스트 모집글 목록 조회
+     */
+    public List<MemberGameResponse> findAllCreatedGames(final Long hostId) {
+        final List<Game> createdGames = gameReader.readAllByHostId(hostId);
+
+        return createdGames.stream()
+                .map(game -> GameResponseMapper.mapToMemberGameResponseDto(
+                                game,
+                                gameMemberReader.readMembersByGameIdAndStatus(game.getGameId(), CONFIRMED),
+                                gameMemberReader.isReviewDoneByGameIdAndMemberId(game.getGameId(), hostId)
+                        )
+                ).toList();
+    }
+
+    /**
+     * 사용자의 게스트 모집 신청 여부 조회
+     */
+    public GameMemberRegistrationStatusResponse findRegistrationStatusForGame(
+            final Long memberId,
+            final Long gameId
+    ) {
+        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(memberId, gameId);
+
+        return GameResponseMapper.mapToGameMemberRegistrationStatusResponseDto(
+                gameMember.getStatus(),
+                gameMember.isReviewDone()
+        );
     }
 }

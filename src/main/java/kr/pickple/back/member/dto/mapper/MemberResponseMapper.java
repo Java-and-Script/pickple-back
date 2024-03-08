@@ -4,12 +4,10 @@ import java.util.List;
 
 import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
 import kr.pickple.back.crew.dto.response.CrewResponse;
-import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
-import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.AccessLevel;
@@ -73,39 +71,5 @@ public final class MemberResponseMapper {
         return members.stream()
                 .map(MemberResponseMapper::mapToMemberResponseDto)
                 .toList();
-    }
-
-    public static MemberGameResponse mapToMemberGameResponseDto(
-            final Game game,
-            final List<Member> members,
-            final Boolean isReviewDone
-    ) {
-        final List<MemberResponse> memberResponses = members.stream()
-                .map(MemberResponseMapper::mapToMemberResponseDto)
-                .toList();
-
-        return MemberGameResponse.builder()
-                .id(game.getGameId())
-                .content(game.getContent())
-                .playDate(game.getPlayDate())
-                .playStartTime(game.getPlayStartTime())
-                .playEndTime(game.getPlayEndTime())
-                .playTimeMinutes(game.getPlayTimeMinutes())
-                .mainAddress(game.getMainAddress())
-                .detailAddress(game.getDetailAddress())
-                .latitude(game.getLatitude())
-                .longitude(game.getLongitude())
-                .status(game.getStatus())
-                .isReviewDone(isReviewDone)
-                .viewCount(game.getViewCount())
-                .cost(game.getCost())
-                .memberCount(game.getMemberCount())
-                .maxMemberCount(game.getMaxMemberCount())
-                .host(mapToMemberResponseDto(game.getHost()))
-                .addressDepth1(game.getAddressDepth1Name())
-                .addressDepth2(game.getAddressDepth2Name())
-                .positions(game.getPositions())
-                .members(memberResponses)
-                .build();
     }
 }
