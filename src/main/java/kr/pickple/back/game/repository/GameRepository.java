@@ -2,6 +2,7 @@ package kr.pickple.back.game.repository;
 
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -24,9 +25,7 @@ public interface GameRepository extends JpaRepository<GameEntity, Long>, GameSea
 
     Optional<GameEntity> findByChatRoomId(final Long chatRoomId);
 
-    default GameEntity getGameById(final Long gameId) {
-        return findById(gameId).orElseThrow(() -> new GameException(GAME_NOT_FOUND, gameId));
-    }
+    List<GameEntity> findAllByHostId(final Long hostId);
 
     @Query("update GameEntity g set g.memberCount = :memberCount, g.status = :status where g.id = :gameId")
     void updateMemberCountAndStatus(final Long gameId, final Integer memberCount, final GameStatus status);

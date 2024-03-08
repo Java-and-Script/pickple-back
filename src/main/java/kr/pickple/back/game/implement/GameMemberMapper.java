@@ -28,6 +28,7 @@ public final class GameMemberMapper {
                 .status(gameMemberEntity.getStatus())
                 .member(member)
                 .game(game)
+                .isReview(gameMemberEntity.isReviewDone())
                 .build();
     }
 }

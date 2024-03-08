@@ -15,12 +15,9 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.exception.ChatException;
-import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
-import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.exception.GameException;
-import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.game.repository.entity.GameEntity;
@@ -38,7 +35,6 @@ public class GameReader {
     private final AddressReader addressReader;
     private final MemberReader memberReader;
     private final GameRepository gameRepository;
-    private final GameMemberRepository gameMemberRepository;
     private final GamePositionRepository gamePositionRepository;
 
     public Game read(final Long gameId) {
@@ -57,6 +53,13 @@ public class GameReader {
         return mapGameEntityToDomain(gameEntity);
     }
 
+    public List<Game> readAllByHostId(final Long hostId) {
+        return gameRepository.findAllByHostId(hostId)
+                .stream()
+                .map(this::mapGameEntityToDomain)
+                .toList();
+    }
+
     private Game mapGameEntityToDomain(final GameEntity gameEntity) {
         final Member host = memberReader.readByMemberId(gameEntity.getHostId());
 
@@ -70,35 +73,7 @@ public class GameReader {
         return GameMapper.mapGameEntityToDomain(gameEntity, mainAddress, host, positions);
     }
 
-    private List<Position> readPositionsByGameId(final Long gameId) {
-        return gamePositionRepository.findAllByGameId(gameId)
-                .stream()
-                .map(GamePosition::getPosition)
-                .toList();
-    }
-
-    public List<Member> readAllMembersByGameIdAndStatus(final Long gameId, final RegistrationStatus status) {
-        return gameMemberRepository.findAllByGameIdAndStatus(gameId, status)
-                .stream()
-                .map(gameMemberEntity -> memberReader.readByMemberId(gameMemberEntity.getMemberId()))
-                .toList();
-    }
-
-    public List<GameMember> readAllGameMembersByMemberIdAndStatus(
-            final Long memberId,
-            final RegistrationStatus status
-    ) {
-        return gameMemberRepository.findAllByMemberIdAndStatus(memberId, status)
-                .stream()
-                .map(gameMemberEntity -> GameMapper.mapGameMemberEntityToDomain(
-                                gameMemberEntity,
-                                memberReader.readByMemberId(gameMemberEntity.getMemberId()),
-                                read(gameMemberEntity.getGameId())
-                        )
-                ).toList();
-    }
-
-    public List<Game> findGamesByAddress(final String address, final Pageable pageable) {
+    public List<Game> readAllByAddress(final String address, final Pageable pageable) {
         final PageRequest pageRequest = PageRequest.of(
                 pageable.getPageNumber(),
                 pageable.getPageSize(),
@@ -127,7 +102,7 @@ public class GameReader {
                 .toList();
     }
 
-    public List<Game> findGamesWithInAddress(final MainAddress mainAddress) {
+    public List<Game> readAllWithInAddress(final MainAddress mainAddress) {
         final List<GameEntity> gameEntities = gameRepository.findGamesWithInAddress(
                 mainAddress.getAddressDepth1(),
                 mainAddress.getAddressDepth2()
@@ -142,7 +117,7 @@ public class GameReader {
                 .toList();
     }
 
-    public List<Game> findGamesWithInDistance(
+    public List<Game> readAllWithInDistance(
             final Double latitude,
             final Double longitude,
             final Double distance
@@ -158,6 +133,13 @@ public class GameReader {
                         ),
                         memberReader.readByMemberId(gameEntity.getHostId()),
                         readPositionsByGameId(gameEntity.getId())))
+                .toList();
+    }
+
+    private List<Position> readPositionsByGameId(final Long gameId) {
+        return gamePositionRepository.findAllByGameId(gameId)
+                .stream()
+                .map(GamePosition::getPosition)
                 .toList();
     }
 }
