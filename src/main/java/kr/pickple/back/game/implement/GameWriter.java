@@ -33,12 +33,12 @@ import lombok.RequiredArgsConstructor;
 public class GameWriter {
 
     private final AddressReader addressReader;
-    private final GameRepository gameRepository;
-    private final GameMemberRepository gameMemberRepository;
-    private final KakaoAddressSearchClient kakaoAddressSearchClient;
-    private final GamePositionRepository gamePositionRepository;
     private final MemberReader memberReader;
     private final MemberRepository memberRepository;
+    private final GameRepository gameRepository;
+    private final GameMemberRepository gameMemberRepository;
+    private final GamePositionRepository gamePositionRepository;
+    private final KakaoAddressSearchClient kakaoAddressSearchClient;
 
     public Game create(final NewGame newGame) {
         final Point point = kakaoAddressSearchClient.fetchAddress(newGame.getMainAddress());

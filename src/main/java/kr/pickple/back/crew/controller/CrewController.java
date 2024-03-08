@@ -64,13 +64,13 @@ public class CrewController {
     }
 
     @GetMapping("/{crewId}/members")
-    public ResponseEntity<CrewProfileResponse> findAllCrewMembers(
+    public ResponseEntity<CrewProfileResponse> findAllCrewMembersByStatus(
             @Login final Long loggedInMemberId,
             @PathVariable final Long crewId,
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(crewMemberService.findCrewMembersByStatus(loggedInMemberId, crewId, status));
+                .body(crewMemberService.findAllCrewMembersByStatus(loggedInMemberId, crewId, status));
     }
 
     @PatchMapping("/{crewId}/members/{memberId}")

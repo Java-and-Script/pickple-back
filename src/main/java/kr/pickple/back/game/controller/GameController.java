@@ -82,13 +82,13 @@ public class GameController {
     }
 
     @GetMapping("/{gameId}/members")
-    public ResponseEntity<GameResponse> findAllGameMembers(
+    public ResponseEntity<GameResponse> findAllGameMembersByStatus(
             @Login final Long loggedInMemberId,
             @PathVariable final Long gameId,
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(gameMemberService.findAllGameMembers(loggedInMemberId, gameId, status));
+                .body(gameMemberService.findAllGameMembersByStatus(loggedInMemberId, gameId, status));
     }
 
     @PatchMapping("/{gameId}/members/{memberId}")

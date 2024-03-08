@@ -16,7 +16,9 @@ import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
+import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
+import kr.pickple.back.crew.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
@@ -56,7 +58,7 @@ public class CrewMemberService {
     /**
      * 크루에 가입 신청된 혹은 확정된 사용자 정보 목록 조회
      */
-    public CrewProfileResponse findCrewMembersByStatus(
+    public CrewProfileResponse findAllCrewMembersByStatus(
             final Long loggedInMemberId,
             final Long crewId,
             final RegistrationStatus status
@@ -131,5 +133,41 @@ public class CrewMemberService {
         if (leaderId.equals(deletingMemberId)) {
             throw new CrewException(CREW_LEADER_CANNOT_BE_DELETED, deletingMemberId);
         }
+    }
+
+    /**
+     * 사용자가 가입한 크루 목록 조회
+     */
+    public List<CrewProfileResponse> findAllJoinedCrews(
+            final Long memberId,
+            final RegistrationStatus memberStatus
+    ) {
+        final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByMemberIdAndStatus(
+                memberId,
+                memberStatus
+        );
+
+        return CrewResponseMapper.mapToCrewProfilesResponseDto(crewProfiles);
+    }
+
+    /**
+     * 사용자가 만든 크루 목록 조회
+     */
+    public List<CrewProfileResponse> findCreatedCrews(final Long memberId) {
+        final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByLeaderId(memberId);
+
+        return CrewResponseMapper.mapToCrewProfilesResponseDto(crewProfiles);
+    }
+
+    /**
+     * 사용자의 크루 가입 신청 여부 조회
+     */
+    public CrewMemberRegistrationStatusResponse findRegistrationStatusForCrew(
+            final Long memberId,
+            final Long crewId
+    ) {
+        final CrewMember crewMember = crewReader.readCrewMember(crewId, memberId);
+
+        return CrewResponseMapper.mapToCrewMemberRegistrationStatusResponse(crewMember.getStatus());
     }
 }

@@ -6,11 +6,11 @@ import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
+import kr.pickple.back.crew.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.dto.response.CrewResponse;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
-import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -66,7 +66,6 @@ public final class CrewResponseMapper {
     public static List<CrewProfileResponse> mapToCrewProfilesResponseDto(
             final List<CrewProfile> crewProfiles
     ) {
-
         return crewProfiles.stream()
                 .map(crewProfile -> CrewProfileResponse.builder()
                         .id(crewProfile.getCrewId())

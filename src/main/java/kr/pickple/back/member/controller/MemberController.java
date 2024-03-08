@@ -23,17 +23,17 @@ import kr.pickple.back.auth.config.resolver.Login;
 import kr.pickple.back.auth.config.resolver.SignUp;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
+import kr.pickple.back.crew.service.CrewMemberService;
+import kr.pickple.back.game.service.GameMemberService;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.dto.mapper.MemberRequestMapper;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
-import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
-import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
-import kr.pickple.back.member.dto.response.MemberGameResponse;
+import kr.pickple.back.crew.dto.response.CrewMemberRegistrationStatusResponse;
+import kr.pickple.back.game.dto.response.GameMemberRegistrationStatusResponse;
+import kr.pickple.back.game.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberProfileResponse;
 import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.service.MemberCrewService;
-import kr.pickple.back.member.service.MemberGameService;
 import kr.pickple.back.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 
@@ -43,8 +43,8 @@ import lombok.RequiredArgsConstructor;
 public class MemberController {
 
     private final MemberService memberService;
-    private final MemberCrewService memberCrewService;
-    private final MemberGameService memberGameService;
+    private final CrewMemberService crewMemberService;
+    private final GameMemberService gameMemberService;
     private final JwtProperties jwtProperties;
 
     @PostMapping
@@ -89,34 +89,45 @@ public class MemberController {
 
     @Identification
     @GetMapping("/{memberId}/crews")
-    public ResponseEntity<List<CrewProfileResponse>> findAllCrewsByMemberId(
+    public ResponseEntity<List<CrewProfileResponse>> findAllJoinedCrews(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberCrewService.findAllCrewsByMemberId(memberId, status));
+                .body(crewMemberService.findAllJoinedCrews(memberId, status));
     }
 
     @Identification
     @GetMapping("/{memberId}/created-crews")
-    public ResponseEntity<List<CrewProfileResponse>> findCreatedCrewsByMemberId(
+    public ResponseEntity<List<CrewProfileResponse>> findCreatedCrews(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberCrewService.findCreatedCrewsByMemberId(memberId));
+                .body(crewMemberService.findCreatedCrews(memberId));
+    }
+
+    @Identification
+    @GetMapping("/{memberId}/crews/{crewId}/registration-status")
+    public ResponseEntity<CrewMemberRegistrationStatusResponse> findRegistrationStatusForCrew(
+            @Login final Long loggedInMemberId,
+            @PathVariable final Long memberId,
+            @PathVariable final Long crewId
+    ) {
+        return ResponseEntity.status(OK)
+                .body(crewMemberService.findRegistrationStatusForCrew(memberId, crewId));
     }
 
     @Identification
     @GetMapping("/{memberId}/games")
-    public ResponseEntity<List<MemberGameResponse>> findAllMemberGames(
+    public ResponseEntity<List<MemberGameResponse>> findAllJoinedGames(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(memberGameService.findAllMemberGames(memberId, status));
+                .body(gameMemberService.findAllJoinedGames(memberId, status));
     }
 
     @Identification
@@ -126,28 +137,17 @@ public class MemberController {
             @PathVariable final Long memberId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberGameService.findAllCreatedGames(memberId));
+                .body(gameMemberService.findAllCreatedGames(memberId));
     }
 
     @Identification
     @GetMapping("/{memberId}/games/{gameId}/registration-status")
-    public ResponseEntity<GameMemberRegistrationStatusResponse> findMemberRegistrationStatusForGame(
+    public ResponseEntity<GameMemberRegistrationStatusResponse> findRegistrationStatusForGame(
             @Login final Long loggedInMemberId,
             @PathVariable final Long memberId,
             @PathVariable final Long gameId
     ) {
         return ResponseEntity.status(OK)
-                .body(memberGameService.findMemberRegistrationStatusForGame(memberId, gameId));
-    }
-
-    @Identification
-    @GetMapping("/{memberId}/crews/{crewId}/registration-status")
-    public ResponseEntity<CrewMemberRegistrationStatusResponse> findMemberRegistrationStatusForCrew(
-            @Login final Long loggedInMemberId,
-            @PathVariable final Long memberId,
-            @PathVariable final Long crewId
-    ) {
-        return ResponseEntity.status(OK)
-                .body(memberCrewService.findMemberRegistrationStatusForCrew(memberId, crewId));
+                .body(gameMemberService.findRegistrationStatusForGame(memberId, gameId));
     }
 }

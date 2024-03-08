@@ -21,9 +21,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GameMemberWriter {
 
-    private final GameMemberRepository gameMemberRepository;
-    private final GameRepository gameRepository;
     private final GameMemberReader gameMemberReader;
+    private final GameRepository gameRepository;
+    private final GameMemberRepository gameMemberRepository;
 
     public GameMember register(final Member member, final Game game) {
         final Long memberId = member.getMemberId();
