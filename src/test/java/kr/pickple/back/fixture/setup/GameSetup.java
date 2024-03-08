@@ -15,7 +15,7 @@ import kr.pickple.back.fixture.domain.GameFixtures;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.repository.entity.GameMemberEntity;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 @Component
 public class GameSetup {
@@ -32,7 +32,7 @@ public class GameSetup {
     @Autowired
     private AddressSetup addressSetup;
 
-    public GameEntity save(final Member host) {
+    public GameEntity save(final MemberEntity host) {
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
@@ -51,9 +51,9 @@ public class GameSetup {
     }
 
     public GameEntity saveWithWaitingMembers(final Integer memberCount) {
-        final List<Member> members = memberSetup.save(memberCount);
+        final List<MemberEntity> members = memberSetup.save(memberCount);
         final GameEntity gameEntity = save(members.get(0));
-        final List<Member> guests = members.subList(1, members.size());
+        final List<MemberEntity> guests = members.subList(1, members.size());
 
         guests.forEach(gameEntity::addGameMember);
 
@@ -62,7 +62,7 @@ public class GameSetup {
 
     public GameEntity saveWithConfirmedMembers(final Integer memberCount) {
         final GameEntity gameEntity = saveWithWaitingMembers(memberCount);
-        final Member host = gameEntity.getHost();
+        final MemberEntity host = gameEntity.getHost();
         final List<GameMemberEntity> gameMemberEntities = gameEntity.getGameMembers();
 
         gameMemberEntities.forEach(gameMember -> {

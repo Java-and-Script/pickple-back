@@ -14,8 +14,8 @@ import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.repository.entity.GameMemberEntity;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
@@ -41,7 +41,7 @@ public class MemberGameService {
             final Long memberId,
             final RegistrationStatus memberStatus
     ) {
-        final Member member = memberReader.readEntityByMemberId(memberId);
+        final MemberEntity member = memberReader.readEntityByMemberId(memberId);
         final List<GameMemberEntity> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
                 memberStatus);
 
@@ -52,7 +52,7 @@ public class MemberGameService {
      * 사용자가 만든 게스트 모집글 목록 조회
      */
     public List<MemberGameResponse> findAllCreatedGames(final Long memberId) {
-        final Member member = memberReader.readEntityByMemberId(memberId);
+        final MemberEntity member = memberReader.readEntityByMemberId(memberId);
         final List<GameMemberEntity> memberGames = gameMemberRepository.findAllByMemberId(member.getId());
 
         return convertToMemberGameResponses(memberGames, CONFIRMED);
@@ -65,7 +65,7 @@ public class MemberGameService {
             final Long memberId,
             final Long gameId
     ) {
-        final Member member = memberReader.readEntityByMemberId(memberId);
+        final MemberEntity member = memberReader.readEntityByMemberId(memberId);
         final GameEntity gameEntity = gameRepository.getGameById(gameId);
 
         final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameId(member.getId(), gameEntity.getId())
@@ -81,7 +81,7 @@ public class MemberGameService {
         return memberGames.stream()
                 .map(memberGame -> {
                     GameEntity gameEntity = gameRepository.getGameById(memberGame.getGameId());
-                    Member member = memberRepository.getMemberById(memberGame.getMemberId());
+                    MemberEntity member = memberRepository.getMemberById(memberGame.getMemberId());
 
                     return MemberGameResponse.of(
                             memberGame,
@@ -110,8 +110,8 @@ public class MemberGameService {
                 .toList();
     }
 
-    private List<Position> getPositionsByMember(final Member member) {
-        final List<MemberPosition> memberPositions = memberPositionReader.readAll(member.getId());
+    private List<Position> getPositionsByMember(final MemberEntity member) {
+        final List<MemberPositionEntity> memberPositions = memberPositionReader.readAll(member.getId());
 
         return Position.fromMemberPositions(memberPositions);
     }

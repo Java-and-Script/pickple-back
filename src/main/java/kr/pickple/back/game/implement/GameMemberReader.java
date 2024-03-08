@@ -6,12 +6,12 @@ import static kr.pickple.back.game.exception.GameExceptionCode.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMemberDomain;
+import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.entity.GameMemberEntity;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -24,7 +24,7 @@ public class GameMemberReader {
     private final MemberReader memberReader;
     private final GameReader gameReader;
 
-    public GameMemberDomain readGameMemberByMemberIdAndGameId(Long loggedInMemberId, Long gameId) {
+    public GameMember readGameMemberByMemberIdAndGameId(final Long loggedInMemberId, final Long gameId) {
         final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
                         loggedInMemberId,
                         gameId,
@@ -32,9 +32,9 @@ public class GameMemberReader {
                 )
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, loggedInMemberId));
 
-        final MemberDomain memberDomain = memberReader.readByMemberId(gameMemberEntity.getMemberId());
-        final GameDomain gameDomain = gameReader.read(gameMemberEntity.getGameId());
+        final Member member = memberReader.readByMemberId(gameMemberEntity.getMemberId());
+        final Game game = gameReader.read(gameMemberEntity.getGameId());
 
-        return GameMemberMapper.mapGameMemberEntityToDomain(gameMemberEntity, memberDomain, gameDomain);
+        return GameMemberMapper.mapGameMemberEntityToDomain(gameMemberEntity, member, game);
     }
 }

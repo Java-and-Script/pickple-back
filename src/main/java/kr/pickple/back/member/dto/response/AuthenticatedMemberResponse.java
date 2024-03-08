@@ -4,7 +4,7 @@ import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.auth.domain.oauth.OauthMember;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.domain.token.AuthTokens;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -48,7 +48,7 @@ public class AuthenticatedMemberResponse {
     }
 
     public static AuthenticatedMemberResponse of(
-            final Member member,
+            final MemberEntity member,
             final AuthTokens authTokens,
             final MainAddress mainAddress
     ) {

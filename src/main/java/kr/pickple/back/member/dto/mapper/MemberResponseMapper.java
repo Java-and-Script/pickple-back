@@ -4,7 +4,7 @@ import java.util.List;
 
 import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
 import kr.pickple.back.crew.dto.response.CrewResponse;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.dto.response.AuthenticatedMemberResponse;
@@ -52,7 +52,7 @@ public final class MemberResponseMapper {
                 .build();
     }
 
-    public static MemberResponse mapToMemberResponseDto(final MemberDomain member) {
+    public static MemberResponse mapToMemberResponseDto(final Member member) {
         return MemberResponse.builder()
                 .id(member.getMemberId())
                 .email(member.getEmail())
@@ -67,7 +67,7 @@ public final class MemberResponseMapper {
                 .build();
     }
 
-    public static List<MemberResponse> mapToMemberResponseDtos(final List<MemberDomain> members) {
+    public static List<MemberResponse> mapToMemberResponseDtos(final List<Member> members) {
         return members.stream()
                 .map(MemberResponseMapper::mapToMemberResponseDto)
                 .toList();

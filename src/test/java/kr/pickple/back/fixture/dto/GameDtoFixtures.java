@@ -9,7 +9,7 @@ import kr.pickple.back.game.dto.request.GameCreateRequest;
 import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.dto.request.MannerScoreReviewsRequest;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.position.domain.Position;
 
 public class GameDtoFixtures {
@@ -36,7 +36,7 @@ public class GameDtoFixtures {
                 .build();
     }
 
-    public static MannerScoreReviewsRequest mannerScoreReviewsRequestBuild(final List<Member> members) {
+    public static MannerScoreReviewsRequest mannerScoreReviewsRequestBuild(final List<MemberEntity> members) {
         final List<MannerScoreReview> mannerScoreReviews = members.stream()
                 .map(member -> MannerScoreReview.builder()
                         .memberId(member.getId())

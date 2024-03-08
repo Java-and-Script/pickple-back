@@ -11,7 +11,7 @@ import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.dto.mapper.CrewResponseMapper;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.implement.CrewReader;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
@@ -31,9 +31,9 @@ public class MemberCrewService {
             final Long memberId,
             final RegistrationStatus memberStatus
     ) {
-        final MemberDomain memberDomain = memberReader.readByMemberId(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByMemberIdAndStatus(
-                memberDomain.getMemberId(),
+                member.getMemberId(),
                 memberStatus
         );
 
@@ -44,8 +44,8 @@ public class MemberCrewService {
      * 사용자가 만든 크루 목록 조회
      */
     public List<CrewProfileResponse> findCreatedCrewsByMemberId(final Long memberId) {
-        final MemberDomain memberDomain = memberReader.readByMemberId(memberId);
-        final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByLeaderId(memberDomain.getMemberId());
+        final Member member = memberReader.readByMemberId(memberId);
+        final List<CrewProfile> crewProfiles = crewReader.readAllCrewProfilesByLeaderId(member.getMemberId());
 
         return CrewResponseMapper.mapToCrewProfilesResponseDto(crewProfiles);
     }

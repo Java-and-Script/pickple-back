@@ -1,6 +1,6 @@
 package kr.pickple.back.member.domain;
 
-import static kr.pickple.back.member.domain.Member.*;
+import static kr.pickple.back.member.repository.entity.MemberEntity.*;
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 import static org.assertj.core.api.Assertions.*;
 
@@ -14,8 +14,9 @@ import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.fixture.domain.AddressFixtures;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
-class MemberTest {
+class MemberEntityTest {
 
     @Test
     @DisplayName("회원의 매너스코어를 업데이트 시킬 수 있다.")
@@ -26,7 +27,7 @@ class MemberTest {
 
         // when & then
         MANNER_SCORE_POINT_RANGE.forEach((mannerScorePoint) -> {
-            final Member member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
+            final MemberEntity member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
             member.updateMannerScore(mannerScorePoint);
 
             assertThat(member.getMannerScore()).isEqualTo(mannerScorePoint);
@@ -41,7 +42,7 @@ class MemberTest {
         final AddressDepth1 addressDepth1 = AddressFixtures.addressDepth1Build();
         final AddressDepth2 addressDepth2 = AddressFixtures.addressDepth2Build();
 
-        final Member member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
+        final MemberEntity member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
 
         // when & then
         assertThatThrownBy(() -> member.updateMannerScore(mannerScorePoint))

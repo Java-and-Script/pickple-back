@@ -16,7 +16,7 @@ import kr.pickple.back.alarm.dto.response.AlarmResponse;
 import kr.pickple.back.alarm.dto.response.CrewAlarmResponse;
 import kr.pickple.back.alarm.dto.response.GameAlarmResponse;
 import kr.pickple.back.alarm.util.CursorResult;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -77,13 +77,13 @@ public class AlarmService {
 
     @Transactional
     public void deleteAllAlarms(final Long loggedInMemberId) {
-        final Member member = findMemberById(loggedInMemberId);
+        final MemberEntity member = findMemberById(loggedInMemberId);
 
         crewAlarmService.deleteAllCrewAlarms(member.getId());
         gameAlarmService.deleteAllGameAlarms(member.getId());
     }
 
-    private Member findMemberById(final Long memberId) {
+    private MemberEntity findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }

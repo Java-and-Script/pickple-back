@@ -4,7 +4,7 @@ import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
 import kr.pickple.back.chat.domain.ChatMessage;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -24,7 +24,7 @@ public final class ChatMapper {
 
     public static ChatMessage mapChatMessageEntityToDomain(
             final ChatMessageEntity chatMessageEntity,
-            final MemberDomain sender,
+            final Member sender,
             final ChatRoom chatRoom
     ) {
         return ChatMessage.builder()

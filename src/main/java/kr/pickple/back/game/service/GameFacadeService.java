@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
-import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.dto.mapper.GameResponseMapper;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.dto.response.GamesAndLocationResponse;
@@ -25,11 +25,15 @@ public class GameFacadeService {
     private final MapService mapService;
     private final GameReader gameReader;
 
+    /**
+     * 특정 지역의 게스트 모집글 조회
+     */
     public GamesAndLocationResponse findGamesWithInAddress(final String addressDepth1, final String addressDepth2) {
         final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1, addressDepth2);
 
-        final List<GameDomain> gameDomains = gameReader.findGamesWithInAddress(mainAddress);
-        final List<GameResponse> gameResponses = gameDomains.stream()
+        final List<Game> games = gameReader.findGamesWithInAddress(mainAddress);
+
+        final List<GameResponse> gameResponses = games.stream()
                 .map(gameDomain -> GameResponseMapper.mapToGameResponseDto(
                                 gameDomain,
                                 gameReader.readAllMembersByGameIdAndStatus(gameDomain.getGameId(), CONFIRMED)

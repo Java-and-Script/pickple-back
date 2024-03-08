@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import kr.pickple.back.game.repository.entity.GamePosition;
-import kr.pickple.back.member.domain.MemberPosition;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.position.exception.PositionException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -49,9 +49,9 @@ public enum Position {
         throw new PositionException(POSITION_NOT_FOUND, positionAcronym);
     }
 
-    public static List<Position> fromMemberPositions(final List<MemberPosition> memberPositions) {
+    public static List<Position> fromMemberPositions(final List<MemberPositionEntity> memberPositions) {
         return memberPositions.stream()
-                .map(MemberPosition::getPosition)
+                .map(MemberPositionEntity::getPosition)
                 .toList();
     }
 

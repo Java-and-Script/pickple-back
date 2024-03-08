@@ -23,7 +23,7 @@ import kr.pickple.back.alarm.repository.CrewAlarmRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.repository.CrewRepository;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class CrewAlarmService {
 
         final Long crewId = crewJoinRequestNotificationEvent.getCrewId();
         final CrewEntity crew = getCrewInfo(crewId);
-        final Member leader = memberRepository.getMemberById(crew.getLeaderId());
+        final MemberEntity leader = memberRepository.getMemberById(crew.getLeaderId());
 
         final CrewAlarm crewAlarm = CrewAlarm.builder()
                 .crew(crew)
@@ -63,7 +63,7 @@ public class CrewAlarmService {
         final Long crewId = crewMemberJoinedEvent.getCrewId();
         final CrewEntity crew = getCrewInfo(crewId);
         final Long memberId = crewMemberJoinedEvent.getMemberId();
-        final Member member = getMemberInfo(memberId);
+        final MemberEntity member = getMemberInfo(memberId);
 
         final CrewAlarm crewAlarm = CrewAlarm.builder()
                 .crew(crew)
@@ -82,7 +82,7 @@ public class CrewAlarmService {
         final Long crewId = crewMemberRejectedEvent.getCrewId();
         final CrewEntity crew = getCrewInfo(crewId);
         final Long memberId = crewMemberRejectedEvent.getMemberId();
-        final Member member = getMemberInfo(memberId);
+        final MemberEntity member = getMemberInfo(memberId);
 
         final CrewAlarm crewAlarm = CrewAlarm.builder()
                 .crew(crew)
@@ -103,8 +103,8 @@ public class CrewAlarmService {
         return crew;
     }
 
-    private Member getMemberInfo(final Long memberId) {
-        final Member member = memberRepository.findById(memberId)
+    private MemberEntity getMemberInfo(final Long memberId) {
+        final MemberEntity member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
 
         return member;
@@ -114,7 +114,7 @@ public class CrewAlarmService {
         final Long crewId = crewAlarmEvent.getCrewId();
         final CrewEntity crew = crewRepository.findById(crewId).orElseThrow(() -> new CrewException(CREW_NOT_FOUND, crewId));
 
-        final Member leader = memberRepository.getMemberById(crew.getLeaderId());
+        final MemberEntity leader = memberRepository.getMemberById(crew.getLeaderId());
 
         if (!crew.isLeader(crewAlarmEvent.getMemberId())) {
             throw new CrewException(CREW_IS_NOT_LEADER, crewId, leader.getId());
@@ -156,13 +156,13 @@ public class CrewAlarmService {
             final Long crewAlarmId,
             final CrewAlarmUpdateStatusRequest crewAlarmUpdateStatusRequest
     ) {
-        final Member member = findMemberById(loggedInMemberId);
+        final MemberEntity member = findMemberById(loggedInMemberId);
         final CrewAlarm crewAlarm = checkExistCrewAlarm(loggedInMemberId, crewAlarmId);
 
         crewAlarm.updateStatus(crewAlarmUpdateStatusRequest.getIsRead());
     }
 
-    private Member findMemberById(final Long memberId) {
+    private MemberEntity findMemberById(final Long memberId) {
         return memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
     }

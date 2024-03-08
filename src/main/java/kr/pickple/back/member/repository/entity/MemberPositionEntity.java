@@ -1,4 +1,4 @@
-package kr.pickple.back.member.domain;
+package kr.pickple.back.member.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -18,7 +18,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberPosition extends BaseEntity {
+public class MemberPositionEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +33,7 @@ public class MemberPosition extends BaseEntity {
     private Long memberId;
 
     @Builder
-    private MemberPosition(final Position position, final Long memberId) {
+    private MemberPositionEntity(final Position position, final Long memberId) {
         this.position = position;
         this.memberId = memberId;
     }

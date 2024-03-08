@@ -15,7 +15,7 @@ import kr.pickple.back.chat.dto.response.PersonalChatRoomStatusResponse;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.implement.ChatReader;
 import kr.pickple.back.chat.implement.ChatWriter;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -35,8 +35,8 @@ public class ChatRoomService {
     public ChatRoomDetailResponse createPersonalRoom(final Long senderId, final Long receiverId) {
         validateSelfChat(senderId, receiverId);
 
-        final MemberDomain sender = memberReader.readByMemberId(senderId);
-        final MemberDomain receiver = memberReader.readByMemberId(receiverId);
+        final Member sender = memberReader.readByMemberId(senderId);
+        final Member receiver = memberReader.readByMemberId(receiverId);
 
         final String roomName = MessageFormat.format("{0},{1}", sender.getNickname(), receiver.getNickname());
         final ChatRoom chatRoom = chatWriter.createNewPersonalRoom(roomName);

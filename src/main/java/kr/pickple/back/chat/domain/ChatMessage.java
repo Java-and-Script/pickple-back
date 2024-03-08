@@ -2,7 +2,7 @@ package kr.pickple.back.chat.domain;
 
 import java.time.LocalDateTime;
 
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +18,7 @@ public class ChatMessage {
     private Long chatMessageId;
     private MessageType type;
     private String content;
-    private MemberDomain sender;
+    private Member sender;
     private ChatRoom chatRoom;
     private LocalDateTime createdAt;
 }

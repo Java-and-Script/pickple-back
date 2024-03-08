@@ -1,7 +1,7 @@
 package kr.pickple.back.crew.domain;
 
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,7 +18,7 @@ public class NewCrew {
     private String addressDepth2Name;
     private String profileImageUrl;
     private String backgroundImageUrl;
-    private MemberDomain leader;
+    private Member leader;
     private ChatRoom chatRoom;
 
     @Builder
@@ -41,7 +41,7 @@ public class NewCrew {
         this.backgroundImageUrl = backgroundImageUrl;
     }
 
-    public void assignLeader(final MemberDomain leader) {
+    public void assignLeader(final Member leader) {
         this.leader = leader;
     }
 

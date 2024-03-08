@@ -4,9 +4,9 @@ import java.util.List;
 
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.crew.domain.Crew;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberDomain;
-import kr.pickple.back.member.domain.MemberPosition;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.domain.MemberStatus;
 import kr.pickple.back.member.domain.NewMember;
@@ -17,8 +17,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MemberMapper {
 
-    public static Member mapToMemberEntity(final NewMember newMember, final MainAddress mainAddress) {
-        return Member.builder()
+    public static MemberEntity mapToMemberEntity(final NewMember newMember, final MainAddress mainAddress) {
+        return MemberEntity.builder()
                 .email(newMember.getEmail())
                 .nickname(newMember.getNickname())
                 .profileImageUrl(newMember.getProfileImageUrl())
@@ -30,12 +30,12 @@ public final class MemberMapper {
                 .build();
     }
 
-    public static List<MemberPosition> mapToMemberPositionEntities(
+    public static List<MemberPositionEntity> mapToMemberPositionEntities(
             final List<Position> positions,
             final Long memberId
     ) {
         return positions.stream()
-                .map(position -> MemberPosition.builder()
+                .map(position -> MemberPositionEntity.builder()
                         .memberId(memberId)
                         .position(position)
                         .build()
@@ -43,7 +43,7 @@ public final class MemberMapper {
     }
 
     public static MemberProfile mapToMemberProfileDomain(
-            final Member member,
+            final MemberEntity member,
             final MainAddress mainAddress,
             final List<Position> positions,
             final List<Crew> crews
@@ -63,12 +63,12 @@ public final class MemberMapper {
                 .build();
     }
 
-    public static MemberDomain mapToMemberDomain(
-            final Member memberEntity,
+    public static Member mapToMemberDomain(
+            final MemberEntity memberEntity,
             final MainAddress mainAddress,
             final List<Position> positions
     ) {
-        return MemberDomain.builder()
+        return Member.builder()
                 .memberId(memberEntity.getId())
                 .email(memberEntity.getEmail())
                 .nickname(memberEntity.getNickname())

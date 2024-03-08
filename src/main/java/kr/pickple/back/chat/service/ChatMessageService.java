@@ -14,7 +14,7 @@ import kr.pickple.back.chat.dto.request.ChatMessageCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatMessageResponse;
 import kr.pickple.back.chat.implement.ChatReader;
 import kr.pickple.back.chat.implement.ChatWriter;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -36,7 +36,7 @@ public class ChatMessageService {
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
         final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
-        final MemberDomain newMember = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final Member newMember = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
         final ChatMessage entranceMessage = chatWriter.enterRoom(newMember, chatRoom);
 
         return ChatResponseMapper.mapToChatMessageResponseDto(entranceMessage);
@@ -51,7 +51,7 @@ public class ChatMessageService {
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
         final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
-        final MemberDomain sender = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final Member sender = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
         final ChatMessage chatMessage = chatWriter.sendMessage(
                 TALK,
                 chatMessageCreateRequest.getContent(),
@@ -71,7 +71,7 @@ public class ChatMessageService {
             final ChatMessageCreateRequest chatMessageCreateRequest
     ) {
         final ChatRoom chatRoom = chatReader.readRoom(chatRoomId);
-        final MemberDomain member = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
+        final Member member = memberReader.readByMemberId(chatMessageCreateRequest.getSenderId());
         final ChatMessage leaveMessage = chatWriter.leaveRoom(member, chatRoom);
 
         return ChatResponseMapper.mapToChatMessageResponseDto(leaveMessage);

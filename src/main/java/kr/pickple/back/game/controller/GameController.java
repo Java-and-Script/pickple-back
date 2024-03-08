@@ -102,7 +102,7 @@ public class GameController {
                 loggedInMemberId,
                 gameId,
                 memberId,
-                gameMemberRegistrationStatusUpdateRequest
+                gameMemberRegistrationStatusUpdateRequest.getStatus()
         );
 
         return ResponseEntity.status(NO_CONTENT)

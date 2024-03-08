@@ -18,11 +18,11 @@ import kr.pickple.back.address.domain.AddressDepth1;
 import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.fixture.domain.MemberFixtures;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberRepository;
 
-public class MemberCrewServiceTestEntity {
+public class MemberEntityCrewServiceTestEntity {
 
     @InjectMocks
     private MemberCrewService memberCrewService;
@@ -36,7 +36,7 @@ public class MemberCrewServiceTestEntity {
         // given
         final Long memberId = 1L;
         final Long loggedInMemberId = 1L;
-        final Member member = buildMember();
+        final MemberEntity member = buildMember();
         given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
 
         // when
@@ -53,7 +53,7 @@ public class MemberCrewServiceTestEntity {
         // given
         final Long memberId = 1L;
         final Long loggedInMemberId = 1L;
-        final Member member = buildMember();
+        final MemberEntity member = buildMember();
 
         given(memberRepository.findById(anyLong())).willReturn(Optional.ofNullable(member));
 
@@ -73,7 +73,7 @@ public class MemberCrewServiceTestEntity {
         // given
         final Long memberId = 1L;
         final Long loggedInMemberId = 2L;
-        final Member member = buildMember();
+        final MemberEntity member = buildMember();
 
         // when && then
         assertThatThrownBy(() -> memberCrewService.findCreatedCrewsByMemberId(
@@ -83,7 +83,7 @@ public class MemberCrewServiceTestEntity {
                 .hasMessage(MEMBER_MISMATCH.getMessage());
     }
 
-    private Member buildMember() {
+    private MemberEntity buildMember() {
         final AddressDepth1 addressDepth1 = AddressDepth1.builder()
                 .name("서울시")
                 .build();

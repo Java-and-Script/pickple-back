@@ -8,7 +8,7 @@ import kr.pickple.back.crew.domain.CrewProfile;
 import kr.pickple.back.crew.dto.response.CrewIdResponse;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.dto.response.CrewResponse;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
 import kr.pickple.back.member.dto.response.CrewMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
@@ -22,7 +22,7 @@ public final class CrewResponseMapper {
         return CrewIdResponse.from(crewId);
     }
 
-    public static CrewProfileResponse mapToCrewProfileResponseDto(final Crew crew, final List<MemberDomain> members) {
+    public static CrewProfileResponse mapToCrewProfileResponseDto(final Crew crew, final List<Member> members) {
         final List<MemberResponse> memberResponses = members.stream()
                 .map(MemberResponseMapper::mapToMemberResponseDto)
                 .toList();

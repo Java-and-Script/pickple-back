@@ -16,7 +16,7 @@ import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.fixture.domain.CrewFixtures;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 @Component
 public class CrewSetup {
@@ -36,7 +36,7 @@ public class CrewSetup {
     @Autowired
     private AddressSetup addressSetup;
 
-    public CrewEntity save(final Member leader) {
+    public CrewEntity save(final MemberEntity leader) {
         final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
         final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
@@ -57,7 +57,7 @@ public class CrewSetup {
     }
 
     public CrewEntity saveWithWaitingMembers(final Integer memberCount) {
-        final List<Member> members = memberSetup.save(memberCount);
+        final List<MemberEntity> members = memberSetup.save(memberCount);
         final CrewEntity crew = save(members.get(0));
 
         members.subList(1, members.size())

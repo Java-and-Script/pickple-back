@@ -2,105 +2,37 @@ package kr.pickple.back.member.domain;
 
 import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
-import java.text.MessageFormat;
 import java.util.List;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.auth.domain.oauth.OauthProvider;
-import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.util.MemberStatusConverter;
+import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
-@Entity
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@EqualsAndHashCode(of = "id", callSuper = false)
-public class Member extends BaseEntity {
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode(of = "memberId")
+public class Member {
 
     public static final List<Integer> MANNER_SCORE_POINT_RANGE = List.of(-1, 0, 1);
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @NotNull
-    @Column(unique = true, length = 100)
+    private Long memberId;
     private String email;
-
-    @NotNull
-    @Column(unique = true, length = 20)
     private String nickname;
-
-    @Column(length = 1000)
     private String introduction;
-
-    @NotNull
-    @Column(length = 300)
     private String profileImageUrl;
+    private Integer mannerScore;
+    private Integer mannerScoreCount;
+    private String addressDepth1Name;
+    private String addressDepth2Name;
+    private List<Position> positions;
 
-    @NotNull
-    @Convert(converter = MemberStatusConverter.class)
-    @Column(length = 10)
-    private MemberStatus status;
-
-    @NotNull
-    private Integer mannerScore = 0;
-
-    @NotNull
-    private Integer mannerScoreCount = 0;
-
-    @NotNull
-    @Column(unique = true)
-    private Long oauthId;
-
-    @NotNull
-    @Enumerated(value = EnumType.STRING)
-    private OauthProvider oauthProvider;
-
-    @NotNull
-    private Long addressDepth1Id;
-
-    @NotNull
-    private Long addressDepth2Id;
-
-    @Builder
-    private Member(
-            final String email,
-            final String nickname,
-            final String profileImageUrl,
-            final MemberStatus status,
-            final Long oauthId,
-            final OauthProvider oauthProvider,
-            final Long addressDepth1Id,
-            final Long addressDepth2Id
-    ) {
-        this.email = email;
-        this.nickname = nickname;
-        this.profileImageUrl = profileImageUrl;
-        this.status = status;
-        this.oauthId = oauthId;
-        this.oauthProvider = oauthProvider;
-        this.addressDepth1Id = addressDepth1Id;
-        this.addressDepth2Id = addressDepth2Id;
-
-        setDefaultIntroduction(nickname);
-    }
-
-    private void setDefaultIntroduction(final String nickname) {
-        this.introduction = MessageFormat.format("안녕하세요. {0}입니다.", nickname);
+    public Boolean isIdMatched(final Long memberId) {
+        return this.memberId.equals(memberId);
     }
 
     public void updateMannerScore(final Integer mannerScorePoint) {

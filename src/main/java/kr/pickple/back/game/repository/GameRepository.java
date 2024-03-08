@@ -33,4 +33,7 @@ public interface GameRepository extends JpaRepository<GameEntity, Long>, GameSea
 
     @Query("update GameEntity g set g.status = :status where g.id = :gameId")
     void updateRegistrationStatus(final GameStatus status, final Long gameId);
+
+    @Query("select g.chatRoomId from GameEntity g where g.id = :gameId")
+    Long findChatRoomId(final Long gameId);
 }

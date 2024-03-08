@@ -1,7 +1,7 @@
 package kr.pickple.back.alarm.controller;
 
 import kr.pickple.back.alarm.IntegrationAlarmTest;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -22,7 +22,7 @@ public class AlarmControllerTest extends IntegrationAlarmTest {
     @DisplayName("사용자는 재접속 시 읽지 않은 알람이 있는지 알 수 있다.")
     void findUnreadAlarm_Success() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
@@ -40,7 +40,7 @@ public class AlarmControllerTest extends IntegrationAlarmTest {
     @DisplayName("사용자는 해당 사용자에게 온 모든 알람 목록을 조회할 수 있다.")
     void findAllAlarms_Success() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);
@@ -60,7 +60,7 @@ public class AlarmControllerTest extends IntegrationAlarmTest {
     @DisplayName("사용자는 해당 사용자에게 온 모든 알람을 모두 삭제할 수 있다.")
     void deleteAllAlarms_Success() throws Exception {
         //given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final String accessToken = jwtProvider.createLoginToken(member.getId().toString()).getAccessToken();
         final HttpHeaders headers = new HttpHeaders();
         headers.setBearerAuth(accessToken);

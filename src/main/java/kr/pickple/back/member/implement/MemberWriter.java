@@ -10,8 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.implement.TokenManager;
-import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.domain.MemberPosition;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.repository.MemberPositionRepository;
@@ -37,21 +37,13 @@ public class MemberWriter {
                 newMember.getAddressDepth2Name()
         );
 
-        final Member memberEntity = MemberMapper.mapToMemberEntity(newMember, mainAddress);
-        final Member savedMemberEntity = memberRepository.save(memberEntity);
+        final MemberEntity memberEntity = MemberMapper.mapToMemberEntity(newMember, mainAddress);
+        final MemberEntity savedMemberEntity = memberRepository.save(memberEntity);
 
         newMember.updateMemberId(savedMemberEntity.getId());
         setPositionsToMember(newMember.getPositions(), newMember.getMemberId());
 
         return newMember;
-    }
-
-    private void setPositionsToMember(final List<Position> positions, final Long memberId) {
-        validateIsDuplicatedPositions(positions);
-
-        final List<MemberPosition> memberPositions = MemberMapper.mapToMemberPositionEntities(positions, memberId);
-
-        memberPositionRepository.saveAll(memberPositions);
     }
 
     private void validateIsDuplicatedMemberInfo(final NewMember newMember) {
@@ -62,6 +54,14 @@ public class MemberWriter {
         if (memberRepository.existsByEmailOrNicknameOrOauthId(email, nickname, oauthId)) {
             throw new MemberException(MEMBER_IS_EXISTED, email, nickname, oauthId);
         }
+    }
+
+    private void setPositionsToMember(final List<Position> positions, final Long memberId) {
+        validateIsDuplicatedPositions(positions);
+
+        final List<MemberPositionEntity> memberPositions = MemberMapper.mapToMemberPositionEntities(positions, memberId);
+
+        memberPositionRepository.saveAll(memberPositions);
     }
 
     private void validateIsDuplicatedPositions(final List<Position> positions) {

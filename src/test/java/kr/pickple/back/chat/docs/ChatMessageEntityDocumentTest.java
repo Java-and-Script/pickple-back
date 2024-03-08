@@ -25,7 +25,7 @@ import kr.pickple.back.chat.IntegrationChatTest;
 import kr.pickple.back.chat.dto.request.PersonalChatRoomCreateRequest;
 import kr.pickple.back.chat.dto.response.ChatRoomDetailResponse;
 import kr.pickple.back.fixture.dto.ChatDtoFixtures;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 @Transactional
 class ChatMessageEntityDocumentTest extends IntegrationChatTest {
@@ -36,9 +36,9 @@ class ChatMessageEntityDocumentTest extends IntegrationChatTest {
     @DisplayName("특정 채팅방의 모든 메시지 목록 조회")
     void findAllMessagesInRoom_ReturnChatMessageResponses() throws Exception {
         // given
-        final List<Member> members = memberSetup.save(2);
-        final Member sender = members.get(0);
-        final Member receiver = members.get(1);
+        final List<MemberEntity> members = memberSetup.save(2);
+        final MemberEntity sender = members.get(0);
+        final MemberEntity receiver = members.get(1);
 
         final PersonalChatRoomCreateRequest personalChatRoomCreateRequest = ChatDtoFixtures.personalChatRoomCreateRequestBuild(
                 receiver.getId());

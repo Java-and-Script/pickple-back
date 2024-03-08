@@ -14,11 +14,11 @@ import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.member.IntegrationMemberTest;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 
 @Transactional
-class MemberControllerTest extends IntegrationMemberTest {
+class MemberEntityControllerTest extends IntegrationMemberTest {
 
     private static final String BASE_URL = "/members";
 
@@ -61,7 +61,7 @@ class MemberControllerTest extends IntegrationMemberTest {
     @DisplayName("회원 프로필을 조회할 수 있다.")
     void findMemberById_ReturnMemberProfileResponse() throws Exception {
         // given
-        final Member savedMember = memberSetup.save();
+        final MemberEntity savedMember = memberSetup.save();
         final CrewEntity savedCrew = crewSetup.save(savedMember);
 
         // when
@@ -112,7 +112,7 @@ class MemberControllerTest extends IntegrationMemberTest {
     @DisplayName("회원이 가입한 크루 목록을 조회할 수 있다.")
     void findAllCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final CrewEntity crew = crewSetup.save(member);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
@@ -164,7 +164,7 @@ class MemberControllerTest extends IntegrationMemberTest {
     @DisplayName("회원이 만든 크루 목록을 조회할 수 있다.")
     void findCreatedCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         final CrewEntity crew = crewSetup.save(member);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));

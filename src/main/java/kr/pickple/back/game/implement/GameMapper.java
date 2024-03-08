@@ -5,25 +5,25 @@ import java.util.List;
 import org.locationtech.jts.geom.Point;
 
 import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.game.repository.entity.GamePosition;
-import kr.pickple.back.member.domain.MemberDomain;
-import kr.pickple.back.member.domain.MemberPosition;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public class GameMapper {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class GameMapper {
 
-    public static GameDomain mapGameEntityToDomain(
+    public static Game mapGameEntityToDomain(
             final GameEntity gameEntity,
             final MainAddress mainAddress,
-            final MemberDomain host,
-            final ChatRoom chatRoom,
+            final Member host,
             final List<Position> positions
     ) {
-        return GameDomain.builder()
+        return Game.builder()
                 .gameId(gameEntity.getId())
                 .content(gameEntity.getContent())
                 .playDate(gameEntity.getPlayDate())
@@ -43,11 +43,14 @@ public class GameMapper {
                 .addressDepth1Name(mainAddress.getAddressDepth1().getName())
                 .addressDepth2Name(mainAddress.getAddressDepth2().getName())
                 .positions(positions)
-                .chatRoom(chatRoom)
                 .build();
     }
 
-    public static GameEntity mapNewGameDomainToEntity(NewGame newGame, Point point, MainAddress mainAddress) {
+    public static GameEntity mapNewGameDomainToEntity(
+            final NewGame newGame,
+            final Point point,
+            final MainAddress mainAddress
+    ) {
         return GameEntity.builder()
                 .content(newGame.getContent())
                 .playDate(newGame.getPlayDate())
@@ -62,7 +65,7 @@ public class GameMapper {
                 .point(point)
                 .addressDepth1Id(mainAddress.getAddressDepth1().getId())
                 .addressDepth2Id(mainAddress.getAddressDepth2().getId())
-                .chatRoomId(newGame.getChatRoom().getId())
+                .chatRoomId(newGame.getChatRoom().getChatRoomId())
                 .build();
     }
 
@@ -70,18 +73,6 @@ public class GameMapper {
         return positions.stream()
                 .map(position -> GamePosition.builder()
                         .gameId(gameId)
-                        .position(position)
-                        .build()
-                ).toList();
-    }
-
-    public static List<MemberPosition> mapToMemberPositionEntities(
-            final List<Position> positions,
-            final Long memberId
-    ) {
-        return positions.stream()
-                .map(position -> MemberPosition.builder()
-                        .memberId(memberId)
                         .position(position)
                         .build()
                 ).toList();

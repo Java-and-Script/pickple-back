@@ -23,11 +23,11 @@ import com.epages.restdocs.apispec.SimpleType;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.fixture.dto.MemberDtoFixtures;
 import kr.pickple.back.member.IntegrationMemberTest;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.dto.request.MemberCreateRequest;
 
 @Transactional
-class MemberDocumentTest extends IntegrationMemberTest {
+class MemberEntityDocumentTest extends IntegrationMemberTest {
 
     @Test
     @DisplayName("회원 생성")
@@ -105,7 +105,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     @DisplayName("회원 프로필 조회")
     void findMemberById_ReturnMemberProfileResponse() throws Exception {
         // given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         crewSetup.save(member);
 
         // when
@@ -194,7 +194,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     @DisplayName("회원이 가입한 크루 목록 조회")
     void findAllCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         crewSetup.save(member);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
@@ -298,7 +298,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     @DisplayName("회원이 만든 크루 목록 조회")
     void findCreatedCrewsByMemberId_ReturnCrewProfileResponses() throws Exception {
         // given
-        final Member member = memberSetup.save();
+        final MemberEntity member = memberSetup.save();
         crewSetup.save(member);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(member.getId()));
@@ -398,7 +398,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     @DisplayName("회원이 참여 확정된 게스트 모집글 목록 조회")
     void findAllMemberGames_ReturnGameResponses() throws Exception {
         // given
-        final Member host = memberSetup.save();
+        final MemberEntity host = memberSetup.save();
         gameSetup.save(host);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(host.getId()));
@@ -513,7 +513,7 @@ class MemberDocumentTest extends IntegrationMemberTest {
     @DisplayName("회원이 만든 게스트 모집글 목록 조회")
     void findAllCreatedGames_ReturnGameResponses() throws Exception {
         // given
-        final Member host = memberSetup.save();
+        final MemberEntity host = memberSetup.save();
         gameSetup.save(host);
 
         final AuthTokens authTokens = jwtProvider.createLoginToken(String.valueOf(host.getId()));

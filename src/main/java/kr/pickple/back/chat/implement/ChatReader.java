@@ -9,18 +9,20 @@ import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
 import kr.pickple.back.chat.domain.ChatMessage;
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.repository.entity.ChatRoomMemberEntity;
 import kr.pickple.back.chat.domain.PersonalChatRoomStatus;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
+import kr.pickple.back.chat.repository.entity.ChatRoomMemberEntity;
+import kr.pickple.back.crew.repository.CrewRepository;
+import kr.pickple.back.game.repository.GameRepository;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -30,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 public class ChatReader {
 
     private final MemberReader memberReader;
+    private final CrewRepository crewRepository;
+    private final GameRepository gameRepository;
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRoomMemberRepository chatRoomMemberRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -39,6 +43,14 @@ public class ChatReader {
                 .orElseThrow(() -> new ChatException(CHAT_ROOM_NOT_FOUND, chatRoomId));
 
         return ChatMapper.mapChatRoomEntityToDomain(chatRoomEntity);
+    }
+
+    public ChatRoom readRoomByCrewId(final Long crewId) {
+        return readRoom(crewRepository.findChatRoomId(crewId));
+    }
+
+    public ChatRoom readRoomByGameId(final Long gameId) {
+        return readRoom(gameRepository.findChatRoomId(gameId));
     }
 
     public PersonalChatRoomStatus readPersonalRoomStatus(final Long senderId, final Long receiverId) {
@@ -68,7 +80,7 @@ public class ChatReader {
                 .toList();
     }
 
-    public MemberDomain readReceiver(final Long senderId, final Long chatRoomId) {
+    public Member readReceiver(final Long senderId, final Long chatRoomId) {
         final ChatRoomMemberEntity receiverEntity = chatRoomMemberRepository.findByChatRoomIdAndMemberIdNot(
                         chatRoomId, senderId)
                 .orElseThrow(() -> new ChatException(CHAT_RECEIVER_NOT_FOUND));
@@ -76,7 +88,7 @@ public class ChatReader {
         return memberReader.readByMemberId(receiverEntity.getMemberId());
     }
 
-    public List<MemberDomain> readRoomMembers(final Long chatRoomId) {
+    public List<Member> readRoomMembers(final Long chatRoomId) {
         return chatRoomMemberRepository.findAllByActiveTrueAndChatRoomId(chatRoomId)
                 .stream()
                 .map(chatRoomMember -> memberReader.readByMemberId(chatRoomMember.getMemberId()))
@@ -86,7 +98,7 @@ public class ChatReader {
     public ChatMessage readLastMessage(final ChatRoom chatRoom) {
         final ChatMessageEntity lastMessageEntity = chatMessageRepository.findTopByChatRoomIdOrderByCreatedAtDesc(
                 chatRoom.getChatRoomId());
-        final MemberDomain sender = memberReader.readByMemberId(lastMessageEntity.getSenderId());
+        final Member sender = memberReader.readByMemberId(lastMessageEntity.getSenderId());
 
         return ChatMapper.mapChatMessageEntityToDomain(lastMessageEntity, sender, chatRoom);
     }

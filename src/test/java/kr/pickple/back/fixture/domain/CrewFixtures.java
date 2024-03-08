@@ -11,14 +11,14 @@ import kr.pickple.back.address.domain.AddressDepth2;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
-import kr.pickple.back.member.domain.Member;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 
 public class CrewFixtures {
 
     public static CrewEntity crewBuild(
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
-            final Member leader
+            final MemberEntity leader
     ) {
         return CrewEntity.builder()
                 .name("백둥크루1")
@@ -32,7 +32,7 @@ public class CrewFixtures {
                 .build();
     }
 
-    public static CrewMemberEntity crewMemberBuild(final Member member, final CrewEntity crew) {
+    public static CrewMemberEntity crewMemberBuild(final MemberEntity member, final CrewEntity crew) {
         return CrewMemberEntity.builder()
                 .member(member)
                 .crew(crew)
@@ -50,7 +50,7 @@ public class CrewFixtures {
             final Integer count,
             final AddressDepth1 addressDepth1,
             final AddressDepth2 addressDepth2,
-            final Member leader
+            final MemberEntity leader
     ) {
         final List<CrewEntity> crews = new ArrayList<>();
 

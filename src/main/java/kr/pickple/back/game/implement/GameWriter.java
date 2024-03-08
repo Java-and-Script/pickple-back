@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
-import kr.pickple.back.game.domain.GameDomain;
+import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
@@ -21,8 +21,7 @@ import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.game.repository.entity.GamePosition;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.member.repository.MemberRepository;
 import kr.pickple.back.position.domain.Position;
@@ -41,7 +40,7 @@ public class GameWriter {
     private final MemberReader memberReader;
     private final MemberRepository memberRepository;
 
-    public GameDomain create(final NewGame newGame) {
+    public Game create(final NewGame newGame) {
         final Point point = kakaoAddressSearchClient.fetchAddress(newGame.getMainAddress());
 
         final MainAddress mainAddress = addressReader.readMainAddressByNames(
@@ -58,7 +57,6 @@ public class GameWriter {
                 savedGameEntity,
                 mainAddress,
                 newGame.getHost(),
-                newGame.getChatRoom(),
                 newGame.getPositions()
         );
     }
@@ -66,13 +64,11 @@ public class GameWriter {
     private void setPositionsToGame(final List<Position> positions, final Long gameId) {
         validateIsDuplicatedPositions(positions);
 
-        final List<GamePosition> gamePositions = GameMapper.mapToGamePositionEntities(positions, gameId);
-
-        gamePositionRepository.saveAll(gamePositions);
+        gamePositionRepository.saveAll(GameMapper.mapToGamePositionEntities(positions, gameId));
     }
 
     private void validateIsDuplicatedPositions(final List<Position> positions) {
-        final Long distinctPositionsSize = positions.stream()
+        final long distinctPositionsSize = positions.stream()
                 .distinct()
                 .count();
 
@@ -85,36 +81,38 @@ public class GameWriter {
         gameRepository.updateRegistrationStatus(status, gameId);
     }
 
-    public void reviewMannerScores(Long loggedInMemberId, Long gameId, List<MannerScoreReview> mannerScoreReviews) {
-        final MemberDomain memberDomain = memberReader.readByMemberId(loggedInMemberId);
+    public void reviewMannerScores(
+            final Long memberId,
+            final Long gameId,
+            final List<MannerScoreReview> mannerScoreReviews
+    ) {
+        final Member member = memberReader.readByMemberId(memberId);
 
         mannerScoreReviews.forEach(review -> {
-            final MemberDomain reviewedMember = getReviewedMember(gameId, review.getMemberId());
-            validateIsSelfReview(memberDomain, reviewedMember);
+            final Member reviewedMember = getReviewedMember(gameId, review.getMemberId());
+
+            if (member.equals(reviewedMember)) {
+                throw new GameException(GAME_MEMBER_CANNOT_REVIEW_SELF, memberId, reviewedMember.getMemberId());
+            }
+
             reviewedMember.updateMannerScore(review.getMannerScore());
             memberRepository.updateMannerScore(reviewedMember.getMannerScore(), reviewedMember.getMemberId());
         });
 
     }
 
-    private MemberDomain getReviewedMember(final Long gameId, final Long reviewedMemberId) {
+    private Member getReviewedMember(final Long gameId, final Long reviewedMemberId) {
         return getConfirmedMembers(gameId)
                 .stream()
-                .filter(confirmedMember -> confirmedMember.getMemberId() == reviewedMemberId)
+                .filter(confirmedMember -> confirmedMember.isIdMatched(reviewedMemberId))
                 .findFirst()
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, reviewedMemberId));
     }
 
-    private List<MemberDomain> getConfirmedMembers(Long gameId) {
+    private List<Member> getConfirmedMembers(final Long gameId) {
         return gameMemberRepository.findAllByGameIdAndStatus(gameId, CONFIRMED)
                 .stream()
                 .map(gameMember -> memberReader.readByMemberId(gameMember.getMemberId()))
                 .toList();
-    }
-
-    private void validateIsSelfReview(final MemberDomain loggedInMember, final MemberDomain reviewedMember) {
-        if (loggedInMember.getMemberId().equals(reviewedMember.getMemberId())) {
-            throw new GameException(GAME_MEMBER_CANNOT_REVIEW_SELF, loggedInMember.getMemberId(), reviewedMember.getMemberId());
-        }
     }
 }

@@ -12,24 +12,24 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
 import kr.pickple.back.chat.domain.ChatMessage;
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.repository.entity.ChatRoomMemberEntity;
 import kr.pickple.back.chat.domain.MessageType;
 import kr.pickple.back.chat.domain.RoomType;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.repository.ChatMessageRepository;
 import kr.pickple.back.chat.repository.ChatRoomMemberRepository;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
+import kr.pickple.back.chat.repository.entity.ChatMessageEntity;
+import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
+import kr.pickple.back.chat.repository.entity.ChatRoomMemberEntity;
 import kr.pickple.back.common.util.DateTimeUtil;
 import kr.pickple.back.crew.repository.CrewMemberRepository;
 import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
-import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -54,7 +54,7 @@ public class ChatWriter {
         return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
     }
 
-    public ChatRoom createNewGroupRoom(final String name, final RoomType type, final Integer maxMemberCount) {
+    public ChatRoom createNewGroupRoom(final RoomType type, final String name, final Integer maxMemberCount) {
         final ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
                 .name(name)
                 .type(type)
@@ -65,7 +65,7 @@ public class ChatWriter {
         return ChatMapper.mapChatRoomEntityToDomain(savedChatRoomEntity);
     }
 
-    public ChatMessage enterRoom(final MemberDomain member, final ChatRoom chatRoom) {
+    public ChatMessage enterRoom(final Member member, final ChatRoom chatRoom) {
         final Long memberId = member.getMemberId();
         final Long chatRoomId = chatRoom.getChatRoomId();
 
@@ -96,7 +96,7 @@ public class ChatWriter {
     public ChatMessage sendMessage(
             final MessageType type,
             final String content,
-            final MemberDomain sender,
+            final Member sender,
             final ChatRoom chatRoom
     ) {
         final Long chatRoomId = chatRoom.getChatRoomId();
@@ -117,7 +117,7 @@ public class ChatWriter {
         return ChatMapper.mapChatMessageEntityToDomain(savedChatMessageEntity, sender, chatRoom);
     }
 
-    public ChatMessage leaveRoom(final MemberDomain member, final ChatRoom chatRoom) {
+    public ChatMessage leaveRoom(final Member member, final ChatRoom chatRoom) {
         final Long memberId = member.getMemberId();
         final Long chatRoomId = chatRoom.getChatRoomId();
 
@@ -168,7 +168,7 @@ public class ChatWriter {
     }
 
     private void validateCanLeaveGameChatRoom(final ChatRoom chatRoom) {
-        final Optional<Game> gameEntity = gameRepository.findByChatRoomId(chatRoom.getChatRoomId());
+        final Optional<GameEntity> gameEntity = gameRepository.findByChatRoomId(chatRoom.getChatRoomId());
 
         if (gameEntity.isPresent() && isGameNotEnded(gameEntity.get().getPlayEndDatetime())) {
             throw new ChatException(CHAT_GAME_CHATROOM_NOT_ALLOWED_TO_LEAVE);
