@@ -96,7 +96,11 @@ public class GameWriter {
             }
 
             reviewedMember.updateMannerScore(review.getMannerScore());
-            memberRepository.updateMannerScore(reviewedMember.getMannerScore(), reviewedMember.getMemberId());
+            memberRepository.updateMannerScore(
+                    reviewedMember.getMemberId(),
+                    reviewedMember.getMannerScore(),
+                    reviewedMember.getMannerScoreCount()
+            );
         });
 
     }
