@@ -10,17 +10,20 @@ import org.springframework.transaction.annotation.Transactional;
 
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.game.repository.entity.GameMemberEntity;
+import kr.pickple.back.game.domain.GameMember;
+import kr.pickple.back.game.implement.GameReader;
 import kr.pickple.back.game.repository.GameMemberRepository;
 import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.member.repository.entity.MemberEntity;
-import kr.pickple.back.member.repository.entity.MemberPositionEntity;
+import kr.pickple.back.game.repository.entity.GameEntity;
+import kr.pickple.back.game.repository.entity.GameMemberEntity;
+import kr.pickple.back.member.dto.mapper.MemberResponseMapper;
 import kr.pickple.back.member.dto.response.GameMemberRegistrationStatusResponse;
 import kr.pickple.back.member.dto.response.MemberGameResponse;
 import kr.pickple.back.member.dto.response.MemberResponse;
 import kr.pickple.back.member.exception.MemberException;
 import kr.pickple.back.member.implement.MemberReader;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
@@ -31,21 +34,17 @@ public class MemberGameService {
 
     private final AddressReader addressReader;
     private final MemberReader memberReader;
+    private final GameReader gameReader;
     private final GameRepository gameRepository;
     private final GameMemberRepository gameMemberRepository;
 
     /**
      * 사용자의 참여 확정 게스트 모집글 목록 조회
      */
-    public List<MemberGameResponse> findAllMemberGames(
-            final Long memberId,
-            final RegistrationStatus memberStatus
-    ) {
-        final MemberEntity member = memberReader.readEntityByMemberId(memberId);
-        final List<GameMemberEntity> memberGames = gameMemberRepository.findAllByMemberIdAndStatus(member.getId(),
-                memberStatus);
+    public List<MemberGameResponse> findAllMemberGames(final Long memberId, final RegistrationStatus status) {
+        final List<GameMember> gameMembers = gameReader.readAllGameMembersByMemberIdAndStatus(memberId, status);
 
-        return convertToMemberGameResponses(memberGames, memberStatus);
+        return getMemberGameResponses(gameMembers);
     }
 
     /**
@@ -58,6 +57,16 @@ public class MemberGameService {
         return convertToMemberGameResponses(memberGames, CONFIRMED);
     }
 
+    private List<MemberGameResponse> getMemberGameResponses(final List<GameMember> gameMembers) {
+        return gameMembers.stream()
+                .map(gameMember -> MemberResponseMapper.mapToMemberGameResponseDto(
+                                gameMember.getGame(),
+                                gameReader.readAllMembersByGameIdAndStatus(gameMember.getGame().getGameId(), CONFIRMED),
+                                gameMember.isReviewDone()
+                        )
+                ).toList();
+    }
+
     /**
      * 회원의 게스트 모집 신청 여부 조회
      */
@@ -68,10 +77,11 @@ public class MemberGameService {
         final MemberEntity member = memberReader.readEntityByMemberId(memberId);
         final GameEntity gameEntity = gameRepository.getGameById(gameId);
 
-        final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameId(member.getId(), gameEntity.getId())
+        final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameId(member.getId(),
+                        gameEntity.getId())
                 .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, member.getId(), gameEntity.getId()));
 
-        return GameMemberRegistrationStatusResponse.of(gameMemberEntity.getStatus(), gameMemberEntity.isAlreadyReviewDone());
+        return GameMemberRegistrationStatusResponse.of(gameMemberEntity.getStatus(), gameMemberEntity.isReviewDone());
     }
 
     private List<MemberGameResponse> convertToMemberGameResponses(
@@ -97,7 +107,8 @@ public class MemberGameService {
                 .toList();
     }
 
-    private List<MemberResponse> getMemberResponsesByGame(final GameEntity gameEntity, final RegistrationStatus memberStatus) {
+    private List<MemberResponse> getMemberResponsesByGame(final GameEntity gameEntity,
+            final RegistrationStatus memberStatus) {
         return gameMemberRepository.findAllByGameIdAndStatus(gameEntity.getId(), memberStatus)
                 .stream()
                 .map(gameMember -> memberRepository.getMemberById(gameMember.getMemberId()))

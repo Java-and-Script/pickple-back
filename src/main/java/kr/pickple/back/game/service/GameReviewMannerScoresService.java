@@ -37,7 +37,7 @@ public class GameReviewMannerScoresService {
     ) {
         final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
 
-        if (gameMember.isAlreadyReviewDone()) {
+        if (gameMember.isReviewDone()) {
             throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
         }
 

@@ -3,7 +3,6 @@ package kr.pickple.back.crew.implement;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.common.domain.RegistrationStatus.*;
 import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
-import static kr.pickple.back.member.exception.MemberExceptionCode.*;
 
 import java.util.List;
 
@@ -25,13 +24,7 @@ import kr.pickple.back.crew.repository.CrewRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.exception.MemberException;
-import kr.pickple.back.member.implement.MemberMapper;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
-import kr.pickple.back.member.repository.entity.MemberEntity;
-import kr.pickple.back.member.repository.entity.MemberPositionEntity;
-import kr.pickple.back.position.domain.Position;
+import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -40,8 +33,7 @@ import lombok.RequiredArgsConstructor;
 public class CrewReader {
 
     private final AddressReader addressReader;
-    private final MemberRepository memberRepository;
-    private final MemberPositionRepository memberPositionRepository;
+    private final MemberReader memberReader;
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
 
@@ -73,7 +65,7 @@ public class CrewReader {
                 crewEntity.getAddressDepth2Id()
         );
 
-        final Member leader = readMemberById(crewEntity.getLeaderId());
+        final Member leader = memberReader.readByMemberId(crewEntity.getLeaderId());
 
         return CrewMapper.mapCrewEntityToDomain(crewEntity, mainAddress, leader);
     }
@@ -94,7 +86,7 @@ public class CrewReader {
                 .map(crewEntity -> CrewMapper.mapCrewEntityToDomain(
                                 crewEntity,
                                 mainAddress,
-                                readMemberById(crewEntity.getLeaderId())
+                                memberReader.readByMemberId(crewEntity.getLeaderId())
                         )
                 ).toList();
     }
@@ -102,7 +94,7 @@ public class CrewReader {
     public CrewMember readCrewMember(final Long memberId, final Long crewId) {
         final CrewMemberEntity crewMemberEntity = crewMemberRepository.findByMemberIdAndCrewId(memberId, crewId)
                 .orElseThrow(() -> new CrewException(CREW_MEMBER_NOT_FOUND, memberId, crewId));
-        final Member member = readMemberById(memberId);
+        final Member member = memberReader.readByMemberId(memberId);
         final Crew crew = read(crewId);
 
         return CrewMapper.mapCrewMemberEntityToDomain(crewMemberEntity, member, crew);
@@ -111,25 +103,8 @@ public class CrewReader {
     public List<Member> readAllMembersInStatus(final Long crewId, final RegistrationStatus status) {
         return crewMemberRepository.findAllByCrewIdAndStatus(crewId, status)
                 .stream()
-                .map(crewMemberEntity -> readMemberById(crewMemberEntity.getMemberId()))
+                .map(crewMemberEntity -> memberReader.readByMemberId(crewMemberEntity.getMemberId()))
                 .toList();
-    }
-
-    private Member readMemberById(final Long memberId) {
-        final MemberEntity memberEntity = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(MEMBER_NOT_FOUND, memberId));
-
-        final MainAddress mainAddress = addressReader.readMainAddressById(
-                memberEntity.getAddressDepth1Id(),
-                memberEntity.getAddressDepth2Id()
-        );
-
-        final List<Position> positions = memberPositionRepository.findAllByMemberId(memberId)
-                .stream()
-                .map(MemberPositionEntity::getPosition)
-                .toList();
-
-        return MemberMapper.mapToMemberDomain(memberEntity, mainAddress, positions);
     }
 
     public List<CrewProfile> readAllCrewProfilesByMemberIdAndStatus(
@@ -161,7 +136,7 @@ public class CrewReader {
                             crew.getAddressDepth1Id(),
                             crew.getAddressDepth2Id()
                     );
-                    final Member leader = readMemberById(crew.getLeaderId());
+                    final Member leader = memberReader.readByMemberId(crew.getLeaderId());
 
                     return CrewMapper.mapCrewEntityToCrewProfile(crew, mainAddress, leader, members);
                 })

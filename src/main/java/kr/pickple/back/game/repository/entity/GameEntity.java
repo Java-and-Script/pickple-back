@@ -1,7 +1,6 @@
 package kr.pickple.back.game.repository.entity;
 
 import static kr.pickple.back.game.domain.GameStatus.*;
-import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,10 +15,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.game.domain.GameStatus;
-import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.util.GameStatusConverter;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -64,7 +61,7 @@ public class GameEntity extends BaseEntity {
     @NotNull
     @Convert(converter = GameStatusConverter.class)
     @Column(length = 10)
-    private GameStatus status = OPEN;
+    private final GameStatus status = OPEN;
 
     //todo 현호: 게시글 상세 조회 기능 구현시 viewCount 올리는 기능 구현
     @NotNull
@@ -74,7 +71,7 @@ public class GameEntity extends BaseEntity {
     private Integer cost = 0;
 
     @NotNull
-    private Integer memberCount = 1;
+    private final Integer memberCount = 1;
 
     @NotNull
     private Integer maxMemberCount = 2;
@@ -123,40 +120,8 @@ public class GameEntity extends BaseEntity {
         this.chatRoomId = chatRoomId;
     }
 
-    public void updateGameStatus(final GameStatus gameStatus) {
-        status = gameStatus;
-    }
-
     public LocalDateTime getPlayEndDatetime() {
         return LocalDateTime.of(playDate, playEndTime);
-    }
-
-    public void increaseMemberCount() {
-        if (isClosedGame()) {
-            throw new GameException(GAME_STATUS_IS_CLOSED, status);
-        }
-
-        if (isFullGame()) {
-            throw new GameException(GAME_CAPACITY_LIMIT_REACHED, memberCount);
-        }
-
-        memberCount += 1;
-
-        if (isFullGame()) {
-            status = CLOSED;
-        }
-    }
-
-    private Boolean isClosedGame() {
-        return status == CLOSED;
-    }
-
-    public Boolean isNotEndedGame() {
-        return status != ENDED;
-    }
-
-    private Boolean isFullGame() {
-        return memberCount.equals(maxMemberCount);
     }
 
     public void increaseViewCount() {
@@ -165,10 +130,5 @@ public class GameEntity extends BaseEntity {
 
     public Boolean isHost(final Long hostId) {
         return hostId.equals(this.hostId);
-    }
-
-    public void makeNewCrewChatRoom(final ChatRoomEntity chatRoom) {
-        chatRoom.updateMaxMemberCount(maxMemberCount);
-        this.chatRoomId = chatRoom.getId();
     }
 }
