@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.dto.response.AllAddressResponse;
-import kr.pickple.back.address.dto.response.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 
 @SpringBootTest
@@ -42,7 +42,7 @@ class AddressServiceTest {
         MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1Name, addressDepth2Name);
 
         //then
-        assertThat(mainAddress.getAddressDepth1().getName()).isEqualTo(addressDepth1Name);
-        assertThat(mainAddress.getAddressDepth2().getName()).isEqualTo(addressDepth2Name);
+        assertThat(mainAddress.getAddressDepth1Name()).isEqualTo(addressDepth1Name);
+        assertThat(mainAddress.getAddressDepth2Name()).isEqualTo(addressDepth2Name);
     }
 }

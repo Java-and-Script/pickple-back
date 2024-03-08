@@ -4,8 +4,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.locationtech.jts.geom.Point;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import jakarta.validation.constraints.Max;
@@ -15,8 +13,6 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import kr.pickple.back.address.dto.response.MainAddress;
-import kr.pickple.back.game.repository.entity.GameEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -64,26 +60,4 @@ public class GameCreateRequest {
 
     @NotNull(message = "포지션 목록은 null일 수 없음")
     private List<Position> positions;
-
-    public GameEntity toEntity(
-            final Long hostId,
-            final MainAddress mainAddress,
-            final Point point
-    ) {
-        return GameEntity.builder()
-                .content(content)
-                .playDate(playDate)
-                .playStartTime(playStartTime)
-                .playEndTime(playStartTime.plusMinutes(playTimeMinutes))
-                .playTimeMinutes(playTimeMinutes)
-                .mainAddress(this.mainAddress)
-                .detailAddress(detailAddress)
-                .cost(cost)
-                .maxMemberCount(maxMemberCount)
-                .hostId(hostId)
-                .point(point)
-                .addressDepth1Id(mainAddress.getAddressDepth1().getId())
-                .addressDepth2Id(mainAddress.getAddressDepth2().getId())
-                .build();
-    }
 }

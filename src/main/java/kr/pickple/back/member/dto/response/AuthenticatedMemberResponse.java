@@ -1,6 +1,6 @@
 package kr.pickple.back.member.dto.response;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.auth.domain.oauth.OauthMember;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.auth.domain.token.AuthTokens;
@@ -61,8 +61,8 @@ public class AuthenticatedMemberResponse {
                 .email(member.getEmail())
                 .oauthId(member.getOauthId())
                 .oauthProvider(member.getOauthProvider())
-                .addressDepth1(mainAddress.getAddressDepth1().getName())
-                .addressDepth2(mainAddress.getAddressDepth2().getName())
+                .addressDepth1(mainAddress.getAddressDepth1Name())
+                .addressDepth2(mainAddress.getAddressDepth2Name())
                 .build();
     }
 

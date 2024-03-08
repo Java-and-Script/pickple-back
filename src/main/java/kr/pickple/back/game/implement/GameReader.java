@@ -1,5 +1,6 @@
 package kr.pickple.back.game.implement;
 
+import static kr.pickple.back.address.exception.AddressExceptionCode.*;
 import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
 import static kr.pickple.back.game.exception.GameExceptionCode.*;
 
@@ -12,8 +13,13 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
+import kr.pickple.back.address.exception.AddressException;
 import kr.pickple.back.address.implement.AddressReader;
+import kr.pickple.back.address.repository.AddressDepth1Repository;
+import kr.pickple.back.address.repository.AddressDepth2Repository;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.GameStatus;
@@ -33,6 +39,8 @@ import lombok.RequiredArgsConstructor;
 public class GameReader {
 
     private final AddressReader addressReader;
+    private final AddressDepth1Repository addressDepth1Repository;
+    private final AddressDepth2Repository addressDepth2Repository;
     private final MemberReader memberReader;
     private final GameRepository gameRepository;
     private final GamePositionRepository gamePositionRepository;
@@ -65,7 +73,7 @@ public class GameReader {
 
         final List<Position> positions = readPositionsByGameId(gameEntity.getId());
 
-        final MainAddress mainAddress = addressReader.readMainAddressById(
+        final MainAddress mainAddress = addressReader.readMainAddressByIds(
                 gameEntity.getAddressDepth1Id(),
                 gameEntity.getAddressDepth2Id()
         );
@@ -84,11 +92,11 @@ public class GameReader {
                 )
         );
 
-        final MainAddress mainAddress = addressReader.readMainAddressByAddressStrings(address);
+        final MainAddress mainAddress = addressReader.readMainAddressFromFullAddress(address);
 
         final Page<GameEntity> gameEntities = gameRepository.findByAddressDepth1IdAndAddressDepth2IdAndStatusNot(
-                mainAddress.getAddressDepth1().getId(),
-                mainAddress.getAddressDepth2().getId(),
+                mainAddress.getAddressDepth1Id(),
+                mainAddress.getAddressDepth2Id(),
                 GameStatus.ENDED,
                 pageRequest
         );
@@ -103,9 +111,18 @@ public class GameReader {
     }
 
     public List<Game> readAllWithInAddress(final MainAddress mainAddress) {
+        final String addressDepth1Name = mainAddress.getAddressDepth1Name();
+        final String addressDepth2Name = mainAddress.getAddressDepth2Name();
+
+        final AddressDepth1Entity addressDepth1Entity = addressDepth1Repository.findByName(addressDepth1Name)
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name));
+        final AddressDepth2Entity addressDepth2Entity = addressDepth2Repository.findByNameAndAddressDepth1Id(
+                        addressDepth2Name, addressDepth1Entity.getId())
+                .orElseThrow(() -> new AddressException(ADDRESS_NOT_FOUND, addressDepth1Name, addressDepth2Name));
+
         final List<GameEntity> gameEntities = gameRepository.findGamesWithInAddress(
-                mainAddress.getAddressDepth1(),
-                mainAddress.getAddressDepth2()
+                addressDepth1Entity,
+                addressDepth2Entity
         );
 
         return gameEntities.stream()
@@ -127,7 +144,7 @@ public class GameReader {
         return gameEntities.stream()
                 .map(gameEntity -> GameMapper.mapGameEntityToDomain(
                         gameEntity,
-                        addressReader.readMainAddressById(
+                        addressReader.readMainAddressByIds(
                                 gameEntity.getAddressDepth1Id(),
                                 gameEntity.getAddressDepth2Id()
                         ),

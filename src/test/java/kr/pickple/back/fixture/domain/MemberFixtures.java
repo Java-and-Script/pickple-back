@@ -1,7 +1,7 @@
 package kr.pickple.back.fixture.domain;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.domain.MemberStatus;
@@ -14,8 +14,8 @@ import java.util.stream.IntStream;
 public class MemberFixtures {
 
     public static MemberEntity memberBuild(
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2
+            final AddressDepth1Entity addressDepth1,
+            final AddressDepth2Entity addressDepth2
     ) {
         return MemberEntity.builder()
                 .email("pickple1@pickple.kr")
@@ -32,8 +32,8 @@ public class MemberFixtures {
 
     public static List<MemberEntity> membersBuild(
             final int count,
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2
+            final AddressDepth1Entity addressDepth1,
+            final AddressDepth2Entity addressDepth2
     ) {
         final List<MemberEntity> members = new ArrayList<>();
 

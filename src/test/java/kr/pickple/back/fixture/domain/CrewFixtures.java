@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.IntStream;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
 import kr.pickple.back.crew.repository.entity.CrewMemberEntity;
@@ -16,8 +16,8 @@ import kr.pickple.back.member.repository.entity.MemberEntity;
 public class CrewFixtures {
 
     public static CrewEntity crewBuild(
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2,
+            final AddressDepth1Entity addressDepth1,
+            final AddressDepth2Entity addressDepth2,
             final MemberEntity leader
     ) {
         return CrewEntity.builder()
@@ -48,8 +48,8 @@ public class CrewFixtures {
 
     public static List<CrewEntity> crewsBuild(
             final Integer count,
-            final AddressDepth1 addressDepth1,
-            final AddressDepth2 addressDepth2,
+            final AddressDepth1Entity addressDepth1,
+            final AddressDepth2Entity addressDepth2,
             final MemberEntity leader
     ) {
         final List<CrewEntity> crews = new ArrayList<>();

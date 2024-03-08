@@ -1,7 +1,5 @@
 package kr.pickple.back.chat.repository.entity;
 
-import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
@@ -10,7 +8,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.RoomType;
-import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.chat.util.RoomTypeAttributeConverter;
 import kr.pickple.back.common.domain.BaseEntity;
 import lombok.AccessLevel;
@@ -45,15 +42,6 @@ public class ChatRoomEntity extends BaseEntity {
     private ChatRoomEntity(final String name, final RoomType type, final Integer maxMemberCount) {
         this.name = name;
         this.type = type;
-        this.maxMemberCount = maxMemberCount;
-    }
-
-    // TODO : Crew, Game 수정하면서 제거 예정 (김영주)
-    public void updateMaxMemberCount(final Integer maxMemberCount) {
-        if (maxMemberCount < memberCount) {
-            throw new ChatException(CHAT_MAX_MEMBER_COUNT_SHOULD_BE_BIGGER_THAN_MEMBER_COUNT, maxMemberCount);
-        }
-
         this.maxMemberCount = maxMemberCount;
     }
 }

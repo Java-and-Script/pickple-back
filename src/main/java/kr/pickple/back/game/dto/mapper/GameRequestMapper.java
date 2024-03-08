@@ -2,7 +2,7 @@ package kr.pickple.back.game.dto.mapper;
 
 import java.time.LocalTime;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.dto.request.GameCreateRequest;
 
@@ -23,8 +23,8 @@ public class GameRequestMapper {
                 .cost(gameCreateRequest.getCost())
                 .maxMemberCount(gameCreateRequest.getMaxMemberCount())
                 .positions(gameCreateRequest.getPositions())
-                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
-                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1Name())
+                .addressDepth2Name(mainAddress.getAddressDepth2Name())
                 .build();
     }
 }

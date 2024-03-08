@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.locationtech.jts.geom.Point;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.repository.entity.GameEntity;
@@ -40,8 +40,8 @@ public final class GameMapper {
                 .memberCount(gameEntity.getMemberCount())
                 .maxMemberCount(gameEntity.getMaxMemberCount())
                 .host(host)
-                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
-                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1Name())
+                .addressDepth2Name(mainAddress.getAddressDepth2Name())
                 .positions(positions)
                 .build();
     }
@@ -63,8 +63,8 @@ public final class GameMapper {
                 .maxMemberCount(newGame.getMaxMemberCount())
                 .hostId(newGame.getHost().getMemberId())
                 .point(point)
-                .addressDepth1Id(mainAddress.getAddressDepth1().getId())
-                .addressDepth2Id(mainAddress.getAddressDepth2().getId())
+                .addressDepth1Id(mainAddress.getAddressDepth1Id())
+                .addressDepth2Id(mainAddress.getAddressDepth2Id())
                 .chatRoomId(newGame.getChatRoom().getChatRoomId())
                 .build();
     }

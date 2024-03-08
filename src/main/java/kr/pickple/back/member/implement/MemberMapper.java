@@ -2,14 +2,14 @@ package kr.pickple.back.member.implement;
 
 import java.util.List;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.crew.domain.Crew;
-import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.member.domain.Member;
-import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.domain.MemberStatus;
 import kr.pickple.back.member.domain.NewMember;
+import kr.pickple.back.member.repository.entity.MemberEntity;
+import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -25,8 +25,8 @@ public final class MemberMapper {
                 .status(MemberStatus.ACTIVE)
                 .oauthId(newMember.getOauthId())
                 .oauthProvider(newMember.getOauthProvider())
-                .addressDepth1Id(mainAddress.getAddressDepth1().getId())
-                .addressDepth2Id(mainAddress.getAddressDepth2().getId())
+                .addressDepth1Id(mainAddress.getAddressDepth1Id())
+                .addressDepth2Id(mainAddress.getAddressDepth2Id())
                 .build();
     }
 
@@ -56,8 +56,8 @@ public final class MemberMapper {
                 .profileImageUrl(member.getProfileImageUrl())
                 .mannerScore(member.getMannerScore())
                 .mannerScoreCount(member.getMannerScoreCount())
-                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
-                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1Name())
+                .addressDepth2Name(mainAddress.getAddressDepth2Name())
                 .positions(positions)
                 .joinedCrews(crews)
                 .build();
@@ -76,8 +76,8 @@ public final class MemberMapper {
                 .profileImageUrl(memberEntity.getProfileImageUrl())
                 .mannerScore(memberEntity.getMannerScore())
                 .mannerScoreCount(memberEntity.getMannerScoreCount())
-                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
-                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1Name())
+                .addressDepth2Name(mainAddress.getAddressDepth2Name())
                 .positions(positions)
                 .build();
     }
