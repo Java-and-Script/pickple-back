@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.fixture.domain.AddressFixtures;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.member.exception.MemberException;
@@ -22,8 +22,8 @@ class MemberEntityTest {
     @DisplayName("회원의 매너스코어를 업데이트 시킬 수 있다.")
     void updateMannerScore() {
         // given
-        final AddressDepth1 addressDepth1 = AddressFixtures.addressDepth1Build();
-        final AddressDepth2 addressDepth2 = AddressFixtures.addressDepth2Build();
+        final AddressDepth1Entity addressDepth1 = AddressFixtures.addressDepth1Build();
+        final AddressDepth2Entity addressDepth2 = AddressFixtures.addressDepth2Build();
 
         // when & then
         MANNER_SCORE_POINT_RANGE.forEach((mannerScorePoint) -> {
@@ -39,8 +39,8 @@ class MemberEntityTest {
     @DisplayName("회원의 매너스코어를 업데이트할 때 매너스코어 포인트가 범위에서 벗어난 경우 예외가 발생한다.")
     void updateMannerScore_ThrowException(int mannerScorePoint) {
         // given
-        final AddressDepth1 addressDepth1 = AddressFixtures.addressDepth1Build();
-        final AddressDepth2 addressDepth2 = AddressFixtures.addressDepth2Build();
+        final AddressDepth1Entity addressDepth1 = AddressFixtures.addressDepth1Build();
+        final AddressDepth2Entity addressDepth2 = AddressFixtures.addressDepth2Build();
 
         final MemberEntity member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
 

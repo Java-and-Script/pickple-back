@@ -13,9 +13,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.domain.token.AuthTokens;
@@ -57,10 +57,10 @@ class MemberEntityServiceTest {
     void createMember_ReturnAuthenticatedMemberResponse() {
         // given
         final MemberCreateRequest memberCreateRequest = MemberDtoFixtures.memberCreateRequestBuild();
-        final AddressDepth1 addressDepth1 = AddressDepth1.builder()
+        final AddressDepth1Entity addressDepth1 = AddressDepth1Entity.builder()
                 .name("서울시")
                 .build();
-        final AddressDepth2 addressDepth2 = AddressDepth2.builder()
+        final AddressDepth2Entity addressDepth2 = AddressDepth2Entity.builder()
                 .name("영등포구")
                 .addressDepth1(addressDepth1)
                 .build();
@@ -104,10 +104,10 @@ class MemberEntityServiceTest {
     }
 
     private MemberEntity buildMember() {
-        final AddressDepth1 addressDepth1 = AddressDepth1.builder()
+        final AddressDepth1Entity addressDepth1 = AddressDepth1Entity.builder()
                 .name("서울시")
                 .build();
-        final AddressDepth2 addressDepth2 = AddressDepth2.builder()
+        final AddressDepth2Entity addressDepth2 = AddressDepth2Entity.builder()
                 .name("영등포구")
                 .addressDepth1(addressDepth1)
                 .build();

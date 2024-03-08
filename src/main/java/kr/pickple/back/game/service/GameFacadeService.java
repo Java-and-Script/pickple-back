@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Component;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.dto.mapper.GameResponseMapper;
@@ -30,8 +30,11 @@ public class GameFacadeService {
     /**
      * 특정 지역의 게스트 모집글 조회
      */
-    public GamesAndLocationResponse findGamesWithInAddress(final String addressDepth1, final String addressDepth2) {
-        final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1, addressDepth2);
+    public GamesAndLocationResponse findGamesWithInAddress(
+            final String addressDepth1Name,
+            final String addressDepth2Name
+    ) {
+        final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1Name, addressDepth2Name);
 
         final List<Game> games = gameReader.readAllWithInAddress(mainAddress);
 

@@ -12,8 +12,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotNull;
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -30,12 +30,12 @@ public class MapPolygon {
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_depth1_id")
-    private AddressDepth1 addressDepth1;
+    private AddressDepth1Entity addressDepth1;
 
     @NotNull
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_depth2_id")
-    private AddressDepth2 addressDepth2;
+    private AddressDepth2Entity addressDepth2;
 
     @NotNull
     private BigDecimal latitude;

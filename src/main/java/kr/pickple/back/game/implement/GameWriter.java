@@ -9,7 +9,7 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.address.service.kakao.KakaoAddressSearchClient;
 import kr.pickple.back.game.domain.Game;

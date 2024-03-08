@@ -23,8 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.auth.domain.token.AuthTokens;
 import kr.pickple.back.crew.IntegrationCrewTest;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
@@ -384,8 +384,8 @@ public class CrewEntityDocumentTest extends IntegrationCrewTest {
     void findCrewsByAddress_ReturnCrews() throws Exception {
         //given
         final CrewEntity crew = crewSetup.saveWithConfirmedMembers(2);
-        final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
-        final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
+        final AddressDepth1Entity addressDepth1 = addressSetup.findAddressDepth1("서울시");
+        final AddressDepth2Entity addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
         //when
         final ResultActions resultActions = mockMvc.perform(

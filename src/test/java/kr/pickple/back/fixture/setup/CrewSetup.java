@@ -7,8 +7,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
 import kr.pickple.back.chat.repository.ChatRoomRepository;
 import kr.pickple.back.crew.repository.entity.CrewEntity;
@@ -37,8 +37,8 @@ public class CrewSetup {
     private AddressSetup addressSetup;
 
     public CrewEntity save(final MemberEntity leader) {
-        final AddressDepth1 addressDepth1 = addressSetup.findAddressDepth1("서울시");
-        final AddressDepth2 addressDepth2 = addressSetup.findAddressDepth2("영등포구");
+        final AddressDepth1Entity addressDepth1 = addressSetup.findAddressDepth1("서울시");
+        final AddressDepth2Entity addressDepth2 = addressSetup.findAddressDepth2("영등포구");
 
         final CrewEntity crew = CrewFixtures.crewBuild(addressDepth1, addressDepth2, leader);
         final ChatRoomEntity savedChatRoom = chatRoomRepository.save(CrewFixtures.crewChatRoomBuild());

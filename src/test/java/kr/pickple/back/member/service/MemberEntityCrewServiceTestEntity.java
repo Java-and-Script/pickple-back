@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.fixture.domain.MemberFixtures;
 import kr.pickple.back.member.repository.entity.MemberEntity;
@@ -84,10 +84,10 @@ public class MemberEntityCrewServiceTestEntity {
     }
 
     private MemberEntity buildMember() {
-        final AddressDepth1 addressDepth1 = AddressDepth1.builder()
+        final AddressDepth1Entity addressDepth1 = AddressDepth1Entity.builder()
                 .name("서울시")
                 .build();
-        final AddressDepth2 addressDepth2 = AddressDepth2.builder()
+        final AddressDepth2Entity addressDepth2 = AddressDepth2Entity.builder()
                 .name("영등포구")
                 .addressDepth1(addressDepth1)
                 .build();

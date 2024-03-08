@@ -6,7 +6,7 @@ import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.crew.domain.Crew;

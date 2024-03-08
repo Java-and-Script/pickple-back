@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.TokenExtractor;
@@ -73,7 +73,7 @@ public class OauthService {
                     jwtProperties.getRefreshTokenExpirationTime()
             );
 
-            final MainAddress mainAddress = addressReader.readMainAddressById(
+            final MainAddress mainAddress = addressReader.readMainAddressByIds(
                     loginMember.getAddressDepth1Id(),
                     loginMember.getAddressDepth2Id()
             );

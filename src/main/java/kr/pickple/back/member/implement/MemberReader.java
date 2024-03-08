@@ -10,7 +10,7 @@ import java.util.Optional;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.exception.CrewException;
@@ -51,7 +51,7 @@ public class MemberReader {
     public Member readByMemberId(final Long memberId) {
         final MemberEntity memberEntity = readEntityByMemberId(memberId);
 
-        final MainAddress mainAddress = addressReader.readMainAddressById(
+        final MainAddress mainAddress = addressReader.readMainAddressByIds(
                 memberEntity.getAddressDepth1Id(),
                 memberEntity.getAddressDepth2Id()
         );
@@ -66,7 +66,7 @@ public class MemberReader {
 
     public MemberProfile readProfileByMemberId(final Long memberId) {
         final MemberEntity member = readEntityByMemberId(memberId);
-        final MainAddress mainAddress = addressReader.readMainAddressById(
+        final MainAddress mainAddress = addressReader.readMainAddressByIds(
                 member.getAddressDepth1Id(),
                 member.getAddressDepth2Id()
         );
@@ -94,7 +94,7 @@ public class MemberReader {
                 .stream()
                 .map(this::readCrewEntityByCrewId)
                 .map(crewEntity -> {
-                    final MainAddress mainAddress = addressReader.readMainAddressById(
+                    final MainAddress mainAddress = addressReader.readMainAddressByIds(
                             crewEntity.getAddressDepth1Id(),
                             crewEntity.getAddressDepth2Id()
                     );

@@ -2,7 +2,7 @@ package kr.pickple.back.crew.implement;
 
 import java.util.List;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.crew.domain.Crew;
 import kr.pickple.back.crew.domain.CrewMember;
 import kr.pickple.back.crew.domain.CrewProfile;
@@ -24,8 +24,8 @@ public final class CrewMapper {
                 .leaderId(newCrew.getLeader().getMemberId())
                 .profileImageUrl(newCrew.getProfileImageUrl())
                 .backgroundImageUrl(newCrew.getBackgroundImageUrl())
-                .addressDepth1Id(mainAddress.getAddressDepth1().getId())
-                .addressDepth2Id(mainAddress.getAddressDepth2().getId())
+                .addressDepth1Id(mainAddress.getAddressDepth1Id())
+                .addressDepth2Id(mainAddress.getAddressDepth2Id())
                 .chatRoomId(newCrew.getChatRoom().getChatRoomId())
                 .build();
     }
@@ -42,8 +42,8 @@ public final class CrewMapper {
                 .memberCount(crewEntity.getMemberCount())
                 .maxMemberCount(crewEntity.getMaxMemberCount())
                 .leader(leader)
-                .addressDepth1Name(mainAddress.getAddressDepth1().getName())
-                .addressDepth2Name(mainAddress.getAddressDepth2().getName())
+                .addressDepth1Name(mainAddress.getAddressDepth1Name())
+                .addressDepth2Name(mainAddress.getAddressDepth2Name())
                 .profileImageUrl(crewEntity.getProfileImageUrl())
                 .backgroundImageUrl(crewEntity.getBackgroundImageUrl())
                 .likeCount(crewEntity.getLikeCount())
@@ -90,8 +90,8 @@ public final class CrewMapper {
                 .likeCount(crewEntity.getLikeCount())
                 .competitionPoint(crewEntity.getCompetitionPoint())
                 .leader(leader)
-                .addressDepth1(mainAddress.getAddressDepth1().getName())
-                .addressDepth2(mainAddress.getAddressDepth2().getName())
+                .addressDepth1(mainAddress.getAddressDepth1Name())
+                .addressDepth2(mainAddress.getAddressDepth2Name())
                 .members(members)
                 .build();
     }

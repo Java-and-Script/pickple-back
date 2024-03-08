@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.dto.response.MainAddress;
+import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.common.domain.RegistrationStatus;
@@ -60,7 +60,7 @@ public class CrewReader {
     }
 
     private Crew mapCrewEntityToDomain(final CrewEntity crewEntity) {
-        final MainAddress mainAddress = addressReader.readMainAddressById(
+        final MainAddress mainAddress = addressReader.readMainAddressByIds(
                 crewEntity.getAddressDepth1Id(),
                 crewEntity.getAddressDepth2Id()
         );
@@ -77,8 +77,8 @@ public class CrewReader {
     ) {
         final MainAddress mainAddress = addressReader.readMainAddressByNames(addressDepth1Name, addressDepth2Name);
         final Page<CrewEntity> crewEntities = crewRepository.findByAddressDepth1IdAndAddressDepth2Id(
-                mainAddress.getAddressDepth1().getId(),
-                mainAddress.getAddressDepth2().getId(),
+                mainAddress.getAddressDepth1Id(),
+                mainAddress.getAddressDepth2Id(),
                 pageable
         );
 
@@ -132,7 +132,7 @@ public class CrewReader {
         return crewEntities.stream()
                 .map(crew -> {
                     final List<Member> members = readAllMembersInStatus(crew.getId(), registrationStatus);
-                    final MainAddress mainAddress = addressReader.readMainAddressById(
+                    final MainAddress mainAddress = addressReader.readMainAddressByIds(
                             crew.getAddressDepth1Id(),
                             crew.getAddressDepth2Id()
                     );

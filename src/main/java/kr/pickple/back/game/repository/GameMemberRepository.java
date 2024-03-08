@@ -21,8 +21,6 @@ public interface GameMemberRepository extends JpaRepository<GameMemberEntity, Lo
 
     List<GameMemberEntity> findAllByMemberIdAndStatus(final Long memberId, final RegistrationStatus memberStatus);
 
-    List<GameMemberEntity> findAllByMemberId(final Long memberId);
-
     List<GameMemberEntity> findAllByGameIdAndStatus(final Long gameId, final RegistrationStatus status);
 
     Boolean existsByGameIdAndMemberId(final Long gameId, final Long memberId);

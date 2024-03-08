@@ -15,8 +15,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import kr.pickple.back.address.domain.AddressDepth1;
-import kr.pickple.back.address.domain.AddressDepth2;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
+import kr.pickple.back.address.repository.entity.AddressDepth2Entity;
 import kr.pickple.back.auth.config.property.JwtProperties;
 import kr.pickple.back.auth.config.resolver.TokenExtractor;
 import kr.pickple.back.auth.domain.oauth.OauthMember;
@@ -86,8 +86,8 @@ class AuthServiceTest {
         // given
         final String authCode = "authCode";
         final OauthMember oauthMember = AuthFixtures.oauthMemberBuild();
-        final AddressDepth1 addressDepth1 = AddressFixtures.addressDepth1Build();
-        final AddressDepth2 addressDepth2 = AddressFixtures.addressDepth2Build();
+        final AddressDepth1Entity addressDepth1 = AddressFixtures.addressDepth1Build();
+        final AddressDepth2Entity addressDepth2 = AddressFixtures.addressDepth2Build();
         final MemberEntity member = MemberFixtures.memberBuild(addressDepth1, addressDepth2);
         final AuthTokens loginTokens = AuthFixtures.authTokensBuild();
         final Long refreshTokenExpirationTime = 10000L;
