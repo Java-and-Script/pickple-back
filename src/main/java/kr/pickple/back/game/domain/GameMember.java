@@ -31,11 +31,11 @@ public class GameMember {
         this.status = status;
     }
 
-    public Boolean isAlreadyReviewDone() {
-        return isReview;
+    public Boolean isReviewDone() {
+        return this.isReview;
     }
 
-    public Boolean isStatusChangedFromWaitingToConfirmed(RegistrationStatus updateStatus) {
-        return this.status == WAITING && updateStatus == CONFIRMED;
+    public Boolean isStatusChangedFromWaitingToConfirmed(final RegistrationStatus newRegistrationStatus) {
+        return this.status == WAITING && newRegistrationStatus == CONFIRMED;
     }
 }

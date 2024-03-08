@@ -17,6 +17,7 @@ import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.chat.exception.ChatException;
 import kr.pickple.back.common.domain.RegistrationStatus;
 import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.domain.GameStatus;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
@@ -81,6 +82,20 @@ public class GameReader {
                 .stream()
                 .map(gameMemberEntity -> memberReader.readByMemberId(gameMemberEntity.getMemberId()))
                 .toList();
+    }
+
+    public List<GameMember> readAllGameMembersByMemberIdAndStatus(
+            final Long memberId,
+            final RegistrationStatus status
+    ) {
+        return gameMemberRepository.findAllByMemberIdAndStatus(memberId, status)
+                .stream()
+                .map(gameMemberEntity -> GameMapper.mapGameMemberEntityToDomain(
+                                gameMemberEntity,
+                                memberReader.readByMemberId(gameMemberEntity.getMemberId()),
+                                read(gameMemberEntity.getGameId())
+                        )
+                ).toList();
     }
 
     public List<Game> findGamesByAddress(final String address, final Pageable pageable) {

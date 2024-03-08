@@ -18,15 +18,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GameMemberEntity extends BaseEntity {
 
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Getter
     @NotNull
     @Convert(converter = RegistrationStatusAttributeConverter.class)
     @Column(length = 10)
@@ -35,9 +36,11 @@ public class GameMemberEntity extends BaseEntity {
     @NotNull
     private Boolean isReview = FALSE;
 
+    @Getter
     @NotNull
     private Long memberId;
 
+    @Getter
     @NotNull
     private Long gameId;
 
@@ -48,23 +51,7 @@ public class GameMemberEntity extends BaseEntity {
         this.gameId = gameId;
     }
 
-    public void confirmRegistration() {
-        this.status = CONFIRMED;
-    }
-
-    public void updateStatus(final RegistrationStatus status) {
-        this.status = status;
-    }
-
-    public Boolean isStatusChangedFromWaitingToConfirmed(RegistrationStatus updateStatus) {
-        return this.status == WAITING && updateStatus == CONFIRMED;
-    }
-
-    public Boolean isAlreadyReviewDone() {
-        return isReview;
-    }
-
-    public void updateReviewDone() {
-        this.isReview = TRUE;
+    public Boolean isReviewDone() {
+        return this.isReview;
     }
 }
