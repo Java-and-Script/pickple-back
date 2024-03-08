@@ -30,16 +30,16 @@ public class GameAlarmResponse implements AlarmResponse {
     private final GameAlarmType gameAlarmMessage;
 
     public static GameAlarmResponse from(final GameAlarm gameAlarm) {
-        final GameEntity gameEntity = gameAlarm.getGameEntity();
+        final GameEntity gameEntity = gameAlarm.getGame();
 
         return GameAlarmResponse.builder()
                 .gameAlarmId(gameAlarm.getId())
                 .gameId(gameEntity.getId())
-                .mainAddress(gameAlarm.getGameEntity().getMainAddress())
+                .mainAddress(gameEntity.getMainAddress())
                 .createdAt(gameAlarm.getCreatedAt())
-                .playDate(gameAlarm.getGameEntity().getPlayDate())
-                .playStartTime(gameAlarm.getGameEntity().getPlayStartTime())
-                .playTimeMinutes(gameAlarm.getGameEntity().getPlayTimeMinutes())
+                .playDate(gameEntity.getPlayDate())
+                .playStartTime(gameEntity.getPlayStartTime())
+                .playTimeMinutes(gameEntity.getPlayTimeMinutes())
                 .isRead(gameAlarm.getIsRead())
                 .gameAlarmMessage(gameAlarm.getGameAlarmType())
                 .build();
