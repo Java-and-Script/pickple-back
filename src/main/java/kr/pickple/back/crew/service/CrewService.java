@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
-import kr.pickple.back.chat.service.ChatRoomService;
+import kr.pickple.back.chat.domain.ChatRoom;
+import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.common.config.property.S3Properties;
 import kr.pickple.back.common.util.RandomUtil;
 import kr.pickple.back.crew.domain.Crew;
@@ -26,7 +26,7 @@ import kr.pickple.back.crew.dto.response.CrewProfileResponse;
 import kr.pickple.back.crew.exception.CrewException;
 import kr.pickple.back.crew.implement.CrewReader;
 import kr.pickple.back.crew.implement.CrewWriter;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import lombok.RequiredArgsConstructor;
 
@@ -42,8 +42,7 @@ public class CrewService {
     private final MemberReader memberReader;
     private final CrewReader crewReader;
     private final CrewWriter crewWriter;
-
-    private final ChatRoomService chatRoomService;
+    private final ChatWriter chatWriter;
     private final S3Properties s3Properties;
 
     /**
@@ -53,11 +52,10 @@ public class CrewService {
     public CrewIdResponse createCrew(final Long loggedInMemberId, final CrewCreateRequest crewCreateRequest) {
         final NewCrew newCrew = CrewRequestMapper.mapToNewCrewDomain(crewCreateRequest);
 
-        final MemberDomain leader = memberReader.readByMemberId(loggedInMemberId);
+        final Member leader = memberReader.readByMemberId(loggedInMemberId);
         validateCreateCrewMoreThanMaxCount(loggedInMemberId);
 
-        final ChatRoomEntity chatRoom = chatRoomService.saveNewChatRoom(leader, newCrew.getName(), CREW);
-        chatRoom.updateMaxMemberCount(newCrew.getMaxMemberCount());
+        final ChatRoom chatRoom = chatWriter.createNewGroupRoom(CREW, newCrew.getName(), newCrew.getMaxMemberCount());
 
         newCrew.assignLeader(leader);
         newCrew.assignChatRoom(chatRoom);
@@ -66,6 +64,7 @@ public class CrewService {
         final Crew crew = crewWriter.create(newCrew);
         final CrewMember crewLeader = crewWriter.register(leader, crew);
         crewWriter.updateMemberRegistrationStatus(crewLeader, CONFIRMED);
+        chatWriter.enterRoom(leader, chatRoom);
 
         return CrewResponseMapper.mapToCrewIdResponseDto(crew.getCrewId());
     }
@@ -91,7 +90,7 @@ public class CrewService {
      */
     public CrewProfileResponse findCrewById(final Long crewId) {
         final Crew crew = crewReader.read(crewId);
-        final List<MemberDomain> members = crewReader.readAllMembersInStatus(crewId, CONFIRMED);
+        final List<Member> members = crewReader.readAllMembersInStatus(crewId, CONFIRMED);
 
         return CrewResponseMapper.mapToCrewProfileResponseDto(crew, members);
     }
@@ -107,7 +106,7 @@ public class CrewService {
         return crewReader.readNearCrewsByAddress(addressDepth1Name, addressDepth2Name, pageable)
                 .stream()
                 .map(crew -> {
-                    final List<MemberDomain> members = crewReader.readAllMembersInStatus(crew.getCrewId(), CONFIRMED);
+                    final List<Member> members = crewReader.readAllMembersInStatus(crew.getCrewId(), CONFIRMED);
 
                     return CrewResponseMapper.mapToCrewProfileResponseDto(crew, members);
                 })

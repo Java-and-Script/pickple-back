@@ -9,32 +9,22 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.alarm.event.game.GameJoinRequestNotificationEvent;
 import kr.pickple.back.alarm.event.game.GameMemberJoinedEvent;
 import kr.pickple.back.alarm.event.game.GameMemberRejectedEvent;
-import kr.pickple.back.chat.domain.ChatRoom;
-import kr.pickple.back.chat.repository.ChatRoomRepository;
-import kr.pickple.back.chat.repository.entity.ChatRoomEntity;
-import kr.pickple.back.chat.service.ChatMessageService;
+import kr.pickple.back.chat.implement.ChatReader;
+import kr.pickple.back.chat.implement.ChatWriter;
 import kr.pickple.back.common.domain.RegistrationStatus;
-import kr.pickple.back.game.domain.GameDomain;
-import kr.pickple.back.game.domain.GameMemberDomain;
+import kr.pickple.back.game.domain.Game;
+import kr.pickple.back.game.domain.GameMember;
 import kr.pickple.back.game.dto.mapper.GameResponseMapper;
-import kr.pickple.back.game.dto.request.GameMemberRegistrationStatusUpdateRequest;
 import kr.pickple.back.game.dto.response.GameResponse;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.implement.GameMemberReader;
 import kr.pickple.back.game.implement.GameMemberWriter;
 import kr.pickple.back.game.implement.GameReader;
-import kr.pickple.back.game.repository.GameMemberRepository;
-import kr.pickple.back.game.repository.GamePositionRepository;
-import kr.pickple.back.game.repository.GameRepository;
-import kr.pickple.back.game.repository.entity.GameMemberEntity;
-import kr.pickple.back.member.domain.MemberDomain;
+import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
-import kr.pickple.back.member.repository.MemberPositionRepository;
-import kr.pickple.back.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -42,25 +32,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class GameMemberService {
 
-    private final AddressReader addressReader;
-
-    private final GameRepository gameRepository;
-    private final MemberRepository memberRepository;
-    private final MemberPositionRepository memberPositionRepository;
-    private final ChatRoomRepository chatRoomRepository;
-    private final ChatMessageService chatMessageService;
-    private final ApplicationEventPublisher eventPublisher;
-    private final GameMemberRepository gameMemberRepository;
-    private final GamePositionRepository gamePositionRepository;
-    private final GameReader gameReader;
     private final MemberReader memberReader;
-    private final GameMemberWriter gameMemberWriter;
+    private final GameReader gameReader;
     private final GameMemberReader gameMemberReader;
+    private final GameMemberWriter gameMemberWriter;
+    private final ChatReader chatReader;
+    private final ChatWriter chatWriter;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     public void registerGameMember(final Long gameId, final Long loggedInMemberId) {
-        final GameDomain gameDomain = gameReader.read(gameId);
-        final MemberDomain memberDomain = memberReader.readByMemberId(loggedInMemberId);
+        final Game gameDomain = gameReader.read(gameId);
+        final Member memberDomain = memberReader.readByMemberId(loggedInMemberId);
 
         gameMemberWriter.register(memberDomain, gameDomain);
 
@@ -75,15 +58,15 @@ public class GameMemberService {
             final Long gameId,
             final RegistrationStatus status
     ) {
-        final GameMemberDomain gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
-        final GameDomain game = gameReader.read(gameId);
-        final MemberDomain member = memberReader.readByMemberId(loggedInMemberId);
+        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final Game game = gameMember.getGame();
+        final Member member = gameMember.getMember();
 
         if (!game.isHost(member.getMemberId()) && status == WAITING) {
             throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
         }
 
-        final List<MemberDomain> members = gameReader.readAllMembersByGameIdAndStatus(gameId, status);
+        final List<Member> members = gameReader.readAllMembersByGameIdAndStatus(gameId, status);
 
         return GameResponseMapper.mapToGameResponseDto(game, members);
     }
@@ -93,18 +76,17 @@ public class GameMemberService {
             final Long loggedInMemberId,
             final Long gameId,
             final Long memberId,
-            final GameMemberRegistrationStatusUpdateRequest gameMemberRegistrationStatusUpdateRequest
+            final RegistrationStatus newRegistrationStatus
     ) {
-        final GameMemberDomain gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
-        final GameDomain game = gameReader.read(gameId);
+        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(loggedInMemberId, gameId);
+        final Game game = gameMember.getGame();
 
-        validateIsHost(loggedInMemberId, game);
-        final RegistrationStatus updateStatus = gameMemberRegistrationStatusUpdateRequest.getStatus();
+        if (!game.isHost(loggedInMemberId)) {
+            throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
+        }
 
-        final ChatRoomEntity chatRoom = chatRoomRepository.getChatRoomById(gameEntity.getChatRoomId());
-        enterGameChatRoom(updateStatus, gameMemberEntity, chatRoom);
-
-        gameMemberWriter.updateMemberRegistrationStatus(gameMember, updateStatus);
+        gameMemberWriter.updateMemberRegistrationStatus(gameMember, newRegistrationStatus);
+        chatWriter.enterRoom(gameMember.getMember(), chatReader.readRoomByGameId(gameId));
 
         eventPublisher.publishEvent(GameMemberJoinedEvent.builder()
                 .gameId(gameId)
@@ -112,58 +94,41 @@ public class GameMemberService {
                 .build());
     }
 
-    private void validateIsHost(final Long loggedInMemberId, final GameDomain gameDomain) {
-        if (!gameDomain.isHost(loggedInMemberId)) {
-            throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
-        }
-    }
-
-    private void enterGameChatRoom(
-            final RegistrationStatus updateStatus,
-            final GameMemberEntity gameMemberEntity,
-            final ChatRoom chatRoom
-    ) {
-        final RegistrationStatus nowStatus = gameMemberEntity.getStatus();
-
-        if (nowStatus == WAITING && updateStatus == CONFIRMED) {
-            chatMessageService.enterRoomAndSaveEnteringMessages(chatRoom, memberRepository.getMemberById(gameMemberEntity.getMemberId()));
-        }
-    }
-
     @Transactional
     public void deleteGameMember(final Long loggedInMemberId, final Long gameId, final Long memberId) {
-        final GameMemberDomain gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(memberId, gameId);
-        final GameDomain game = gameReader.read(gameId);
-        final MemberDomain member = memberReader.readByMemberId(gameMember.getMember().getMemberId());
-        final MemberDomain loggedInMember = memberReader.readByMemberId(loggedInMemberId);
+        final GameMember gameMember = gameMemberReader.readGameMemberByMemberIdAndGameId(memberId, gameId);
+        final Game game = gameMember.getGame();
 
         if (game.isHost(loggedInMemberId)) {
-            validateIsHostSelfDeleted(loggedInMember, member);
+            validateIsHostSelfDeleted(loggedInMemberId, memberId);
+
+            gameMemberWriter.deleteGameMember(gameMember);
+
             eventPublisher.publishEvent(GameMemberRejectedEvent.builder()
                     .gameId(gameId)
                     .memberId(memberId)
                     .build());
 
-            gameMemberWriter.deleteGameMember(gameMember);
             return;
         }
 
-        if (loggedInMember.getMemberId().equals(member.getMemberId())) {
+        if (loggedInMemberId.equals(memberId)) {
             cancelGameMember(gameMember);
+
             return;
         }
 
         throw new GameException(GAME_NOT_ALLOWED_TO_DELETE_GAME_MEMBER, loggedInMemberId);
     }
 
-    private void validateIsHostSelfDeleted(final MemberDomain loggedInMember, final MemberDomain member) {
-        if (loggedInMember.getMemberId().equals(member.getMemberId())) {
-            throw new GameException(GAME_HOST_CANNOT_BE_DELETED, loggedInMember.getMemberId());
+    private void validateIsHostSelfDeleted(final Long loggedInMemberId, final Long memberId) {
+        if (loggedInMemberId.equals(memberId)) {
+            throw new GameException(GAME_HOST_CANNOT_BE_DELETED, loggedInMemberId);
         }
     }
 
-    private void cancelGameMember(final GameMemberDomain gameMember) {
-        RegistrationStatus status = gameMember.getStatus();
+    private void cancelGameMember(final GameMember gameMember) {
+        final RegistrationStatus status = gameMember.getStatus();
 
         if (status != WAITING) {
             throw new GameException(GAME_MEMBER_STATUS_IS_NOT_WAITING, status);
