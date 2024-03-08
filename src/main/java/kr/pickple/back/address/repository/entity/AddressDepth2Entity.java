@@ -1,4 +1,4 @@
-package kr.pickple.back.address.domain;
+package kr.pickple.back.address.repository.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AddressDepth1 extends BaseEntity {
+public class AddressDepth2Entity extends BaseEntity implements AddressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,8 +25,12 @@ public class AddressDepth1 extends BaseEntity {
     @Column(unique = true, length = 10)
     private String name;
 
+    @NotNull
+    private Long addressDepth1Id;
+
     @Builder
-    private AddressDepth1(final String name) {
+    private AddressDepth2Entity(final String name, final Long addressDepth1Id) {
         this.name = name;
+        this.addressDepth1Id = addressDepth1Id;
     }
 }
