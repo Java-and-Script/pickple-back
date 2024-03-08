@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import kr.pickple.back.address.domain.AddressDepth1;
+import kr.pickple.back.address.repository.entity.AddressDepth1Entity;
 
-public interface AddressDepth1Repository extends JpaRepository<AddressDepth1, Long> {
+public interface AddressDepth1Repository extends JpaRepository<AddressDepth1Entity, Long> {
 
-    Optional<AddressDepth1> findByName(final String name);
+    Optional<AddressDepth1Entity> findByName(final String name);
 }
