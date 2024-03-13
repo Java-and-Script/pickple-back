@@ -10,12 +10,12 @@ import org.springframework.transaction.annotation.Transactional;
 import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.address.implement.AddressReader;
 import kr.pickple.back.auth.implement.TokenManager;
-import kr.pickple.back.member.repository.entity.MemberEntity;
-import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.exception.MemberException;
+import kr.pickple.back.member.repository.MemberPositionJdbcRepository;
 import kr.pickple.back.member.repository.MemberPositionRepository;
 import kr.pickple.back.member.repository.MemberRepository;
+import kr.pickple.back.member.repository.entity.MemberEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +28,7 @@ public class MemberWriter {
     private final AddressReader addressReader;
     private final MemberRepository memberRepository;
     private final MemberPositionRepository memberPositionRepository;
+    private final MemberPositionJdbcRepository memberPositionJdbcRepository;
 
     public NewMember create(final NewMember newMember) {
         validateIsDuplicatedMemberInfo(newMember);
@@ -59,9 +60,7 @@ public class MemberWriter {
     private void setPositionsToMember(final List<Position> positions, final Long memberId) {
         validateIsDuplicatedPositions(positions);
 
-        final List<MemberPositionEntity> memberPositions = MemberMapper.mapToMemberPositionEntities(positions, memberId);
-
-        memberPositionRepository.saveAll(memberPositions);
+        memberPositionJdbcRepository.creatMemberPositions(positions, memberId);
     }
 
     private void validateIsDuplicatedPositions(final List<Position> positions) {

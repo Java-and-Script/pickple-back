@@ -9,7 +9,6 @@ import kr.pickple.back.member.domain.MemberProfile;
 import kr.pickple.back.member.domain.MemberStatus;
 import kr.pickple.back.member.domain.NewMember;
 import kr.pickple.back.member.repository.entity.MemberEntity;
-import kr.pickple.back.member.repository.entity.MemberPositionEntity;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -28,18 +27,6 @@ public final class MemberMapper {
                 .addressDepth1Id(mainAddress.getAddressDepth1Id())
                 .addressDepth2Id(mainAddress.getAddressDepth2Id())
                 .build();
-    }
-
-    public static List<MemberPositionEntity> mapToMemberPositionEntities(
-            final List<Position> positions,
-            final Long memberId
-    ) {
-        return positions.stream()
-                .map(position -> MemberPositionEntity.builder()
-                        .memberId(memberId)
-                        .position(position)
-                        .build()
-                ).toList();
     }
 
     public static MemberProfile mapToMemberProfileDomain(
