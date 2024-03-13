@@ -8,7 +8,6 @@ import kr.pickple.back.address.domain.MainAddress;
 import kr.pickple.back.game.domain.Game;
 import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.game.repository.entity.GamePosition;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.position.domain.Position;
 import lombok.AccessLevel;
@@ -67,14 +66,5 @@ public final class GameMapper {
                 .addressDepth2Id(mainAddress.getAddressDepth2Id())
                 .chatRoomId(newGame.getChatRoom().getChatRoomId())
                 .build();
-    }
-
-    public static List<GamePosition> mapToGamePositionEntities(final List<Position> positions, final Long gameId) {
-        return positions.stream()
-                .map(position -> GamePosition.builder()
-                        .gameId(gameId)
-                        .position(position)
-                        .build()
-                ).toList();
     }
 }
