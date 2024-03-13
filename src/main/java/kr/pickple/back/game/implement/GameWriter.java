@@ -18,6 +18,7 @@ import kr.pickple.back.game.domain.NewGame;
 import kr.pickple.back.game.dto.request.MannerScoreReview;
 import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GameMemberRepository;
+import kr.pickple.back.game.repository.GamePositionJdbcRepository;
 import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.game.repository.entity.GameEntity;
@@ -39,6 +40,7 @@ public class GameWriter {
     private final GameMemberRepository gameMemberRepository;
     private final GamePositionRepository gamePositionRepository;
     private final KakaoAddressSearchClient kakaoAddressSearchClient;
+    private final GamePositionJdbcRepository gamePositionJdbcRepository;
 
     public Game create(final NewGame newGame) {
         final Point point = kakaoAddressSearchClient.fetchAddress(newGame.getMainAddress());
@@ -64,7 +66,7 @@ public class GameWriter {
     private void setPositionsToGame(final List<Position> positions, final Long gameId) {
         validateIsDuplicatedPositions(positions);
 
-        gamePositionRepository.saveAll(GameMapper.mapToGamePositionEntities(positions, gameId));
+        gamePositionJdbcRepository.creatGamePositions(positions, gameId);
     }
 
     private void validateIsDuplicatedPositions(final List<Position> positions) {
