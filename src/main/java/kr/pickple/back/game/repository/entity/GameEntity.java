@@ -82,9 +82,11 @@ public class GameEntity extends BaseEntity {
     private Long hostId;
 
     @NotNull
+    @Column(name = "address_depth1_id")
     private Long addressDepth1Id;
 
     @NotNull
+    @Column(name = "address_depth2_id")
     private Long addressDepth2Id;
 
     private Long chatRoomId;

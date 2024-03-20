@@ -64,9 +64,11 @@ public class CrewEntity extends BaseEntity {
     private Long leaderId;
 
     @NotNull
+    @Column(name = "address_depth1_id")
     private Long addressDepth1Id;
 
     @NotNull
+    @Column(name = "address_depth2_id")
     private Long addressDepth2Id;
 
     private Long chatRoomId;

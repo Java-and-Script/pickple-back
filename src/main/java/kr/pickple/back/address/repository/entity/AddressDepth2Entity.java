@@ -28,6 +28,7 @@ public class AddressDepth2Entity extends BaseEntity implements AddressEntity {
     private String name;
 
     @NotNull
+    @Column(name = "address_depth1_id")
     private Long addressDepth1Id;
 
     @Builder
