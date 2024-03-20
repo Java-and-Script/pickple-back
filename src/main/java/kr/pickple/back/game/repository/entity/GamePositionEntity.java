@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import kr.pickple.back.position.domain.Position;
@@ -16,8 +17,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(name = "game_position")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class GamePosition extends BaseEntity {
+public class GamePositionEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +35,7 @@ public class GamePosition extends BaseEntity {
     private Long gameId;
 
     @Builder
-    private GamePosition(final Position position, final Long gameId) {
+    private GamePositionEntity(final Position position, final Long gameId) {
         this.position = position;
         this.gameId = gameId;
     }

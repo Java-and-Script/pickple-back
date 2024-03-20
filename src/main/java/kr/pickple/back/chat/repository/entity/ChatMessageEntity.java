@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.chat.domain.MessageType;
 import kr.pickple.back.chat.util.MessageTypeAttributeConverter;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @Entity
+@Table(name = "chat_message")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChatMessageEntity extends BaseEntity {
 

@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.common.domain.BaseEntity;
 import lombok.AccessLevel;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "address_depth2")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class AddressDepth2Entity extends BaseEntity implements AddressEntity {
 

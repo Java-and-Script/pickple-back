@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import kr.pickple.back.game.repository.entity.GamePosition;
+import kr.pickple.back.game.repository.entity.GamePositionEntity;
 
-public interface GamePositionRepository extends JpaRepository<GamePosition, Long> {
+public interface GamePositionRepository extends JpaRepository<GamePositionEntity, Long> {
 
-    List<GamePosition> findAllByGameId(final Long gameId);
+    List<GamePositionEntity> findAllByGameId(final Long gameId);
 }
 

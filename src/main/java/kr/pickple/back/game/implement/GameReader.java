@@ -27,7 +27,7 @@ import kr.pickple.back.game.exception.GameException;
 import kr.pickple.back.game.repository.GamePositionRepository;
 import kr.pickple.back.game.repository.GameRepository;
 import kr.pickple.back.game.repository.entity.GameEntity;
-import kr.pickple.back.game.repository.entity.GamePosition;
+import kr.pickple.back.game.repository.entity.GamePositionEntity;
 import kr.pickple.back.member.domain.Member;
 import kr.pickple.back.member.implement.MemberReader;
 import kr.pickple.back.position.domain.Position;
@@ -156,7 +156,7 @@ public class GameReader {
     private List<Position> readPositionsByGameId(final Long gameId) {
         return gamePositionRepository.findAllByGameId(gameId)
                 .stream()
-                .map(GamePosition::getPosition)
+                .map(GamePositionEntity::getPosition)
                 .toList();
     }
 }

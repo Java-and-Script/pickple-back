@@ -13,6 +13,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import kr.pickple.back.auth.domain.oauth.OauthProvider;
 import kr.pickple.back.common.domain.BaseEntity;
@@ -27,6 +28,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@Table(name = "member")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class MemberEntity extends BaseEntity {

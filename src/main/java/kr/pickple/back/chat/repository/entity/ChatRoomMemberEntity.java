@@ -19,7 +19,7 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "chat_room_id"}))
+@Table(name = "chat_room_member", uniqueConstraints = @UniqueConstraint(columnNames = {"member_id", "chat_room_id"}))
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(of = {"memberId", "chatRoomId"}, callSuper = false)
 public class ChatRoomMemberEntity extends BaseEntity {
