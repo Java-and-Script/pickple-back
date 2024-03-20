@@ -16,7 +16,7 @@ public class MapService {
     private final MapPolygonRepository mapPolygonRepository;
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "polygon", key = "#mainAddress.addressDepth2.name")
+    @Cacheable(cacheManager = "caffeineCacheManager", cacheNames = "polygon", key = "#mainAddress.addressDepth2Id")
     public MapPolygon findMapPolygonByMainAddress(final MainAddress mainAddress) {
 
         return mapPolygonRepository.findByAddressDepth1IdAndAddressDepth2Id(
