@@ -1,7 +1,9 @@
 package kr.pickple.back.chat.implement;
 
-import static kr.pickple.back.chat.domain.RoomType.*;
-import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
+import static kr.pickple.back.chat.domain.RoomType.PERSONAL;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_MEMBER_IS_NOT_IN_ROOM;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_RECEIVER_NOT_FOUND;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_ROOM_NOT_FOUND;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -110,9 +112,14 @@ public class ChatReader {
             throw new ChatException(CHAT_MEMBER_IS_NOT_IN_ROOM, chatRoomId, memberId);
         }
 
-        final LocalDateTime entranceDatetime = chatMessageRepository.findLastEntranceDatetimeByMemberId(memberId);
+        final LocalDateTime entranceDatetime = chatMessageRepository.findChatRoomLastEntranceMessageCreatedAt(
+                memberId,
+                chatRoomId
+        );
         final List<ChatMessageEntity> chatMessageEntities = chatMessageRepository.findAllByChatRoomIdAndCreatedAtGreaterThanEqual(
-                chatRoomId, entranceDatetime);
+                chatRoomId,
+                entranceDatetime
+        );
 
         return chatMessageEntities.stream()
                 .map(chatMessageEntity -> ChatMapper.mapChatMessageEntityToDomain(

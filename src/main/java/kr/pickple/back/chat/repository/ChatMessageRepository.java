@@ -20,9 +20,11 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessageEntity, 
     @Query("""
                 select cm.createdAt
                 from ChatMessageEntity cm
-                where cm.senderId= :memberId and cm.type = kr.pickple.back.chat.domain.MessageType.ENTER
+                where cm.senderId= :memberId
+                    and cm.chatRoomId = :chatRoomId
+                    and cm.type = kr.pickple.back.chat.domain.MessageType.ENTER
                 order by cm.createdAt desc
                 limit 1
             """)
-    LocalDateTime findLastEntranceDatetimeByMemberId(final Long memberId);
+    LocalDateTime findChatRoomLastEntranceMessageCreatedAt(final Long memberId, final Long chatRoomId);
 }
