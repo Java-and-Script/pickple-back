@@ -3,6 +3,7 @@ package kr.pickple.back.member.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import kr.pickple.back.member.repository.entity.MemberEntity;
@@ -13,6 +14,7 @@ public interface MemberRepository extends JpaRepository<MemberEntity, Long> {
 
     Optional<MemberEntity> findByOauthId(final Long oauthId);
 
+    @Modifying(clearAutomatically = true)
     @Query("""
             update MemberEntity m 
             set m.mannerScore = :mannerScore, m.mannerScoreCount = :mannerScoreCount 
