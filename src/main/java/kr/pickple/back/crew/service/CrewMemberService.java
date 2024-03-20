@@ -1,8 +1,6 @@
 package kr.pickple.back.crew.service;
 
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADER;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_LEADER_CANNOT_BE_DELETED;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_NOT_ALLOWED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
 
 import java.util.List;
 
@@ -169,7 +167,7 @@ public class CrewMemberService {
             final Long memberId,
             final Long crewId
     ) {
-        final CrewMember crewMember = crewReader.readCrewMember(crewId, memberId);
+        final CrewMember crewMember = crewReader.readCrewMember(memberId, crewId);
 
         return CrewResponseMapper.mapToCrewMemberRegistrationStatusResponse(crewMember.getStatus());
     }
