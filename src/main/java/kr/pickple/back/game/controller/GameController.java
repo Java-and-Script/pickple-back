@@ -88,7 +88,7 @@ public class GameController {
             @RequestParam final RegistrationStatus status
     ) {
         return ResponseEntity.status(OK)
-                .body(gameMemberService.findAllGameMembersByStatus(loggedInMemberId, gameId, status));
+                .body(gameMemberService.findAllGameMembersByStatus(gameId, status));
     }
 
     @PatchMapping("/{gameId}/members/{memberId}")

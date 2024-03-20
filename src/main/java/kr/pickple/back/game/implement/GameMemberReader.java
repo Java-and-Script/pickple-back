@@ -27,7 +27,7 @@ public class GameMemberReader {
     private final GameReader gameReader;
     private final GameMemberRepository gameMemberRepository;
 
-    public GameMember readByMemberIdAndGameId(final Long memberId, final Long gameId) {
+    public GameMember readConfirmedStatusByMemberIdAndGameId(final Long memberId, final Long gameId) {
         final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameIdAndStatus(
                         memberId,
                         gameId,
@@ -35,6 +35,17 @@ public class GameMemberReader {
                 )
                 .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
 
+        return getGameMember(gameMemberEntity);
+    }
+
+    public GameMember readByMemberIdAndGameId(final Long memberId, final Long gameId) {
+        final GameMemberEntity gameMemberEntity = gameMemberRepository.findByMemberIdAndGameId(memberId, gameId)
+                .orElseThrow(() -> new GameException(GAME_MEMBER_NOT_FOUND, gameId, memberId));
+
+        return getGameMember(gameMemberEntity);
+    }
+
+    private GameMember getGameMember(final GameMemberEntity gameMemberEntity) {
         final Member member = memberReader.readByMemberId(gameMemberEntity.getMemberId());
         final Game game = gameReader.read(gameMemberEntity.getGameId());
 

@@ -62,17 +62,10 @@ public class GameMemberService {
      * 게스트 모집에 참여 신청된 혹은 확정된 사용자 정보 목록 조회
      */
     public GameResponse findAllGameMembersByStatus(
-            final Long loggedInMemberId,
             final Long gameId,
             final RegistrationStatus status
     ) {
-        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(loggedInMemberId, gameId);
-        final Game game = gameMember.getGame();
-        final Member member = gameMember.getMember();
-
-        if (!game.isHost(member.getMemberId()) && status == WAITING) {
-            throw new GameException(GAME_MEMBER_IS_NOT_HOST, loggedInMemberId);
-        }
+        final Game game = gameReader.read(gameId);
 
         final List<Member> members = gameMemberReader.readMembersByGameIdAndStatus(gameId, status);
 
@@ -89,7 +82,7 @@ public class GameMemberService {
             final Long memberId,
             final RegistrationStatus newRegistrationStatus
     ) {
-        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(memberId, gameId);
         final Game game = gameMember.getGame();
 
         if (!game.isHost(loggedInMemberId)) {
@@ -187,7 +180,7 @@ public class GameMemberService {
             final Long memberId,
             final Long gameId
     ) {
-        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(memberId, gameId);
+        final GameMember gameMember = gameMemberReader.readConfirmedStatusByMemberIdAndGameId(memberId, gameId);
 
         return GameResponseMapper.mapToGameMemberRegistrationStatusResponseDto(
                 gameMember.getStatus(),

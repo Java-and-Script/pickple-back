@@ -35,7 +35,7 @@ public class GameReviewMannerScoresService {
             final Long gameId,
             final List<MannerScoreReview> mannerScoreReviews
     ) {
-        final GameMember gameMember = gameMemberReader.readByMemberIdAndGameId(loggedInMemberId, gameId);
+        final GameMember gameMember = gameMemberReader.readConfirmedStatusByMemberIdAndGameId(loggedInMemberId, gameId);
 
         if (gameMember.isReviewDone()) {
             throw new GameException(GAME_MEMBER_NOT_ALLOWED_TO_REVIEW_AGAIN, loggedInMemberId);
