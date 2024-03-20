@@ -1,10 +1,17 @@
 package kr.pickple.back.chat.implement;
 
-import static java.lang.Boolean.*;
-import static kr.pickple.back.chat.domain.MessageType.*;
-import static kr.pickple.back.chat.domain.RoomType.*;
-import static kr.pickple.back.chat.exception.ChatExceptionCode.*;
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static kr.pickple.back.chat.domain.MessageType.ENTER;
+import static kr.pickple.back.chat.domain.MessageType.LEAVE;
+import static kr.pickple.back.chat.domain.RoomType.CREW;
+import static kr.pickple.back.chat.domain.RoomType.GAME;
+import static kr.pickple.back.chat.domain.RoomType.PERSONAL;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_CREW_CHATROOM_NOT_ALLOWED_TO_LEAVE;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_GAME_CHATROOM_NOT_ALLOWED_TO_LEAVE;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_MEMBER_IS_ALREADY_IN_ROOM;
+import static kr.pickple.back.chat.exception.ChatExceptionCode.CHAT_MEMBER_IS_NOT_IN_ROOM;
+import static kr.pickple.back.common.domain.RegistrationStatus.CONFIRMED;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -37,6 +44,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ChatWriter {
 
+    private static final Integer PERSONAL_ROOM_MAX_MEMBER_COUNT = 2;
+
     private final CrewRepository crewRepository;
     private final CrewMemberRepository crewMemberRepository;
     private final GameRepository gameRepository;
@@ -48,6 +57,7 @@ public class ChatWriter {
         final ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()
                 .name(name)
                 .type(PERSONAL)
+                .maxMemberCount(PERSONAL_ROOM_MAX_MEMBER_COUNT)
                 .build();
         final ChatRoomEntity savedChatRoomEntity = chatRoomRepository.save(chatRoomEntity);
 

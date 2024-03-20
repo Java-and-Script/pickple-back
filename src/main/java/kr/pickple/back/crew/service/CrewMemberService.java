@@ -1,6 +1,8 @@
 package kr.pickple.back.crew.service;
 
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_NOT_LEADER;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_LEADER_CANNOT_BE_DELETED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_NOT_ALLOWED;
 
 import java.util.List;
 
@@ -92,6 +94,7 @@ public class CrewMemberService {
         }
 
         crewWriter.updateMemberRegistrationStatus(crewMember, newRegistrationStatus);
+        crewWriter.increaseMemberCount(crew);
         chatWriter.enterRoom(crewMember.getMember(), chatReader.readRoomByCrewId(crewId));
 
         eventPublisher.publishEvent(CrewMemberJoinedEvent.builder()

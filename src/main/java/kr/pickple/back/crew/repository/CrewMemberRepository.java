@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import kr.pickple.back.common.domain.RegistrationStatus;
@@ -21,6 +22,7 @@ public interface CrewMemberRepository extends JpaRepository<CrewMemberEntity, Lo
 
     Boolean existsByCrewIdAndMemberIdAndStatus(final Long crewId, final Long memberId, final RegistrationStatus status);
 
+    @Modifying(clearAutomatically = true)
     @Query("update CrewMemberEntity cm set cm.status = :status where cm.id = :crewMemberId")
     void updateRegistrationStatus(final Long crewMemberId, final RegistrationStatus status);
 }

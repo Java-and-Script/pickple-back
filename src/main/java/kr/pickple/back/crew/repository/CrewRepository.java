@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 
 import kr.pickple.back.crew.domain.CrewStatus;
@@ -27,6 +28,7 @@ public interface CrewRepository extends JpaRepository<CrewEntity, Long> {
 
     Integer countByLeaderId(final Long leaderId);
 
+    @Modifying(clearAutomatically = true)
     @Query("update CrewEntity c set c.memberCount = :memberCount, c.status = :status where c.id = :crewId")
     void updateMemberCountAndStatus(final Long crewId, final Integer memberCount, final CrewStatus status);
 

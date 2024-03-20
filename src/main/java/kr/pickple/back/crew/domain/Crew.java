@@ -1,7 +1,8 @@
 package kr.pickple.back.crew.domain;
 
-import static kr.pickple.back.crew.domain.CrewStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.crew.domain.CrewStatus.CLOSED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_CAPACITY_LIMIT_REACHED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_STATUS_IS_CLOSED;
 
 import kr.pickple.back.chat.domain.ChatRoom;
 import kr.pickple.back.crew.exception.CrewException;
@@ -23,7 +24,7 @@ public class Crew {
     private String content;
     private Integer memberCount;
     private Integer maxMemberCount;
-    private CrewStatus status = OPEN;
+    private CrewStatus status;
     private Member leader;
     private String addressDepth1Name;
     private String addressDepth2Name;

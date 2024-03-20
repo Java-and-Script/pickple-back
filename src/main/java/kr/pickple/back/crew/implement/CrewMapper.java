@@ -41,6 +41,7 @@ public final class CrewMapper {
                 .content(crewEntity.getContent())
                 .memberCount(crewEntity.getMemberCount())
                 .maxMemberCount(crewEntity.getMaxMemberCount())
+                .status(crewEntity.getStatus())
                 .leader(leader)
                 .addressDepth1Name(mainAddress.getAddressDepth1Name())
                 .addressDepth2Name(mainAddress.getAddressDepth2Name())

@@ -1,7 +1,9 @@
 package kr.pickple.back.crew.implement;
 
-import static kr.pickple.back.common.domain.RegistrationStatus.*;
-import static kr.pickple.back.crew.exception.CrewExceptionCode.*;
+import static kr.pickple.back.common.domain.RegistrationStatus.WAITING;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_IS_EXISTED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_ALREADY_EXISTED;
+import static kr.pickple.back.crew.exception.CrewExceptionCode.CREW_MEMBER_STATUS_IS_NOT_WAITING;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,8 +75,9 @@ public class CrewWriter {
     public void updateMemberRegistrationStatus(final CrewMember crewMember, final RegistrationStatus status) {
         crewMember.updateRegistrationStatus(status);
         crewMemberRepository.updateRegistrationStatus(crewMember.getCrewMemberId(), status);
+    }
 
-        final Crew crew = crewMember.getCrew();
+    public void increaseMemberCount(final Crew crew) {
         crew.increaseMemberCount();
         crewRepository.updateMemberCountAndStatus(crew.getCrewId(), crew.getMemberCount(), crew.getStatus());
     }
